@@ -1,0 +1,117 @@
+\documentclass[11pt]{article}
+
+%%%%%%%% CREATE DOCUMENT STRUCTURE %%%%%%%%
+%% Language and font encodings
+\usepackage[english]{babel}
+\usepackage[utf8x]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+%% Sets page size and margins
+\usepackage[a4paper,top=3cm,bottom=2cm,left=2cm,right=2cm,marginparwidth=1.75cm]{geometry}
+\hypersetup{colorlinks,linkcolor={black},citecolor={black},urlcolor={blue}} 
+%% Useful packages
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{parskip}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[style=apa]{biblatex}
+\addbibresource{report/references.bib} % Make sure to change this to your actual .bib file name
+\usepackage{subcaption}
+\usepackage{placeins}
+\usepackage{sectsty}
+\usepackage{float}
+\usepackage{titling} 
+\usepackage{blindtext}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{pdfpages}
+\usepackage{lscape}
+\usepackage{multirow}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage{epstopdf}
+\usepackage{gensymb}
+\usepackage{tablefootnote}
+\usepackage{minted}
+\usepackage{biblatex}
+\usepackage{enumerate}
+\usepackage{enumitem}
+\usepackage{eurosym}
+\usepackage{fancyhdr}  % For custom headers and footers
+\usepackage{sectsty}
+\usepackage{cleveref}
+\usepackage{nicefrac}
+\usepackage{csquotes}
+\definecolor{codeblue}{RGB}{0, 172, 230}
+\definecolor{grey}{RGB}{211,211,211}
+\setlength{\parindent}{0pt}
+\newcolumntype{s}{>{\hsize=.2\hsize}X}
+\newcolumntype{d}{>{\hsize=.17\hsize}X}
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcommand{\tabitem}{~~\llap{\textbullet}~~}
+
+
+% Footer settings
+\pagestyle{fancy}
+\fancyhf{}  % Clear existing header/footer
+
+\fancyhead[L]{\textsc{Delft University of Technology}}  % Left header
+\fancyhead[R]{Fluid-structure Interaction}  % Right header
+
+\lfoot{\includegraphics[width=2.2cm]{report/images/TU_delft_logo.jpg}}  % Add logo to the left footer
+\rfoot{\thepage}  % Add page number to the right footer
+
+
+\begin{document}
+
+\begin{titlepage}
+
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}} 							% horizontal line and its thickness
+\center 
+ 
+% Document info
+\textsc{\LARGE Delft University of Technology}\\[0.5cm]
+\textsc{\LARGE Fluid Structure Interaction}\\[0.4cm]
+\textsc{\large MT44090 (2025)}\\[0.8cm]  % Course Code
+\color{codeblue}\HRule \\[0.8cm]
+{\huge \bfseries \color{black} Assignment 1}\\[0.7cm]			
+\HRule \\[2cm] \color{black}
+\large
+
+\emph{Authors:}\\
+\begin{table}[H]
+    \centering
+    \begin{tabular}{R{0.3\textwidth}L{0.4\textwidth}}
+         5032881 & Albert Aperghis \\
+         5144574 & Anna de Bever \\
+         5127955 & Miekje Schwippert\\
+    \end{tabular}
+\end{table}
+\emph{Instructor:}
+\center
+Apostolos Grammatikopoulos
+
+\vspace{1cm}
+
+{\large \today}\\[2cm] 
+
+
+
+\vspace{-1cm}
+\includegraphics[width=0.6\textwidth]{report/images/TU_delft_logo.jpg} 	% University logo
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+
+\newpage
+\printbibliography % Use this command to print the bibliography instead of \bibliographystyle and \bibliography.
+
+
+\end{document}
+

@@ -1,0 +1,27 @@
+
+# Environments
+.env
+.envrc
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Python
+__pycache__/
+
+# Latex
+latex_out/*.aux
+latex_out/*.bcf
+latex_out/*.fdb_latexmk
+latex_out/*.fls
+latex_out/*.log
+latex_out/*.loc
+latex_out/*.out
+latex_out/*.run.xml
+latex_out/*.synctex.gz
+latex_out/*.toc
+latex_out/*.soc
+latex_out/**/*
