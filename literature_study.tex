@@ -1,0 +1,62 @@
+\makeatletter
+\def\input@path{
+                {report/}
+                {report/chapters/}
+                {report/images/}
+                {report/appendices/}
+                {plots/}
+                }
+\makeatother
+
+\documentclass[whitelogo, roman]{tudelft-report}
+
+\usepackage{csquotes}
+\usepackage[style=apa]{biblatex}
+\addbibresource{report/bibliography/zotero_bib.bib}
+
+\usepackage{changes}
+\usepackage{comment}
+\begin{document}
+
+\input{custom_funcs}
+
+%% Use Roman numerals for the page numbers of the title pages and table of
+%% contents.
+\frontmatter
+
+%% Uncomment following 19 lines for a cover with a picture on the lower half only
+\title[tudelft-white]{Literature review}
+\subtitle[tudelft-black]{Efficient modelling of time-domain dynamic positioning simulations}
+\author[tudelft-white]{A.W.N. Aperghis}
+\affiliation{Technische Universiteit Delft}
+\coverimage{cover/cover.jpg}
+\titleoffsetx{10cm}
+\titleoffsety{10cm}
+\afiloffsetx{1cm}
+\afiloffsety{18cm}
+\covertext[tudelft-white]{
+}
+\setpagecolor{tudelft-cyan}
+\makecover[whitelogo, split]
+
+
+%% Include an optional title page.
+% \input{title}
+
+\tableofcontents
+
+%% Use Arabic numerals for the page numbers of the chapters.
+\mainmatter
+
+\input{literature_study/1_introduction}
+
+%% Use letters for the chapter numbers of the appendices.
+% \appendix
+
+% \input{a_example}
+
+\printbibliography
+
+
+\end{document}
+

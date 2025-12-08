@@ -1,5 +1,7 @@
 {
     "recommendations": [
-        "undefined_publisher.colour-theme-dark"
+        "tecosaur.latex-utilities",
+        "james-yu.latex-workshop",
+        "aaperghis.python-run-buttons"
     ]
 }
