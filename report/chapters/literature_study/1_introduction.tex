@@ -1,8 +1,63 @@
 \chapter{Introduction}
-In this section the background and scope of the literature study will be presented. First some background information on dynamic positioning industry practices will be given followed by a motivation for the thesis that will follow. This will culminate in the research question and subsequent goals of the thesis.
+In this section the background and scope of the literature study will be presented. 
+First some background information on dynamic positioning industry practices will be given 
+followed by a motivation for the thesis that will follow. 
+This will culminate in the research question and subsequent goals of the thesis.
 
 \section{Background}
-Since the introduction of the first ship equipped with dynamic positioning in the 1960's, the use of dynamic positioning has become much more widespread in the offshore industry. 
+Since the introduction of the first ship equipped with dynamic positioning in the 1960's, 
+the use of dynamic positioning (DP) has become much more widespread in the offshore industry \parencite{HistoryDP2017}. 
+Current industry practice for making operational decisions is to use quasi-static force balances 
+\parencites{RecommendedPracticeSpecification2025}{AssessmentStationKeeping2021}. 
+In these calculations, a force balance is found between environmental loads and thruster forces, 
+neglecting any dynamics of the thrusters. 
+
+When making decisions on board, 
+dynamic positioning operators (DPOs) make use of activity specific operating guidelines (ASOGs) \parencites{ASOGDecisionSupport2022}{baillyguimaeraesCAMOASOGNaval2023}. 
+These ASOGs contain requirements for when to cease operations, based on power consumption limits.
+These limits are calculated using a quasi-static approach 
+and do not consider behaviour such as transients in the case of a thruster failing.
+
+Recently, more attention has started going to the use of time-domain simulations to predict dynamic positioning behaviour \parencites{RecommendedPracticeSpecification2025}{AssessmentStationKeeping2021}.
+
+\subsection{Time-domain DP simulations}
+When performing time-domain DP simulations, several additional factors affecting the DP behaviour of the ship are considered. 
+The environmental loads are modelled as time-varying forces, and the thruster dynamics are included. 
+This allows for a more realistic representation of the DP system, 
+as the thrusters cannot instantaneously provide the required forces to counteract environmental loads \parencite{armaogluAdvantagesUsingTimeDomain2014}. 
+This allows time-domain simulations to capture transient effects, power peaks and the footprint of the ship.
+
+Several studies have been done on the difference between quasi-static calculations and time-domain simulations, 
+specifically on the difference in predicted capability. 
+\Cref{fig:comparison static dynamic dp capability} shows a comparison of a dynamic calculation with a static calculation 
+as well as with experimental data in \cref{subfig:comparison experiment}, 
+and a comparison of intact and worst-case single failure capabilites in \cref{subfig:comparison failure}. 
+As \cref{fig:comparison static dynamic dp capability} shows, 
+the quasi-static apporach generally overestimates the DP capability. 
+The factor by which is not constant however and very ship dependent. 
+As such dynamic DP simulations are necessary if improved accuracy is desired.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{\textwidth}
+        \includegraphics[width=\linewidth]{images/literature_study/borhaugExperimentalValidationDynamic2012.png}
+        \caption{Comparison of static and dynamic DP capability \parencite{borhaugExperimentalValidationDynamic2012}}
+        \label{subfig:comparison experiment}
+    \end{subfigure}
+    \begin{subfigure}{\textwidth}
+        \includegraphics[width=\linewidth]{images/literature_study/nguyendongDynamicStationkeepingCapability2013}
+        \caption{Comparison of static and dynamic DP capability for intact and failure case \parencite{nguyendongDynamicStationkeepingCapability2013}}
+        \label{subfig:comparison failure}
+    \end{subfigure}
+    \caption{Comparisons of quasi-static and dynamic DP capabilities}
+    \label{fig:comparison static dynamic dp capability}
+\end{figure}
+
+In addition to finding a significant difference between the quasi-static and dynamic capability, 
+\cite{borhaugExperimentalValidationDynamic2012} compared their results to experimental data. 
+They found an average difference of \qty{10}{\%} between the experimental data and their simulations.
+While this is useful in confirming the increased accuracy of the time domain approach as opposed to the quasi-static approach, 
+\qty{10}{\%} is still a large margin for operational decision making.
 
 \section{Previous work}
  - Increased use of dynamic DP simulations

@@ -15,6 +15,3 @@ __pycache__/
 # Latex
 # ignore everything in latex_out (all levels)
 latex_out/**
-# allow PDF files anywhere under latex_out
-!latex_out/**/*.pdf
-!latex_out/*.pdf
