@@ -70,6 +70,11 @@
     \RequirePackage[noindentafter]{titlesec}
 \fi
 
+\RequirePackage{subcaption}
+\RequirePackage{nicefrac}
+\RequirePackage{cleveref}
+\RequirePackage{float}
+\RequirePackage{siunitx}
 \RequirePackage{titletoc}
 \RequirePackage{xcolor}
 \RequirePackage{xkeyval}
