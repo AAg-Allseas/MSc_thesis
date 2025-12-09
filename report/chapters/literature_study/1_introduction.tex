@@ -1,9 +1,8 @@
 \chapter{Introduction}
+In this section the background and scope of the literature study will be presented. First some background information on dynamic positioning industry practices will be given followed by a motivation for the thesis that will follow. This will culminate in the research question and subsequent goals of the thesis.
 
-\section{Motivation}
-
-\subsection{Time-domain DP simulations}
-In recent years, the offshore industry has seen a significant increase in the use 
+\section{Background}
+Since the introduction of the first ship equipped with dynamic positioning in the 1960's, the use of dynamic positioning has become much more widespread in the offshore industry. 
 
 \section{Previous work}
  - Increased use of dynamic DP simulations
@@ -11,7 +10,7 @@ In recent years, the offshore industry has seen a significant increase in the us
  - Time consuming simulations
 
  - Probabilistic approach to capability - calculated capability for different Hs/Tp/Vw combinations, then determined most probable capability based on chance of each Hs/Tp/Vw combination occuring \cite{mauroProbabilisticApproachDynamic2022}
- - Hydrodynamic load estimation using PINNs, used as added mass etc isn't perfect. Estimateed based on measured motions. \cite{dingHydrodynamicsIdentificationDynamic2025a}
+ - Hydrodynamic load estimation using PINNs, used as added mass etc isn't perfect. Estimateed based on measured motions. \cite{dingHydrodynamicsIdentificationDynamic2025}
  - Simulation of pipe coupled with DP \cite{aiModelingSimulationDeepwater2018}, \cite{armaogluAdvantagesUsingTimeDomain2014}, \cite{li-pingCouplingTimeDomainAnalysis2014}
  
  - Developed a fast method for evaluating the DP capability in time domain for early design. Not sure how it is fast though, this isn't discussed \cite{luebckeFastMethodEvaluation2015}
@@ -19,7 +18,7 @@ In recent years, the offshore industry has seen a significant increase in the us
  - \cite{serrarisDPStationkeepingAccuracy} performed DP capability analyses with aNySIM from MARIN. performed 8700 simulations of each 10 minutes approximately to determine capability under various conditions. Only had 9 headings
 
  - Following studies quantified size of their modelling errors. All used deterministic models:
-    - \cite{borhaugExperimentalValidationDynamic}, comparison to model tests. 10\% error in power demand
+    - \cite{borhaugExperimentalValidationDynamic2012}, comparison to model tests. 10\% error in power demand
     - \cite{martelliTimedomainMethodologyAssess2022} performed model tests, compared static capability to dynamic. Non-linear factor differences, changed for each condition
     - \cite{donnarummaNUMERICALMODELSSHIP2015} compared high fidelity model to low fidelity, two different power trains. Much larger power peaks, peaks 25\% to 50\% power, wheras simplified had constant 20\% consumption
 
@@ -38,6 +37,18 @@ In recent years, the offshore industry has seen a significant increase in the us
     - Main goal was to used the clustering to improve accuracy for longer forecasts compared to a global forecaster
     - Relevance to DP -> Dynamic system subject to exogenous variables. Quantifies uncertainty of prediction
 
+- \cite{ebadollahiTimedependentUncertaintyQuantification2025} propose a method using NARX (Nonlinear Auto-Regressive with eXogenous input) to perform uncertainty quantification on non-linear dynamic systems. As an example they used a pickup truck travelling over bumps.
+    - Used PDD (Polynomial dimensional decomposition) to propegate uncertainty
+
+- \cite{salinasDeepARProbabilisticForecasting2020} discusses a recurrent neural network architecture to create probabilistic forecasts with uncertainty.
+    - Introduces DeepAR, a probabilistic forecasting method using autoregressive recurrent neural networks trained on large sets of related time series for improved accuracy and scalability.
+    - Handles scale variability through rescaling and weighted sampling, and supports flexible likelihood functions (Gaussian for real-valued data, Negative Binomial for count data).
+    - Generates full predictive distributions via Monte Carlo sampling, outperforming traditional methods in both point and probabilistic forecasts across multiple datasets. 
+
+- \cite{yogeeshIntervalBasedMultiBodyDynamics2025} predict vessel motions using fuzzy-set logic
+    - Uses deterministic calculations over an interval to predict effect of uncertain inputs.
+    - 
+
 So far not covered:
 How DP behaviour is influenced by varying parameters, how sensitive is it to uncertainty?
 Probabilistic dynamic DP perediction, quantified uncertainty (how good is the prediction likely to be?)
@@ -45,4 +56,13 @@ Probabilistic dynamic DP perediction, quantified uncertainty (how good is the pr
 
 \section{Research question}
 
-How can a ship's dynamic positioning behaviour efficiently be forecast while considering environmental and system uncertainty?
+\textit{How can a pipelay ship's short term dynamic positioning behaviour efficiently be forecast while considering environmental and system uncertainty?} 
+
+
+To answer this question, the following sub-questions will be investigated:
+
+\begin{enumerate}
+    \item What simulation framework gives the best trade-off between accuracy and computational efficiency?
+    \item How can uncertainty in model parameters and external inputs be quantified and propagated through the forecasting model
+    \item How does the forecasting model perform compared to traditional DP simulation methods in terms of speed and accuracy?
+\end{enumerate}

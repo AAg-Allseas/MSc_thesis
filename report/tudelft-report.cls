@@ -8,6 +8,7 @@
 \newif\if@roman
 \@romantrue
 \newif\if@whitelogo
+\newif\if@parspace
 \DeclareOption{dutch}{\@dutchtrue\@englishfalse}
 \DeclareOption{roman}{\@romantrue}
 \DeclareOption{noroman}{\@romanfalse}
@@ -15,7 +16,9 @@
 \DeclareOption{nativefonts}{\@nativefontstrue}
 \DeclareOption{print}{\@printtrue}
 \DeclareOption{whitelogo}{\@whitelogotrue}
+\DeclareOption{parspace}{\@parspacetrue}
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{book}}
+
 \ExecuteOptions{english}
 \ProcessOptions\relax
 
@@ -57,7 +60,16 @@
 \fi
 \RequirePackage{metalogo}
 \RequirePackage{tikz}
-\RequirePackage[noindentafter]{titlesec}
+
+\if@parspace    
+    \RequirePackage{titlesec}
+    \RequirePackage{parskip}
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{0.5\baselineskip plus 2pt minus 1pt}
+\else
+    \RequirePackage[noindentafter]{titlesec}
+\fi
+
 \RequirePackage{titletoc}
 \RequirePackage{xcolor}
 \RequirePackage{xkeyval}
@@ -198,6 +210,8 @@
                {\list{}{\rightmargin\leftmargin}\tudrmfamily\selectfont%
                 \item\relax}
                {\endlist}
+
+
 
 %% Define the TU Delft house style colors.
 \definecolor{tudelft-cyan}{cmyk}{1,0,0,0}
