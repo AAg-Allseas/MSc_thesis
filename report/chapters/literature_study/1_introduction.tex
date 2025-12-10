@@ -54,15 +54,22 @@ As such dynamic DP simulations are necessary if improved accuracy is desired.
 \end{figure}
 
 In addition to finding a significant difference between the quasi-static and dynamic capability, 
-\cite{borhaugExperimentalValidationDynamic2012} compared their results to experimental data. 
+\textcite{borhaugExperimentalValidationDynamic2012} compared their results to experimental data. 
 They found an average difference of \qty{10}{\%} between the experimental data and their simulations.
 While this is useful in confirming the increased accuracy of the time domain approach as opposed to the quasi-static approach, 
 \qty{10}{\%} is still a large margin for operational decision making.
 
-\section{Previous work}
- - Increased use of dynamic DP simulations
- - Deterministic DP simulations, no margin for varying input parameters 
- - Time consuming simulations
+Researchers from the Maritime Research Institite Netherlands (MARIN)
+also developed a time domain DP simulator \parencite{serrarisDPStationkeepingAccuracy2017}. 
+In their paper they highlight that 
+while static DP solvers are useful when estimating the ultimimate capability of a ship,
+they are unable to say anything about the accuracy of the DP system.
+In many operations, such as crane operations, pipelay, drilling or crew transfers
+\parencites{tannuriUtilizationNumericalSimulation2011}{serrarisDPStationkeepingAccuracy2017}{theilenNumericalSimulationShip2024}, 
+the maximum excursion can be a limiting factor much before the total power consumption. 
+In 2025, the International Marine Contractors Association (IMCA) 
+updated their reccomended practices for evaluating DP behaviour \parencite{RecommendedPracticeSpecification2025}.
+In the revised version, dynamic simulations are recommended for cases where the footprint is critical, reinforcing the statement from \textcite{serrarisDPStationkeepingAccuracy2017}. 
 
  - Probabilistic approach to capability - calculated capability for different Hs/Tp/Vw combinations, then determined most probable capability based on chance of each Hs/Tp/Vw combination occuring \cite{mauroProbabilisticApproachDynamic2022}
  - Hydrodynamic load estimation using PINNs, used as added mass etc isn't perfect. Estimateed based on measured motions. \cite{dingHydrodynamicsIdentificationDynamic2025}
