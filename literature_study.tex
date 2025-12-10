@@ -8,7 +8,7 @@
                 }
 \makeatother
 
-\documentclass[whitelogo, roman, parspace]{tudelft-report}
+\documentclass[whitelogo, roman, parspace, oneside]{tudelft-report}
 
 \usepackage{csquotes}
 \usepackage[style=apa]{biblatex}
@@ -17,6 +17,7 @@
 \usepackage{changes}
 \usepackage{comment}
 
+\makenomenclature
 \begin{document}
 
 \input{custom_funcs}
@@ -43,7 +44,7 @@
 
 %% Include an optional title page.
 % \input{title}
-
+\input{literature_study/0_nomenclature}
 \tableofcontents
 
 %% Use Arabic numerals for the page numbers of the chapters.

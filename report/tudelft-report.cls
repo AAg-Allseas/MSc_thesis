@@ -70,10 +70,22 @@
     \RequirePackage[noindentafter]{titlesec}
 \fi
 
+\if@twoside
+
+\else
+    \captionsetup{
+    justification=centering,
+    singlelinecheck=false
+    }
+\fi
+
 \RequirePackage{subcaption}
 \RequirePackage{nicefrac}
 \RequirePackage{cleveref}
 \RequirePackage{float}
+\RequirePackage{multicol}
+\RequirePackage{nomencl}
+\RequirePackage{xstring}
 \RequirePackage{siunitx}
 \RequirePackage{titletoc}
 \RequirePackage{xcolor}
@@ -561,16 +573,27 @@
 }
 
 %% Fancy style for the main matter.
-\fancypagestyle{mainmatter}{%
-    \fancyhf{}
-    %% Page numbers on the top left and top right.
-    \fancyhead[LE,RO]{\titlefont\titleshape\thepage}
-    %% Chapter name on the left (even) page.
-    \fancyhead[RE]{\titlefont\titleshape\nouppercase{\leftmark}}
-    %% Section name on the right (odd) page.
-    \fancyhead[LO]{\titlefont\titleshape\nouppercase{\rightmark}}
-}
+\if@twoside
+    \fancypagestyle{mainmatter}{%
+        \fancyhf{}
+        %% Page numbers on the top left and top right.
+        \fancyhead[LE,RO]{\titlefont\titleshape\thepage}
+        %% Chapter name on the left (even) page.
+        \fancyhead[RE]{\titlefont\titleshape\nouppercase{\leftmark}}
+        %% Section name on the right (odd) page.
+        \fancyhead[LO]{\titlefont\titleshape\nouppercase{\rightmark}}
+    }
+\else
 
+    \fancypagestyle{mainmatter}{%
+        \fancyhf{}
+        %% Page numbers on the top  top right.
+        \fancyhead[R]{\titlefont\titleshape\thepage}
+        %% Chapter name on the left (even) page.
+        \fancyhead[L]{\titlefont\titleshape\nouppercase{\leftmark}}
+        %% Section name on the right (odd) page.
+        % \fancyhead[LO]{\titlefont\titleshape\nouppercase{\rightmark}}
+    }
 %% The mainmatter style is default for normal pages.
 \pagestyle{mainmatter}
 

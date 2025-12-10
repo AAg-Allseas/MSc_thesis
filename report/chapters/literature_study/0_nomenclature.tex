@@ -1,0 +1,28 @@
+
+
+
+
+% Define groups and their names
+\renewcommand\nomgroup[1]{%
+  \item[\bfseries
+  \ifstrequal{#1}{A}{Acronyms}{%
+  \ifstrequal{#1}{M}{Mathematical Symbols}{}}%
+]}
+
+% Define number of columns for the nomenclature
+\nomencols{1}
+
+% Nomenclature format: \nomenclature[Group]{Abbreviation}{Definition}
+\nomenclature[A]{DP}{Dynamic Positioning}
+\nomenclature[A]{IMCA}{International Marine Contractors Association}
+\nomenclature[A]{MARIN}{Maritime Research Institute Netherlands}
+
+
+% \nomenclature[M]{$Acc$}{test factor}
+
+
+
+\printnomenclature
+
+\addcontentsline{toc}{chapter}{Nomenclature}
+
