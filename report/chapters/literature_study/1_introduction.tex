@@ -71,45 +71,37 @@ In 2025, the International Marine Contractors Association (IMCA)
 updated their reccomended practices for evaluating DP behaviour \parencite{RecommendedPracticeSpecification2025}.
 In the revised version, dynamic simulations are recommended for cases where the footprint is critical, reinforcing the statement from \textcite{serrarisDPStationkeepingAccuracy2017}. 
 
- - Probabilistic approach to capability - calculated capability for different Hs/Tp/Vw combinations, then determined most probable capability based on chance of each Hs/Tp/Vw combination occuring \cite{mauroProbabilisticApproachDynamic2022}
- - Hydrodynamic load estimation using PINNs, used as added mass etc isn't perfect. Estimateed based on measured motions. \cite{dingHydrodynamicsIdentificationDynamic2025}
- - Simulation of pipe coupled with DP \cite{aiModelingSimulationDeepwater2018}, \cite{armaogluAdvantagesUsingTimeDomain2014}, \cite{li-pingCouplingTimeDomainAnalysis2014}
- 
- - Developed a fast method for evaluating the DP capability in time domain for early design. Not sure how it is fast though, this isn't discussed \cite{luebckeFastMethodEvaluation2015}
+\subsection{Probabilistic predictions}
+\label{subsec:probabilistic_predictions}
+In \textcite{RecommendedPracticeSpecification2025}, the IMCA also warns that time-domain models can contain inaccuracies due to differences between the model and the actual vessel. Factors influencing the accuracy such as complex interaction effects, thruster dynamics and controller tuning \parencite{serrarisTimeDomainAnalysis2009} all increase modelling error and introduce uncertainty into the final predictions. Additionally, environmental loads are subject to uncertainty due to their stochastic nature \parencite{vanessenRequiredTestDurations2023}.
 
- - \cite{serrarisDPStationkeepingAccuracy} performed DP capability analyses with aNySIM from MARIN. performed 8700 simulations of each 10 minutes approximately to determine capability under various conditions. Only had 9 headings
+So far, most quantifications of ship DP behavior use deterministic approaches. These generally use 3-hour simulations \parencites{serrarisDPStationkeepingAccuracy2017}{RecommendedPracticeSpecification2025}{AssessmentStationKeeping2021} to generate a point forecast with a single set of parameters, which is then post-processed. In these simulations, uncertainty in the simulation parameters is not considered. 
 
- - Following studies quantified size of their modelling errors. All used deterministic models:
-    - \cite{borhaugExperimentalValidationDynamic2012}, comparison to model tests. 10\% error in power demand
-    - \cite{martelliTimedomainMethodologyAssess2022} performed model tests, compared static capability to dynamic. Non-linear factor differences, changed for each condition
-    - \cite{donnarummaNUMERICALMODELSSHIP2015} compared high fidelity model to low fidelity, two different power trains. Much larger power peaks, peaks 25\% to 50\% power, wheras simplified had constant 20\% consumption
+Probabilistic forecasting treats uncertain inputs and model parameters as random variables and propagates that uncertainty through a model to produce a predictive distribution for quantities of interest. Instead of a single point forecast from one 3-hour run, probabilistic outputs give ranges with associated probabilities making the risk in operational decisions explicit \parencite{nowotarskiRecentAdvancesElectricity2018}. 
 
- These errors tended to be quite large for use in decision making.
+Quasi-static capability calculations has seen some use of probabilistic forecasting in a study performed by \textcite{mauroProbabilisticApproachDynamic2022}. A Quasi-Monte Carlo was used to investigate the effect of different significant wave height (\(H_s\)), peak periods (\(T_p\)), and wind speed (\(V_w\)) combinations. Based on the probability of each combination occuring, a capability plot with confidence interval was generated (\cref{fig:probabilistic_capability_plot_mauro}). Note the capability is limited at $\mathcal{X} \in {0, 180}$ as the study considered wind speeds up to a set maximum, whereas the reference IMCA considered an unlimited maximum wind speed.
 
-\cite{hopPipeIntegrityPipelay2024} and \cite{devriesEfficientModellingOffshore2020} modelled pipelay dynamics. 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{literature_study/mauroProbabilisticApproachDynamic2022_capability}
+    \caption{Probabilistic DP capability plot \parencite{mauroProbabilisticApproachDynamic2022}}
+    \label{fig:probabilistic_capability_plot_mauro}
+\end{figure}
 
-- System identification of non-linear systems is a large and relatively known field
-    - Create model of mainly unknown system to predict behaviour.
+This approach required the use of a very large number of samples to converge. \Cref{fig:convergence_history_mauro} shows the convergence history of their approach in red, with classic monte-carlo runs overlaid. In both cases, thousands of runs were needed for the final value to converge. This approach is likely to be prohibitavely expensive for use with a time-domain approach. \textcite{serrarisDPStationkeepingAccuracy2017} mentioned that a single time domain simulation using the MARIN framework would take approximately 10 minutes; to blindly use monte-carlo simulations would render the approach useless for use in offshore decision making.
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{literature_study/mauroProbabilisticApproachDynamic2022_convergence}
+    \caption{Convergence history of Monte-Carlo DP simulation \parencite{mauroProbabilisticApproachDynamic2022}}
+    \label{fig:convergence_history_mauro}
+\end{figure}
 
-- \cite{tsiakalosScalableProbabilisticLoad2026a} propose a pipeline to predict power grid consumption while subject to exogenous variables such as weather conditions. They use ML to make the predictions as well as quantify the uncertainty of the prediction. 
-    -   Used UMAP to reduce input dimensionality, then performed clustering to identify patterns for different households
-    - Train a forecaster for each cluster to allow it to specialise more.
-    - uncertainty was based on the forecasters, as these output quantiles or distributions. The more certain the forecaster was, the smaller the uncertainty.
-    - Main goal was to used the clustering to improve accuracy for longer forecasts compared to a global forecaster
-    - Relevance to DP -> Dynamic system subject to exogenous variables. Quantifies uncertainty of prediction
-
-- \cite{ebadollahiTimedependentUncertaintyQuantification2025} propose a method using NARX (Nonlinear Auto-Regressive with eXogenous input) to perform uncertainty quantification on non-linear dynamic systems. As an example they used a pickup truck travelling over bumps.
-    - Used PDD (Polynomial dimensional decomposition) to propegate uncertainty
-
-- \cite{salinasDeepARProbabilisticForecasting2020} discusses a recurrent neural network architecture to create probabilistic forecasts with uncertainty.
-    - Introduces DeepAR, a probabilistic forecasting method using autoregressive recurrent neural networks trained on large sets of related time series for improved accuracy and scalability.
-    - Handles scale variability through rescaling and weighted sampling, and supports flexible likelihood functions (Gaussian for real-valued data, Negative Binomial for count data).
-    - Generates full predictive distributions via Monte Carlo sampling, outperforming traditional methods in both point and probabilistic forecasts across multiple datasets. 
-
-- \cite{yogeeshIntervalBasedMultiBodyDynamics2025} predict vessel motions using fuzzy-set logic
-    - Uses deterministic calculations over an interval to predict effect of uncertain inputs.
-    - 
+Uncertainty modelling and probabilistic forecasting is a well estabilished field \parencite{gneitingProbabilisticForecasting2014}. It is widely used for applications such as meteorology, economics and power grids.
+Particularly power grids are of interest. A power grid is a highly non-linear dynamic system, 
+subject to external loading. Power distribution is regulated by controllers, aimed at minimising total power consumption \parencite{sadamotoDynamicModelingStability2019}. 
+Such a system has a lot of parallels to a dynamic positioning system; a DP system aims to counter external loading while minimising power consumption. 
+As probabilistic forecasting has seen use in predicting power consumption in electrical grids, it is likely to be suitable for predicting DP behaviour.
 
 So far not covered:
 How DP behaviour is influenced by varying parameters, how sensitive is it to uncertainty?
