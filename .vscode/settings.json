@@ -73,8 +73,11 @@
         "%DIR%/report/bibliography"
     ],
     "[latex]": {
-        "editor.wordWrap": "on",
-        "editor.inlineSuggest.enabled": false
+        "editor.wordWrap": "bounded",
+        "editor.inlineSuggest.enabled": false,
+        "editor.wordWrapColumn": 120,
+        "rewrap.wrappingColumn": 120,
+        "rewrap.autoWrap.enabled": true
     },
     "latex-utilities.liveReformat.enabled": true,
     "latex-workshop.latex.tools": [
