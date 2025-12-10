@@ -103,20 +103,24 @@ subject to external loading. Power distribution is regulated by controllers, aim
 Such a system has a lot of parallels to a dynamic positioning system; a DP system aims to counter external loading while minimising power consumption. 
 As probabilistic forecasting has seen use in predicting power consumption in electrical grids, it is likely to be suitable for predicting DP behaviour.
 
-So far not covered:
-How DP behaviour is influenced by varying parameters, how sensitive is it to uncertainty?
-Probabilistic dynamic DP perediction, quantified uncertainty (how good is the prediction likely to be?)
+\subsection{Uncertainty quantification}
+Uncertainty quantification is a field of mathematics that focusess on propegating input uncertainty through a mathematical system to quantify the uncertainty of the output \parencite{ebadollahiTimedependentUncertaintyQuantification2025}. Typically this is done with Monte-Carlo simulations, but as discussed in \cref{subsec:probabilistic_predictions}, this would be too computationally expensive for use with dynamic DP analyses. Alternative methods for uncertainty quantification exist. These often consist of some form of surrogate model to inexpensively model the system's dynamics, which can then be combined with an uncertainty model to propegate uncertainty from input to output \parencites{maiSurrogateModellingStochastic2016}{heuvelineHybridGeneralizedPolynomial2014}{nowotarskiRecentAdvancesElectricity2018}. 
 
+Surrogate models can take many forms; for high diminsional non-linear systems machine learning is a promising candidate \parencite{salinasDeepARProbabilisticForecasting2020}. The use of machine learning models in uncertainty quantification can lead to significantly faster model evaluations while maintaining decent accuracy \parencite{willardIntegratingPhysicsBasedModelling2022}. Prior physics knowledge can also be included to further improve accuracy.
 
 \section{Research question}
 
+The marine offshore sector is experiencing a growing interest in the use of time domain simulations to analyse the dynamic DP behaviour of ships. So far, almost all research done on dynamic positioning has used deterministic approaches, using realisations of random environmental conditions and accepting modelling errors.
+Some research has been done on using probabilistic methods to predict quasi-static DP performance, but these use prohibitively expensive Monte-Carlo simulations.
+Probabilistic forecasting using uncertainty quantification has been used in other industries and shows promise for use with dynamic positioning systems. 
+Based on this research gap, the following research question is defined:
+
 \textit{How can a pipelay ship's short term dynamic positioning behaviour efficiently be forecast while considering environmental and system uncertainty?} 
 
-
-To answer this question, the following sub-questions will be investigated:
+To answer this question, a series of research goals will be persued:
 
 \begin{enumerate}
-    \item What simulation framework gives the best trade-off between accuracy and computational efficiency?
-    \item How can uncertainty in model parameters and external inputs be quantified and propagated through the forecasting model
-    \item How does the forecasting model perform compared to traditional DP simulation methods in terms of speed and accuracy?
+\item What simulation framework gives the best trade-off between accuracy and computational efficiency?
+\item How can uncertainty in model parameters and external inputs be quantified and propagated through the forecasting model
+\item How does the forecasting model perform compared to traditional DP simulation methods in terms of speed and accuracy?
 \end{enumerate}
