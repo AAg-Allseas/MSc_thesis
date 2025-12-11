@@ -2,6 +2,11 @@
     "recommendations": [
         "tecosaur.latex-utilities",
         "james-yu.latex-workshop",
-        "aaperghis.python-run-buttons"
+        "aaperghis.python-run-buttons",
+        "gruntfuggly.todo-tree",
+        "stkb.rewrap",
+        "alefragnani.project-manager",
+        "zainchen.json",
+        "aaperghis.colour-theme-dark"
     ]
 }

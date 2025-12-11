@@ -77,7 +77,7 @@
         "editor.inlineSuggest.enabled": false,
         "editor.wordWrapColumn": 120,
         "rewrap.wrappingColumn": 120,
-        "rewrap.autoWrap.enabled": true
+        "rewrap.autoWrap.enabled": true,
     },
     "latex-utilities.liveReformat.enabled": true,
     "latex-workshop.latex.tools": [
@@ -217,4 +217,17 @@
             "env": {}
         }
     ],
+    "todo-tree.general.periodicRefreshInterval": 10,
+    "todo-tree.general.showActivityBarBadge": true,
+    "todo-tree.regex.regexCaseSensitive": false,
+
+    "todo-tree.regex.regex": "(\\\\|//|#|<!--|;|/\\*|^|^[ \\t]*(-|\\d+.))\\s*($TAGS)",
+    "todo-tree.general.tags": [
+        "BUG",
+        "HACK",
+        "FIXME",
+        "TODO",
+        "XXX",
+    ],
+    "todo-tree.highlights.useColourScheme": true,
 }
