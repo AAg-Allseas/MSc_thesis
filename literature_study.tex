@@ -1,26 +1,21 @@
 \makeatletter
-\def\input@path{
-                {report/}
-                {report/chapters/}
-                {report/images/}
-                {report/appendices/}
-                {plots/}
-                }
 \makeatother
 
+% \documentclass[whitelogo, roman, parspace, oneside, draft]{tudelft-report}
 \documentclass[whitelogo, roman, parspace, oneside]{tudelft-report}
+
 
 \usepackage{csquotes}
 \usepackage[style=apa]{biblatex}
 \addbibresource{report/bibliography/zotero_bib.bib}
 
-\usepackage{changes}
+\usepackage[todonotes={color=green!40}]{changes}
 \usepackage{comment}
 
 \makenomenclature
 \begin{document}
 
-\input{custom_funcs}
+\input{report/custom_funcs}
 
 %% Use Roman numerals for the page numbers of the title pages and table of
 %% contents.
@@ -31,7 +26,7 @@
 \subtitle[tudelft-black]{Efficient modelling of time-domain dynamic positioning simulations}
 \author[tudelft-white]{A.W.N. Aperghis}
 \affiliation{Technische Universiteit Delft}
-\coverimage{cover/Rosmari_Allseas Solitaire_Drone_15.jpg}
+\coverimage{report/images/cover/Rosmari_Allseas Solitaire_Drone_15.jpg}
 \titleoffsetx{1cm}
 \titleoffsety{10cm}
 \afiloffsetx{1cm}
@@ -44,13 +39,16 @@
 
 %% Include an optional title page.
 % \input{title}
-\input{literature_study/0_nomenclature}
+\input{report/chapters/literature_study/0_nomenclature}
 \tableofcontents
 
 %% Use Arabic numerals for the page numbers of the chapters.
 \mainmatter
 
-\input{literature_study/1_introduction}
+\input{report/chapters/literature_study/1_introduction}
+\input{report/chapters/literature_study/2_dp_simulation}
+\input{report/chapters/literature_study/3_uncertainty_quantification}
+\input{report/chapters/literature_study/4_surrogate_modelling}
 
 %% Use letters for the chapter numbers of the appendices.
 % \appendix

@@ -398,27 +398,27 @@
         \ifKV@cover@whitelogo
           \ifKV@cover@back
               \node at (current page.south west)[anchor=south west,inner sep=20pt]{
-                  \includegraphics{cover/logo_white}
+                  \includegraphics{report/images/cover/logo_white}
               };
               \node at (current page.south east)[anchor=south east,inner sep=20pt]{
-                  \includegraphics{cover/logo_white}
+                  \includegraphics{report/images/cover/logo_white}
               };
           \else
               \node at (current page.south west)[anchor=south west,inner sep=20pt]{
-                  \includegraphics{cover/logo_white}
+                  \includegraphics{report/images/cover/logo_white}
               };
           \fi
         \else
           \ifKV@cover@back
               \node at (current page.south west)[anchor=south west,inner sep=20pt]{
-                  \includegraphics{cover/logo_black}
+                  \includegraphics{report/images/cover/logo_black}
               };
               \node at (current page.south east)[anchor=south east,inner sep=20pt]{
-                  \includegraphics{cover/logo_black}
+                  \includegraphics{report/images/cover/logo_black}
               };
           \else
               \node at (current page.south west)[anchor=south west,inner sep=20pt]{
-                  \includegraphics{cover/logo_black}
+                  \includegraphics{report/images/cover/logo_black}
               };
           \fi
         \fi
