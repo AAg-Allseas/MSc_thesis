@@ -23,15 +23,86 @@ This chapter will describe the main components of a DP system and outline the ma
 This section will describe the main components that make up a DP system. A global overview will be given and each
 individual section will be futher explained.
 
-Overall, most dynamic positioning systems have a similiar structure. The main components are the reference system,
-observer, controller and thrusters.
+Most dynamic positioning (DP) systems share a common architecture consisting of four main components: the reference
+system, observer, controller, and thrusters \parencite{witOptimalThrustAllocation2009}. \Cref{fig:dp_overview}
+illustrates these components and their interactions. The overall workflow is as follows: sensors measure the vessel’s
+position and velocity, and this data is processed by a state estimator to filter out noise and high-frequency motions.
+The estimated state is then compared to a desired setpoint to compute the position error. Based on this error, the
+controller determines the required force, which is passed to a thrust allocation algorithm that translates it into
+actuator commands. Finally, the actuators generate thrust forces that act on the vessel alongside external environmental
+forces \parencite{cadetIntroductionKalmanFilter2003}. 
 
-\begin{figure}
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.75\linewidth]{report/images/diagrams/DP_overview.pdf}
-    \caption{Overview of DP system components}
+    \caption{Overview of DP system components, adapted from \parencite{cadetIntroductionKalmanFilter2003}}
     \label{fig:dp_overview}
 \end{figure}
 
+\subsection{State estimator}
+A ship is subject to a wide range of exicting frequencies. In general, these can be split into high and low frequency
+excitations. A DP system aims to compensate just the low frequency motions, as due to the response time of thrusters the
+DP system cannot compensate the high frequency motions \parencite{serrarisTimeDomainAnalysis2009}. Furthermore, the
+position and velocity must be measured with sensors; the measurements are subject to noise. To solve both these issues a
+Kalman is generally used. The Kalman filter uses an internal model of the dynamics to predict the state, using
+measurements to correct the estimate. As the dynamics of the ship are non-linear, extended kalman filters are often
+used. These linearise the equations of motion around the current estimated state at each timestep. 
+
+The Kalman filter also estimates the so-called “DP current” \parencite{cadetIntroductionKalmanFilter2003}, which represents the combined effect of all unknown forces acting on the vessel. This state behaves similarly to the integral term in a Proportional-Integral-Derivative (PID) controller, as it compensates for steady-state errors by accounting for persistent disturbances.
+
+\subsection{Controller and thrust allocation}
+The controller takes the state estimate and converts this into a desired thruster force. The simplest form of this
+controller is a PID controller, though the integral term is often neglected; this function is taken up by the state
+estimator. 
+
+Once the desired thrust is known, this is passed to a thrust allocation algorithm. Typically ships have more than one
+actuator per degree of freedom, making them over-actuated. This means there are an infinite number of ways to configure
+the actuators. To solve this issue an optimisation algorithm is used that aims to match the desired thrust through
+actuator settings such as motor RPM and azimuthing angle. The objective is to do this with as little power consumption
+as possible, while respecting constraints such as forbidden zones, actuator rate limitations and total power consumption per switchboard. \parencite{overengDynamicPositioningUsing2021}
+
+Actuators can be subject to a large number of disturbances. The main effects that effect the thrust generated are
+thruster-hull interactions, thruster-thruster interactions and thruster-current interactions
+\parencite{serrarisTimeDomainAnalysis2009}. These are difficult to accurately include, as these are very complex phenomena.
+
+\subsection{Actuators}
+The actuators are generally defined as any active device producing a force that can be used for station keeping. These
+include azimuthing thrusters, fixed propellers, rudders and tunnel thrusters. The actuators are limited by physical
+constraints such as ramp up periods and direction rate limitaions. These constraints are the reason time-domain
+simulations are needed; else the ship would be able to maintain almost position perfectly \parencite{borhaugExperimentalValidationDynamic2012}. 
+
+\subsection{Vessel model}
+The general non-linear equation of motion for a floating structure can be formulated as follows
+\parencite{RecommendedPracticeGlobal2019}:
+
+\[
+\label{eq:general_eq_motion}
+(M + A(\omega))\ddot{{\mathbf{x}}} + B(\omega)\dot{\mathbf{x}} + D_1\dot{\mathbf{x}} + D_2 \dot{\mathbf{x}} \odot |\mathbf{x}|+ K\mathbf{x} = F^{(1)}_{wave} + F^{(2)}_{wave} + F_{curr} + F_{wind} + F_{ext} + F_{thr}
+\]
 
 
+\[
+\begin{split}
+    \text{Where:}   \quad & \\
+    x               \quad &\text{State of the system}\\
+    M               \quad &\text{Structural mass matrix}\\
+    A(\omega)       \quad &\text{Frequency dependent added mass matrix }\\
+    B(\omega)       \quad &\text{Frequency depended damping matrix}\\
+    D_1             \quad &\text{Linear damping matrix}\\
+    D_2             \quad &\text{Quadratic damping matrix}\\
+    K               \quad &\text{Hydrostatic stiffness matrix}\\
+    F^{(1)}_{wave}  \quad &\text{First order wave excitation force}\\
+    F^{(2)}_{wave}  \quad &\text{Second order wave excitation force}\\
+    F_{curr}        \quad &\text{Current drag force}\\
+    F_{wind}        \quad &\text{Wind drag force}\\
+    F_{ext}         \quad &\text{External forces}\\
+    F_{thr}         \quad &\text{Actuator forces}\\
+\end{split}
+\]
+
+\Cref{eq:general_eq_motion} has several non-linearities. In the hydrodynamics, the quadratic damping is proportional to
+the velocity squared. The thruster forcing is also non-linear due to the thruster dynamics and Kalman filtering.
+Furthermore, the system is causal, dynamic and time-invarient. 
+
+\section{Environmental forces}
+A significant portion of the external loading are environmental forces. 
