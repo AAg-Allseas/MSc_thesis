@@ -91,6 +91,17 @@
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Børhaug - Experimental validation of dynamic stationkeeping capability analysis.pdf}
 }
 
+@inproceedings{bruvollMultiAgentSystem2013,
+  title = {A Multi Agent System for Simulation of Battalion  Operations},
+  author = {Bruvoll, Solveig and Løvlid, Rikke Amilde},
+  date = {2013-10-16},
+  pages = {24--43},
+  location = {Bergen},
+  eventtitle = {{{SIMS}} 54th {{Conference}} on {{Simulation}} and {{Modelling}}},
+  langid = {english},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\SIMS2013.pdf}
+}
+
 @inproceedings{cadetIntroductionKalmanFilter2003,
   title = {Introduction to {{Kalman Filter}} and Its {{Use}} in {{Dynamic Positioning Systems}}},
   booktitle = {{{MTS Dynamic Positioning Conference}}},
@@ -125,6 +136,23 @@
   publisher = {David Taylor Model Basin},
   location = {Washington DC},
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\DTMB_1962_1661.pdf}
+}
+
+@online{dandekarBayesianNeuralOrdinary2022,
+  title = {Bayesian {{Neural Ordinary Differential Equations}}},
+  author = {Dandekar, Raj and Chung, Karen and Dixit, Vaibhav and Tarek, Mohamed and Garcia-Valadez, Aslan and Vemula, Krishna Vishal and Rackauckas, Chris},
+  date = {2022-02-06},
+  eprint = {2012.07244},
+  eprinttype = {arXiv},
+  eprintclass = {cs},
+  doi = {10.48550/arXiv.2012.07244},
+  url = {http://arxiv.org/abs/2012.07244},
+  urldate = {2025-12-12},
+  abstract = {Recently, Neural Ordinary Differential Equations has emerged as a powerful framework for modeling physical simulations without explicitly defining the ODEs governing the system, but instead learning them via machine learning. However, the question: “Can Bayesian learning frameworks be integrated with Neural ODE’s to robustly quantify the uncertainty in the weights of a Neural ODE?” remains unanswered. In an effort to address this question, we primarily evaluate the following categories of inference methods: (a) The No-U-Turn MCMC sampler (NUTS), (b) Stochastic Gradient Hamiltonian Monte Carlo (SGHMC) and (c) Stochastic Langevin Gradient Descent (SGLD). We demonstrate the successful integration of Neural ODEs with the above Bayesian inference frameworks on classical physical systems, as well as on standard machine learning datasets like MNIST, using GPU acceleration. On the MNIST dataset, we achieve a posterior sample accuracy of 98.5\% on the test ensemble of 10,000 images. Subsequently, for the first time, we demonstrate the successful integration of variational inference with normalizing flows and Neural ODEs, leading to a powerful Bayesian Neural ODE object. Finally, considering a predator-prey model and an epidemiological system, we demonstrate the probabilistic identification of model specification in partially-described dynamical systems using universal ordinary differential equations. Together, this gives a scientific machine learning tool for probabilistic estimation of epistemic uncertainties.},
+  langid = {english},
+  pubstate = {prepublished},
+  keywords = {Computer Science - Machine Learning},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Dandekar et al. - 2022 - Bayesian Neural Ordinary Differential Equations.pdf}
 }
 
 @online{DeepLearningOverview,
@@ -406,6 +434,49 @@
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Ge et al. - 2024 - Learning the Dynamics of Future Marine Microgrids Using Temporal Convolutional Neural Network.pdf}
 }
 
+@article{gerritsmaTimedependentGeneralizedPolynomial2010,
+  title = {Time-Dependent Generalized Polynomial Chaos},
+  author = {Gerritsma, Marc and Van Der Steen, Jan-Bart and Vos, Peter and Karniadakis, George},
+  date = {2010-11},
+  journaltitle = {Journal of Computational Physics},
+  shortjournal = {Journal of Computational Physics},
+  volume = {229},
+  number = {22},
+  pages = {8333--8363},
+  issn = {00219991},
+  doi = {10.1016/j.jcp.2010.07.020},
+  url = {https://linkinghub.elsevier.com/retrieve/pii/S0021999110004134},
+  urldate = {2025-12-12},
+  abstract = {Generalized polynomial chaos (gPC) has non-uniform convergence and tends to break down for long-time integration. The reason is that the probability density distribution (PDF) of the solution evolves as a function of time. The set of orthogonal polynomials associated with the initial distribution will therefore not be optimal at later times, thus causing the reduced efficiency of the method for long-time integration. Adaptation of the set of orthogonal polynomials with respect to the changing PDF removes the error with respect to long-time integration. In this method new stochastic variables and orthogonal polynomials are constructed as time progresses. In the new stochastic variable the solution can be represented exactly by linear functions. This allows the method to use only low order polynomial approximations with high accuracy. The method is illustrated with a simple decay model for which an analytic solution is available and subsequently applied to the three mode Kraichnan–Orszag problem with favorable results.},
+  langid = {english},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Gerritsma et al. - 2010 - Time-dependent generalized polynomial chaos.pdf}
+}
+
+@article{ghanemIdentificationPredictionStochastic2005,
+  title = {Identification and Prediction of Stochastic Dynamical Systems in a Polynomial Chaos Basis},
+  author = {Ghanem, Roger and Masri, Sami and Pellissetti, Manuel and Wolfe, Raymond},
+  date = {2005-04},
+  journaltitle = {Computer Methods in Applied Mechanics and Engineering},
+  shortjournal = {Computer Methods in Applied Mechanics and Engineering},
+  volume = {194},
+  number = {12--16},
+  pages = {1641--1654},
+  issn = {00457825},
+  doi = {10.1016/j.cma.2004.05.031},
+  url = {https://linkinghub.elsevier.com/retrieve/pii/S0045782504004098},
+  urldate = {2025-12-12},
+  abstract = {Non-parametric system identification techniques have been proposed for constructing predictive models of dynamical systems without detailed knowledge of the mechanisms of energy transfer and dissipation. In a class of such models, multi-dimensional Chebychev polynomials in the state variables are fitted to the observed dynamical state of the system. Due to the approximative nature of this non-parametric model as well as to various other sources of uncertainty such as measurement errors and non-anticipative excitations, the parameters of the model exhibit a scatter that is treated here in a probabilistic context. The statistics of these coefficients are related to the physical properties of the model being analyzed, and are used to endow the model predictions with a probabilistic structure. They are also used to obtain a parsimonious characterization of the predictive model while maintaining a desirable level of accuracy. The proposed methodology is quite simple and robust.},
+  langid = {english},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Ghanem et al. - 2005 - Identification and prediction of stochastic dynamical systems in a polynomial chaos basis.pdf}
+}
+
+@article{ghoshApplicabilitySpectralStochastic,
+  title = {Applicability of the Spectral Stochastic Finite Element Method in Time-Dependent Uncertain Problems},
+  author = {Ghosh, D and Iaccarino, G},
+  langid = {english},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Ghosh and Iaccarino - Applicability of the spectral stochastic ﬁnite element method in time-dependent uncertain problems.pdf}
+}
+
 @article{gneitingProbabilisticForecasting2014,
   title = {Probabilistic {{Forecasting}}},
   author = {Gneiting, Tilmann and Katzfuss, Matthias},
@@ -474,6 +545,19 @@
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Heuveline and Schick - 2014 - A HYBRID GENERALIZED POLYNOMIAL CHAOS METHOD FOR STOCHASTIC DYNAMICAL SYSTEMS.pdf}
 }
 
+@report{higdonUncertaintyQuantificationError2009,
+  type = {Panel report},
+  title = {Uncertainty {{Quantification}} and {{Error Analysis}}},
+  author = {Higdon, Dave and Klein, Richard},
+  date = {2009-10},
+  pages = {135--165},
+  institution = {US Department of Energy},
+  url = {https://science.osti.gov/-/media/ascr/pdf/program-documents/docs/Nnsa_grand_challenges_report.pdf},
+  urldate = {2025-12-12},
+  langid = {english},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Higdon et al. - UNCERTAINTY QUANTIFICATION AND ERROR ANALYSIS.pdf}
+}
+
 @online{HistoryDP2017,
   title = {History of {{DP}}},
   date = {2017},
@@ -513,21 +597,6 @@
   langid = {english},
   keywords = {dynamic positioning,environmental disturbances,marine vessel,state estimation,unknown dynamics,wave filtering},
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Hosseinnajad and Loueipour - 2020 - Dynamic Positioning System Design for A Marine Vessel with Unknown Dynamics Subject to External Dist.pdf}
-}
-
-@book{hyndmanForecastingPrinciplesPractice2018,
-  title = {Forecasting: Principles and Practice},
-  shorttitle = {Forecasting},
-  author = {Hyndman, Rob J. and Athanasopoulos, George},
-  date = {2018-05-08},
-  eprint = {_bBhDwAAQBAJ},
-  eprinttype = {googlebooks},
-  publisher = {OTexts},
-  abstract = {Forecasting is required in many situations. Stocking an inventory may require forecasts of demand months in advance. Telecommunication routing requires traffic forecasts a few minutes ahead. Whatever the circumstances or time horizons involved, forecasting is an important aid in effective and efficient planning.This textbook provides a comprehensive introduction to forecasting methods and presents enough information about each method for readers to use them sensibly.},
-  isbn = {978-0-9875071-1-2},
-  langid = {english},
-  pagetotal = {380},
-  keywords = {Business & Economics / Forecasting,Business & Economics / Statistics,Computers / Databases / Data Mining,Computers / Mathematical & Statistical Software}
 }
 
 @inproceedings{islamMachineLearningTechniques2021,
@@ -808,6 +877,16 @@
   file = {C:\Users\AAg\Zotero\storage\5YYXT48F\105012357000.html}
 }
 
+@online{PhysicalSystemsRandom,
+  title = {Physical {{Systems}} with {{Random Uncertainties}}: {{Chaos Representations}} with {{Arbitrary Probability Measure}}},
+  shorttitle = {Physical {{Systems}} with {{Random Uncertainties}}},
+  doi = {10.1137/S1064827503424505},
+  url = {https://epubs.siam.org/doi/epdf/10.1137/S1064827503424505},
+  urldate = {2025-12-12},
+  langid = {english},
+  file = {C\:\\Users\\AAg\\OneDrive - Allseas Engineering BV\\Documents\\Thesis\\Thesis-Literature - Documents\\Physical Systems with Random Uncertainties Chaos Representations with Arbitrary Probability Measure.pdf;C\:\\Users\\AAg\\Zotero\\storage\\4QEAR2F6\\S1064827503424505.html}
+}
+
 @inproceedings{pivanoDigitalTwinDrilling2019,
   title = {Digital {{Twin}} for {{Drilling Operations}} – {{Towards Cloud-Based Operational Planning}}},
   author = {Pivano, Luca and Nguyen, Dong Trong and Bruun Ludvigsen, Kristine},
@@ -1081,7 +1160,7 @@
   file = {C:\Users\AAg\Zotero\storage\VJHYQVWJ\time-domain-analysis-for-floating-offshore-wind-substructure-design.html}
 }
 
-@article{tsiakalosScalableProbabilisticLoad2026a,
+@article{tsiakalosScalableProbabilisticLoad2026,
   title = {Scalable Probabilistic Load Forecasting and Advanced Clustering for Smart Grids Using High-Frequency Energy Data and Weather Integration},
   author = {Tsiakalos, Anastasios and Tsiakalos, Apostolos},
   date = {2026-02},
@@ -1096,18 +1175,6 @@
   abstract = {The effective management of modern smart grids requires accurate short-term and long-term load forecasting while identifying scalable, interpretable consumption patterns to enable demand response (DR) and enhance renewable integration. This paper presents a comprehensive, scalable pipeline for high-frequency household energy data analysis, integrating weather information to improve forecasting accuracy. The methodology combines Uniform Manifold Approximation and Projection (UMAP) for dimensionality reduction, ensemble clustering methods (HDBSCAN and Gaussian Mixture Models) for advanced segmentation, and hybrid forecasting models (LSTM with attention mechanisms and XGBoost with quantile regression) for probabilistic forecasting. Evaluations across multiple horizons (1-hour, 4-hour, 24-hour) using deterministic metrics (MAE, RMSE) and probabilistic metrics (CRPS, Pinball Loss) show that cluster-wise probabilistic forecasting achieves up to 15\% reduction in CRPS and 12\% reduction in MAE compared to global models. Additional sensitivity and ablation studies confirm that weather integration improves MAE by approximately 9\%, while attention mechanisms enhance LSTM performance by 6\%–8\%. These results demonstrate that the proposed approach provides actionable insights for targeted DR, peak load reduction, and renewable integration within smart grids.},
   langid = {english},
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Tsiakalos and Tsiakalos - 2026 - Scalable probabilistic load forecasting and advanced clustering for smart grids using high-frequency.pdf}
-}
-
-@article{UncertaintyQuantificationTheory,
-  title = {Uncertainty {{Quantification}}: {{Theory}}, {{Implementation}}, and {{Applications}} | {{Chapter}} 9: {{Uncertainty Propagation}} in {{Models}}},
-  shorttitle = {Uncertainty {{Quantification}}},
-  journaltitle = {Computational Science and Engineering},
-  url = {https://epubs.siam.org/doi/10.1137/1.9781611973228.ch9},
-  urldate = {2025-12-08},
-  abstract = {“Prediction is very difficult, especially if it’s about the future,” Niels Bohr We noted in Chapter 1 that predictive estimation is comprised of three components: model calibration, model prediction, and estimation of the validation domain. In the first, measured data is used to quantify input uncertainties associated with parameters, initial or boundary conditions, and forcing functions. For certain applications, input uncertainties can be directly quantified from experiments. For phenomenological models with nonphysical parameters, however, experimental input distributions are typically unavailable and densities must be estimated using the Bayesian techniques presented in Chapter 8. This is often referred to as inverse uncertainty quantification.},
-  isbn = {9781611973228},
-  langid = {english},
-  file = {C:\Users\AAg\Zotero\storage\UFTTJ8Z5\1.9781611973228.html}
 }
 
 @article{vanessenRequiredTestDurations2023,
