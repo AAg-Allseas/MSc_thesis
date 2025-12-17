@@ -1,8 +1,9 @@
 
-\section{Previous work}
+# Previous work
  - Increased use of dynamic DP simulations
  - Deterministic DP simulations, no margin for varying input parameters 
  - Time consuming simulations
+
 
  - Probabilistic approach to capability - calculated capability for different Hs/Tp/Vw combinations, then determined most probable capability based on chance of each Hs/Tp/Vw combination occuring \cite{mauroProbabilisticApproachDynamic2022}
  - Hydrodynamic load estimation using PINNs, used as added mass etc isn't perfect. Estimateed based on measured motions. \cite{dingHydrodynamicsIdentificationDynamic2025}
@@ -47,3 +48,20 @@
 So far not covered:
 How DP behaviour is influenced by varying parameters, how sensitive is it to uncertainty?
 Probabilistic dynamic DP perediction, quantified uncertainty (how good is the prediction likely to be?)
+
+# Possible approaches
+
+## PCE
+- gPC:Note suited for time domain
+- TD-gPC: Suited for TD, does increase in computational cost quite quickly
+- Hybrid Heuveline approach: Need to look into
+- PC-NARX: Look into
+- PDD-NARX: more efficient than PC-NARX?
+
+## Surrogate with MC
+
+## Bayesian NN
+
+## Gaussian processes
+
+## DeepAR

@@ -1,0 +1,70 @@
+
+\section{Polynomical Chaos Expansions}
+Polynomial chaos expansions (PCE) are a spectral method for uncertainty quantification. A spectral mathod is a method where a
+stochastic process is represented as a series expansion using an orthogonal basis of functions. Spectral methods
+decompose a random variable into components, similar to a fourier analysis \parencite{heuvelineHybridGeneralizedPolynomial2014}.
+
+\subsection{Generalised Polynomial chaos}
+PCE uses polynomials as the orthogonal basis. Originally developed to model Wiener processes using Hermite polynomials, it was extended by
+\textcite{xiuWienerAskeyPolynomial2002} to use other polynomials and thus represent other probability distributions. The
+generalised polynomial chaos expansion (gPC) works as follows:
+\TODO{Fix bold greek symbols}
+Let \(X\) be a random variable in probability space \(\left(\Omega, \mathcal{F}, \mathbb{P}\right)\), where \(\Omega\) is
+the sample space with \(\omega \in \Omega\). \(X\) can then be formulated as follows
+\parencite{heuvelineHybridGeneralizedPolynomial2014}:
+
+\begin{equation}
+\label{eq:gPC_explain_X}
+X(\omega) = \sum_{i = 0}^{\infty}c_i\boldsymbol{\Psi}_i(\boldsymbol{\xi})
+\end{equation}
+
+\(\boldsymbol{\xi}\) is a random variable subject to some probability distribution.\({\boldsymbol{\Psi}}\) is a set of orthogonal polynomials that describes the
+distribution of the random variable. \(c_i\) is a weight given to each term of the polynomial. These are determined by
+pointwise sampling at a given point in time. Given a time dependent process \(X = X(t, \omega)\), \(c_i\) has to be
+re-evaluated at each timestep. 
+
+infinite sums are not possible in reality, so the sum is truncated at point \(M\). This gives an approximation of \(X\)
+defined as:
+
+\begin{equation}
+X^M(t, \omega) \coloneq \sum_{i = 0}^{M}c_i(t)\boldsymbol{\Psi_i}(\boldsymbol{\xi})
+\end{equation}
+Where M is given by:
+\begin{equation}
+M = \frac{(P + L)!}{P!L!} - 1
+\end{equation}
+
+The truncation order \(M\) is dependent on two discretisation parameters, \(L\) and \(P\). \(P\) is the maximal polynomial order
+used, and \(L\) is the dimension of the vector of random variables \(\boldsymbol{\xi} = (\xi_1, \dots, \xi_L)\). The value of M
+grows rapidly as the dimensionality of the problem increases. The mean and variance of the result can be determined from
+the resulting expansion. 
+
+\begin{align}
+    \overbar{X}(t) &= c_0(t) \\
+    \mathit{Var} \, \left[ X(t) \right] &= \sum_{i = 1}^{M} c_i(t)^2
+\end{align}
+
+Overall this method works more efficiently than Monte-Carlo as the coefficients for the sum can be estimated using far
+fewer model evaluations. Additionally, once the polynomial surrogate model is constructed, it can be evaluated quickly
+for any variations of the input values. 
+
+\subsection{Time dependent generalised polynomial chaos}
+\textcite{gerritsmaTimedependentGeneralizedPolynomial2010} introduced the concept of time-dependent generalised
+polynomial chaos (TD-gPC). One of the limitaions of gPC is a lack of convergence when the dependence on \(\boldsymbol{\xi}\) is
+strongly non-linear. This is especially the case when considering long term integration
+\parencite{heuvelineHybridGeneralizedPolynomial2014}. The difference between this method and the time independent method
+is that with TD-gPC, the orthogonal polynomials can be adjusted if the distributions of \( \boldsymbol{\xi} \) changes.
+This increases the accuracy of the PCE over long-term simulations. 
+
+The TD-gPC approach does have some limitations in the application to dynamic systems. For longer simulations, the
+accuracy of the method decreases \parencite{gerritsmaTimedependentGeneralizedPolynomial2010}, thus needing recalculation
+and adding extra computing cost. \textcite{ebadollahiTimedependentUncertaintyQuantification2025} also mentions a
+deterioration of the performance of TD-gPC for longer simulations. The computational cost rapidly increases as the
+required polynomial order increases as time evolves. This makes it inefficient for strongly nonlinear dynamic systems.
+The technique does not scale well for higher dimension problems
+\parencites{heuvelineHybridGeneralizedPolynomial2014}{maiSurrogateModellingStochastic2016}. 
+
+
+\subsection{Polynomial Dimensional Decomposition}
+The poor scaling of PCE makes it less suitable for higher dimensional systems. An alternative approach, based on the
+same mathematical basis, is polynomial dimensional decomposition (PDD). 

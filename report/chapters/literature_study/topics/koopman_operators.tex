@@ -1,0 +1,39 @@
+\section{Koopman Operator Theory}
+A continuous time dynamical system can at its simplist be considered in the following form:
+
+\begin{equation}
+    \diff{\mathbf{x}(t)}{t} = \mathbf{f}\left(\mathbf{x}(t), t; \boldsymbol{\beta}\right)
+\end{equation}
+
+A discrete time system can analogously be considered in the following form:
+
+\begin{equation}
+    \mathbf{x}_{k + 1} = \mathbf{F}(\mathbf{x}_k, t; \mathbb{\beta})
+    \label{eq:discrete_dynamical_system}
+\end{equation}
+
+Koopman operator theory states that it is possible to represent a nonlinear dynamical system in terms of an
+infinite-dimensioned linear operator acting on a Hilbert space of measurement functions of the state of the system
+\parencite{bruntonDatadrivenScienceEngineering2019}. This was demonstrated by
+\citeauthor{koopmanHamiltonianSystemsTransformation1931} in \citeyear{koopmanHamiltonianSystemsTransformation1931}. This
+operator is linear, making analysis of the system much easier. It is however infinite, so must be truncated for real
+applications. 
+
+\subsection{Mathematical Formulation}
+The Koopman operator is a linear operator that acts on a measurement function as follows:
+\begin{equation}
+    \mathcal{K} g = g(\mathbf{F})
+\end{equation}
+For a discrete system as described in \eqref{eq:discrete_dynamical_system}, this formulation becomes the following:
+
+\begin{align}
+    \mathcal{K}g(\mathbf{x}_k) = g(\mathbf{F}(\mathbf{x}_k)) \\
+    \mathcal{K} g(\mathbf{x}_k) = g(\mathbf{x}_{k + 1})
+\end{align}
+
+This means the Koopman Operator is a linear operator that advances the observation of a state forward in time. This is
+true for any observable function \( g\) and any state \( \mathbf{x}_k \). 
+
+\subsection{Data-driven Koopman analysis}
+
+\subsection{Koopman theory for stochastic systems}

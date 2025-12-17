@@ -22,51 +22,52 @@ uncertainty about the correct parameter values \parencite{sullivanIntroductionUn
 In general in the study of UQ, one is interested in the relationship between the input and output. Two general examples
 are the forward and the inverse problem \parencite{sullivanIntroductionUncertaintyQuantification2015}. In both examples
 we will consider a general model of a physical system:
-\[
-z = f(x, y)
-\]
 
-In the forward problem, $f, \, x, \, y$ are known. $z$ can be calculated. However, if $f$ is an imperfect model or $x,
-\, y$ are subject to some uncertainty, then this uncertainty will in some way affect $z$. This is known as the 
+\begin{equation}
+z = f(x, y)
+\end{equation}
+
+In the forward problem, \(f, \, x, \, y\) are known. \(z\) can be calculated. However, if \(f\) is an imperfect model or 
+\(x,\, y\) are subject to some uncertainty, then this uncertainty will in some way affect \(z\). This is known as the 
 \textit{forward propegation of uncertainty}.
 
-In the inverse problem $z, \, x,\, y$ are measured. We are interested in determining $f$. These measurements are subject to noise and as $f$ is a model of a
+In the inverse problem \(z, \, x,\, y\) are measured. We are interested in determining \(f\). These measurements are subject to noise and as \(f\) is a model of a
 real system and thus has infinitely many degrees of freedom, the problem is undetermined. 
+
+\section{Types of uncertainty}
+Aleatoric uncertainty: inherent, irreducable randomness or noise in data. Eg. 
+Epistemic uncertainty: Uncertainty due to unknowns. 
 
 
 \section{Sensitivity analysis}
 In this section sensitivity analysis will be discussed. Sensitivity analysis is the understanding of how a function
-$f(x_1, \dots, x_n)$ depends on variations in $x_i$, both individually and in combinanation with other $x_i$
+\(f(x_1, \dots, x_n)\) depends on variations in \(x_i\), both individually and in combinanation with other \(x_i\)
 \parencite{sullivanIntroductionUncertaintyQuantification2015}. There are two approaches: local sensitivity analysis and
 global sensitivity analysis. Local analyses study how the system responds to input variations around a point
-$\overbar{x}$. Global sensitivity analyes study the average sensitivity of $f$ to variations across the entire domain. A
+\(\overbar{x}\). Global sensitivity analyes study the average sensitivity of \(f\) to variations across the entire domain. A
 practical application is that understanding the sensitivity of a system can allow an engineer to decide which variables
 to include uncertainty of in their uncertainty modelling. 
 
-\section{Intrusive Methods}
-Intrusive methods for uncertainty quantification are methods that require alteration of the governing equations ot
-incorporate uncertainty directly.
 
-\section{Polynomical Chaos Expansions}
-Polynomial chaos expansions (PCE) are a spectral method for uncertainty quantification. A spectral mathod is a method where a
-stochastic process is represented as a series expansion using an orthogonal basis of functions. Spectral methods
-decompose a random variable into components, similar to a fourier analysis \parencite{heuvelineHybridGeneralizedPolynomial2014}.
 
-PCE uses polynomials as the orthogonal basis
 
-\section{Non-intrusive methods}
-Non-intrusive methods for uncertainty quantification are methods that allow the use of existing models as a black box
-without adjusting their internal structure for UQ. 
 
-\textcite{sullivanIntroductionUncertaintyQuantification2015} discusses several of these methods. The guiding principle
-of these is that the function is evaluated at a number of points. A surrogate model is then made based on these samples.
-The first method discussed is a non-intrusive spectral projection. With this method the aim is to select the best
-polynomial chaos coefficients so as to model the function best using a set of orthogonal polynomials.
-The second method, stochastic collocation, creates an interpolant between chosen nodes. The third method is gaussian
-process regression. This method, in contrast to the two previous methods, does not assume perfectly accurate
-observations. The function is assumed to be a random gaussian field and any observations made reduce the uncertainty at
-those points.
+% \section{Intrusive Methods}
+% Intrusive methods for uncertainty quantification are methods that require alteration of the governing equations ot
+% incorporate uncertainty directly.
 
-One important aspect to note is that these methods all assume the function does not change in time. This makes these
-methods as is unsuitable for dynamic systems. 
+% \section{Non-intrusive methods}
+% Non-intrusive methods for uncertainty quantification are methods that allow the use of existing models as a black box
+% without adjusting their internal structure for UQ. 
 
+% \textcite{sullivanIntroductionUncertaintyQuantification2015} discusses several of these methods. The guiding principle
+% of these is that the function is evaluated at a number of points. A surrogate model is then made based on these samples.
+% The first method discussed is a non-intrusive spectral projection. With this method the aim is to select the best
+% polynomial chaos coefficients so as to model the function best using a set of orthogonal polynomials.
+% The second method, stochastic collocation, creates an interpolant between chosen nodes. The third method is gaussian
+% process regression. This method, in contrast to the two previous methods, does not assume perfectly accurate
+% observations. The function is assumed to be a random gaussian field and any observations made reduce the uncertainty at
+% those points.
+
+% One important aspect to note is that these methods all assume the function does not change in time. This makes these
+% methods as is unsuitable for dynamic systems. 

@@ -195,10 +195,14 @@
         ItalicFont = *-ItalicMT,
         BoldItalicFont = *-BoldItalicMT
     ]{CourierNewPS}
-    \setmathfont[
-        Path = report/fonts/,
-        Extension = .ttf
-    ]{CambriaMath}
+    % \setmathfont[
+    %     Path = report/fonts/,
+    %     Extension = .ttf,
+    %     BoldFont= *-Bold,
+    %     ItalicFont = *-Italic,
+    %     BoldItalicFont = *-BoldItalic
+    % ]{CambriaMath}
+
     %% The default style for text is Tahoma (sans-serif).
     \renewcommand*\familydefault{\sfdefault}
     %% The default style for titles is Bookman Old Style (serif). 
@@ -407,6 +411,9 @@
               \node at (current page.south west)[anchor=south west,inner sep=20pt]{
                   \includegraphics{report/images/cover/logo_white}
               };
+                \node at (current page.south east)[anchor=south east,inner sep=30pt]{
+                    \includegraphics[width=145pt]{report/images/cover/Logo Allseas_DIAP_white_FC}
+                };
           \fi
         \else
           \ifKV@cover@back
