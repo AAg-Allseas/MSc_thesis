@@ -123,19 +123,13 @@
 
 
 \if@nativefonts
-    %% The native font is Utopia Regular with Fourier math. We use Latin Modern
-    %% as a fallback, since Utopia lacks support for sans-serif and monospace.
     \RequirePackage[T1]{fontenc}
     \RequirePackage[utf8]{inputenc}
-%    \RequirePackage{lmodern}
     \if@roman
-%      \RequirePackage{lato}
-%      \RequirePackage{helvet}
       \RequirePackage[thin]{roboto}
       \RequirePackage{fourier}
     \else
       \RequirePackage[thin]{roboto}
-%      \RequirePackage[default]{lato}
       \RequirePackage{helvet}
       \renewcommand{\familydefault}{\sfdefault}
     \fi
@@ -148,28 +142,16 @@
         \renewcommand{\familydefault}{\rmdefault}
         \def\titlefont{\fontfamily{fla}}
         \def\sectitleshape{\fontshape{n}}
-        \def\sectitlestyle{\rmfamily\titleshape\bfseries}%{\familydefault\bfseries}
+        \def\sectitlestyle{\rmfamily\titleshape\bfseries}
         \def\chaptitlestyle{\rmfamily\titleshape}
     \else
-%        \renewcommand{\familydefault}{\tudsffamily}
-%        \def\titleshape{\fontshape{n}}
         \def\titlefont{\fontfamily{fla}}
-        \def\sectitlestyle{\sffamily\titleshape\bfseries}%        \def\sectitlestyle{\titleshape\bfseries}
+        \def\sectitlestyle{\sffamily\titleshape\bfseries}
         \def\chaptitlestyle{\sffamily\titleshape}
     \fi
-%    \def\largetitleshape{\upshape}
-%    \if@print
+
     \def\titlestyle{\titlefont\titleshape}
-%    \else
-%        \def\titlestyle{\titlefont\titleshape}
-%        \def\sectitlestyle{\sffamily\titleshape\bfseries}
-%    \fi
-%    \def\titlestyle{\titlefont\titleshape\bfseries}
-%    \if@print
-%        \def\headerstyle{\titlefont\titleshape\bfseries}
-%    \else
-        \def\headerstyle{\titlefont}
-%    \fi
+    \def\headerstyle{\titlefont\titleshape\bfseries}
 \else
     %% Apart from Bookman Old Style and Arial, we use Courier New for monospace
     %% and Cambria for math.
@@ -195,13 +177,6 @@
         ItalicFont = *-ItalicMT,
         BoldItalicFont = *-BoldItalicMT
     ]{CourierNewPS}
-    % \setmathfont[
-    %     Path = report/fonts/,
-    %     Extension = .ttf,
-    %     BoldFont= *-Bold,
-    %     ItalicFont = *-Italic,
-    %     BoldItalicFont = *-BoldItalic
-    % ]{CambriaMath}
 
     %% The default style for text is Tahoma (sans-serif).
     \renewcommand*\familydefault{\sfdefault}
@@ -213,16 +188,11 @@
     \def\largetitleseries{}
     \def\largetitlestyle{\largetitlefont\largetitleseries\largetitleshape}
     \def\chaptitlefamily{\tudsffamily}
-%    \if@print
-%        \def\titlestyle{\titlefont\titleshape}
-%%        \def\largetitlestyle{\largetitlefont\titleshape\bfseries}
-%        \def\sectitlestyle{\tudsffamily\titleshape\bfseries}
-%    \else
-        \def\titlestyle{\titlefont\titleshape}
-%        \def\largetitlestyle{\largetitlefont\titleshape}
-        \def\sectitlestyle{\tudsffamily\titleshape\bfseries}
-        \def\chaptitlestyle{\chaptitlefamily}
-%    \fi
+    
+    \def\titlestyle{\titlefont\titleshape}
+    \def\sectitlestyle{\tudsffamily\titleshape\bfseries}
+    \def\chaptitlestyle{\chaptitlefamily}
+
     \def\headerstyle{\titlestyle}
 \fi
 
@@ -493,7 +463,7 @@
         \else
           \coordinate (tcorner) at ($(top left)+(\@cover@x,-\@cover@y)$);
           \coordinate (acorner) at ($(top left)+(\@cover@ax,-\@cover@ay)$);
-  %        \coordinate (lcorner) at ($(bottom left)+(2cm,2cm)$);
+
           %% Calculate the top left and bottom right coordinates of the front and
           %% back boxes.
           \ifKV@cover@frontbottom
@@ -505,8 +475,7 @@
           \fi
           \coordinate (front bottom right) at ($(front top left)+(\@cover@frontboxwidth,-\@cover@frontboxheight)$);
           \coordinate (back bottom right) at ($(back top left)+(\@cover@splitboxwidth,-\@cover@splitboxheight)$);
-          %% Draw the front box in black.
-  %        \fill[fill=tudelft-black](front top left) rectangle (front bottom right);
+
           %% Calculate the width and height of the front text box.
           \setlength\@cover@fronttextwidth{\@cover@frontboxwidth}
           \addtolength\@cover@fronttextwidth{-2\@cover@margin}
@@ -528,29 +497,13 @@
                   {\largetitlestyle\color{\@authorcolor}\fontsize{26}{26}\selectfont\@author}
               \end{minipage}
           };
-          %% Draw the back box in cyan.
-  %        \fill[fill=tudelft-cyan](back top left) rectangle (back bottom right);
-          %% Print the affiliation.
           \ifx\@affiliation\undefined\else
   %            \node at (back bottom right)[rotate=90,anchor=south west,inner sep=\@cover@margin]{
               \node at (acorner)[rotate=90,anchor=south west,inner sep=\@cover@margin]{
                   \tudsffamily\color{\@afilcolor}\@affiliation
               };
           \fi
-%          \ifKV@cover@back\ifx\@cover@text\undefined\else
-%              %% Calculate the width and height of the back text box.
-%              \setlength\@cover@backtextwidth{\@cover@backboxwidth}
-%              \addtolength\@cover@backtextwidth{-2\@cover@margin}
-%              \setlength\@cover@backtextheight{\@cover@backboxheight}
-%              \addtolength\@cover@backtextheight{-2\@cover@margin}
-%              %% Create the back text box.
-%              \node at (back top left)[anchor=north west,inner sep=\@cover@margin]{
-%                  \begin{minipage}[t][\@cover@backtextheight]{\@cover@backtextwidth}
-%                      \tudsffamily\color{tudelft-white}\@cover@text
-%                  \end{minipage}
-%              };
-%          \fi
-         
+%      
        \fi
     \end{tikzpicture}
     %% Restore the margins and turn the page white again.
