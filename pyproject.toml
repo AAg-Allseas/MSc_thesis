@@ -1,21 +1,27 @@
 [project]
-name = "overleaf_template"
+name = "msc_thesis_awn_aperghis"
 version = "1.0.0"
 description = "template repository to include overleaf report"
-authors = [
-    "Your Name <your.email@example.com>"
-]
-readme = "README.md"
+authors = [{ name = "Albert Aperghis", email = "a.w.n.aperghis@student.tudelft.nl" }]
 requires-python = ">=3.10"
-package-mode=false
+readme = "README.md"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+package-mode = false
+dependencies = [
+    "matplotlib>=3.10.8",
+    "numpy>=2.2.6",
+]
 
-
-[tool.poetry]
-package-mode=false
-
-[tool.poetry.dependencies]
-python = ">=3.10"
+[tool.uv]
+package = false
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["uv_build>=0.9.11,<0.10.0"]
+build-backend = "uv_build"
