@@ -14,6 +14,43 @@
   file = {C\:\\Users\\AAg\\OneDrive - Allseas Engineering BV\\Documents\\Thesis\\Thesis-Literature - Documents\\Ai et al. - 2018 - Modeling and Simulation of Deepwater Pipeline S-Lay With Coupled Dynamic Positioning.pdf;C\:\\Users\\AAg\\Zotero\\storage\\GDBYGDBX\\1.html}
 }
 
+@inproceedings{akaBalancedNeuralODEs2025,
+  title = {Balanced {{Neural ODEs}}: Nonlinear Model Order Reduction and {{Koopman}} Operator Approximations},
+  shorttitle = {Balanced {{Neural ODEs}}},
+  author = {Aka, Julius and Brunnemann, Johannes and Eiden, Jörg and Speerforck, Arne and Mikelsons, Lars},
+  date = {2025-02-26},
+  eprint = {2410.10174},
+  eprinttype = {arXiv},
+  eprintclass = {cs},
+  publisher = {arXiv},
+  doi = {10.48550/arXiv.2410.10174},
+  url = {http://arxiv.org/abs/2410.10174},
+  urldate = {2026-01-07},
+  abstract = {Variational Autoencoders (VAEs) are a powerful framework for learning latent representations of reduced dimensionality, while Neural ODEs excel in learning transient system dynamics. This work combines the strengths of both to generate fast surrogate models with adjustable complexity reacting on time-varying inputs signals. By leveraging the VAE’s dimensionality reduction using a nonhierarchical prior, our method adaptively assigns stochastic noise, naturally complementing known NeuralODE training enhancements and enabling probabilistic time series modeling. We show that standard Latent ODEs struggle with dimensionality reduction in systems with time-varying inputs. Our approach mitigates this by continuously propagating variational parameters through time, establishing fixed information channels in latent space. This results in a flexible and robust method that can learn different system complexities, e.g. deep neural networks or linear matrices. Hereby, it enables efficient approximation of the Koopman operator without the need for predefining its dimensionality. As our method balances dimensionality reduction and reconstruction accuracy, we call it Balanced Neural ODE (B-NODE)1. We demonstrate the effectiveness of this methods on several academic and real-world test cases, e.g. a power plant or MuJoCo data.},
+  langid = {english},
+  keywords = {Computer Science - Machine Learning,Statistics - Machine Learning},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Aka et al. - 2025 - Balanced Neural ODEs nonlinear model order reduction and Koopman operator approximations.pdf}
+}
+
+@article{anantharamanStablyAcceleratingStiff2022,
+  title = {Stably {{Accelerating Stiff Quantitative Systems Pharmacology Models}}: {{Continuous-Time Echo State Networks}} as {{Implicit Machine Learning}}},
+  shorttitle = {Stably {{Accelerating Stiff Quantitative Systems Pharmacology Models}}},
+  author = {Anantharaman, Ranjan and Abdelrehim, Anas and Jain, Anand and Pal, Avik and Sharp, Danny and {Utkarsh} and Edelman, Alan and Rackauckas, Chris},
+  date = {2022},
+  journaltitle = {IFAC-PapersOnLine},
+  shortjournal = {IFAC-PapersOnLine},
+  volume = {55},
+  number = {23},
+  pages = {1--6},
+  issn = {24058963},
+  doi = {10.1016/j.ifacol.2023.01.004},
+  url = {https://linkinghub.elsevier.com/retrieve/pii/S2405896323000046},
+  urldate = {2026-01-07},
+  abstract = {In this paper, we propose the use of neural network surrogates of stiff QsP models, which reduces and accelerates QsP models by training ML approximations on simulations. We describe how common neural network methodologies, such as residual neural networks, recurrent neural networks, and physics/biologically-informed neural networks, are fundamentally related to explicit solvers of ordinary differential equations (ODEs), and thus are ill-equipped to deal with stiffness. To address this issue, we showcase methods from scientific machine learning (SciML) which combine techniques from mechanistic modeling with traditional deep learning. We describe the continuous-time echo state network (CTESN) as the implicit analogue of ML architectures. We demonstrate the CTESN’s ability to surrogatize a production QsP model, a {$>$}1,000 ODE chemical reaction system from the SBML Biomodels repository, and a reaction-diffusion partial differential equation. We showcase the ability to accelerate QsP simulations by up to 5.2x against the optimized DifferentialEquations.jl solvers while achieving {$<$}5\% relative error. This shows how incorporating the numerical properties of QsP methods into ML can improve the intersection, and thus presents a potential method for accelerating repeated calculations such as global sensitivity analysis and virtual populations.},
+  langid = {english},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Anantharaman et al. - 2022 - Stably Accelerating Stiff Quantitative Systems Pharmacology Models Continuous-Time Echo State Netwo 1.pdf}
+}
+
 @online{ANySIMXMFMARIN,
   title = {{{aNySIM XMF}} | {{MARIN}}},
   url = {https://www.marin.nl/about/facilities-and-tools/software/anysim},
@@ -68,6 +105,21 @@
   file = {C:\Users\AAg\Zotero\storage\ZVG478L2\automeris.io.html}
 }
 
+@dataset{baierSimulated4DOFShip2023,
+  title = {A {{Simulated}} 4-{{DOF Ship Motion Dataset}} for {{System Identification}} under {{Environmental Disturbances}}},
+  author = {Baier, Alexandra and Staab, Steffen},
+  date = {2023-06-17},
+  publisher = {DaRUS},
+  doi = {10.18419/darus-2905},
+  url = {https://darus.uni-stuttgart.de/dataset.xhtml?persistentId=doi:10.18419/DARUS-2905},
+  urldate = {2025-12-18},
+  abstract = {This dataset contains data of 125 1-hour simulations of ship motion during various sea states performing random maneuvers in 4 degrees of freedom (surge-sway-yaw-roll). The original ship is a patrol ship developed by Perez et al. [1]. We have extended it with a set of two symmetrically placed rudder propellers. Additionally, we simulate wind forces according to Isherwood's wind model [2]. Wind-induced waves are generated with the JONSWAP spectrum [3] and the corresponding wave forces are then computed using wave force response amplitude operators (ROA). Implementations of the ship model, Isherwood's wave model, wave force ROAs and the JONSWAP spectrum can be found in the Marine Systems Simulator toolbox by Fossen and Perez [4]. The dataset is split into a routine operation set (96 hours) and into an Out-Of-Distribution (OOD) set (29 hours). The routine operation set is split into train-validation-test with a 60-10-30 split, while the OOD set is used solely for testing. The dataset is used for the evaluation of nonlinear system identification methods for multi-step predictions. The following inputs and outputs are considered for the identification problem. Inputs are the shaft speeds of both propellers, their azimut angles, and wind speed. Measured states or outputs are surge velocity, sway velocity, roll rate, yaw rate and roll angle, as well as the wind angle of attack. Please see the README.txt file for details regarding the file structure of this dataset and a description of the variables in the .tab files. This research is funded by Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) under Germany's Excellence Strategy - EXC 2075 - 390740016. We acknowledge the support by the Stuttgart Center for Simulation Science (SimTech). [1] T. Perez, A. Ross, and T. I. Fossen, “A 4-DOF SIMULINK model of a coastal patrol vessel for manoeuvring in waves,” in IFAC MCMC, 2006. [2] R. M. Isherwood, “Wind resistance of merchant ships,” The Royal Institution of Naval Architects, 1972. [3] K. Hasselmann, T. Barnett, E. Bouws, H. Carlson, D. Cartwright, K. Enke, J. Ewing, H. Gienapp, D. Hasselmann, P. Kruseman, A. Meerburg, P. Muller, D. Olbers, K. Richter, W. Sell, and H. Walden, “Measurements of wind-wave growth and swell decay during the joint north sea wave project (JONSWAP),” Deut. Hydrogr. Z., vol. 8, pp. 1-95, 01 1973. [4] T. I. Fossen and T. Perez, “Marine Systems Simulator (MSS),” https://github.com/cybergalactic/MSS, 2004, last accessed: 2022-06-14.},
+  langid = {english},
+  version = {1.2},
+  keywords = {Engineering},
+  file = {C:\Users\AAg\Zotero\storage\R8R6GVVW\dataset.html}
+}
+
 @unpublished{baillyguimaeraesCAMOASOGNaval2023,
   type = {Allseas presentation},
   title = {{{CAMO ASOG}} – {{Naval}} Presentation to {{PM}}},
@@ -97,6 +149,24 @@
   file = {C\:\\Users\\AAg\\OneDrive - Allseas Engineering BV\\Documents\\Thesis\\Thesis-Literature - Documents\\Bettini et al. - 2025 - Data-driven nonlinear model reduction to spectral submanifolds via oblique projection.pdf;C\:\\Users\\AAg\\Zotero\\storage\\M6W4V6BX\\5.html}
 }
 
+@article{bittracherDimensionalityReductionComplex2020,
+  title = {Dimensionality {{Reduction}} of {{Complex Metastable Systems}} via {{Kernel Embeddings}} of {{Transition Manifolds}}},
+  author = {Bittracher, Andreas and Klus, Stefan and Hamzi, Boumediene and Koltai, Péter and Schütte, Christof},
+  date = {2020-12-18},
+  journaltitle = {Journal of Nonlinear Science},
+  shortjournal = {J Nonlinear Sci},
+  volume = {31},
+  number = {1},
+  pages = {3},
+  issn = {1432-1467},
+  doi = {10.1007/s00332-020-09668-z},
+  url = {https://doi.org/10.1007/s00332-020-09668-z},
+  urldate = {2026-01-07},
+  abstract = {We present a novel kernel-based machine learning algorithm for identifying the low-dimensional geometry of the effective dynamics of high-dimensional multiscale stochastic systems. Recently, the authors developed a mathematical framework for the computation of optimal reaction coordinates of such systems that is based on learning a parameterization of a low-dimensional transition manifold in a certain function space. In this article, we enhance this approach by embedding and learning this transition manifold in a reproducing kernel Hilbert space, exploiting the favorable properties of kernel embeddings. Under mild assumptions on the kernel, the manifold structure is shown to be preserved under the embedding, and distortion bounds can be derived. This leads to a more robust and more efficient algorithm compared to the previous parameterization approaches.},
+  langid = {english},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Bittracher et al. - 2020 - Dimensionality Reduction of Complex Metastable Systems via Kernel Embeddings of Transition Manifolds.pdf}
+}
+
 @online{bongersCausalModelingDynamical2022,
   title = {Causal {{Modeling}} of {{Dynamical Systems}}},
   author = {Bongers, Stephan and Blom, Tineke and Mooij, Joris M.},
@@ -123,6 +193,24 @@
   location = {Trondheim},
   langid = {english},
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Børhaug - Experimental validation of dynamic stationkeeping capability analysis.pdf}
+}
+
+@online{brouwerGRUODEBayesContinuousModeling2019,
+  title = {{{GRU-ODE-Bayes}}: {{Continuous}} Modeling of Sporadically-Observed Time Series},
+  shorttitle = {{{GRU-ODE-Bayes}}},
+  author = {Brouwer, Edward De and Simm, Jaak and Arany, Adam and Moreau, Yves},
+  date = {2019-11-28},
+  eprint = {1905.12374},
+  eprinttype = {arXiv},
+  eprintclass = {cs},
+  doi = {10.48550/arXiv.1905.12374},
+  url = {http://arxiv.org/abs/1905.12374},
+  urldate = {2026-01-07},
+  abstract = {Modeling real-world multidimensional time series can be particularly challenging when these are sporadically observed (i.e., sampling is irregular both in time and across dimensions)—such as in the case of clinical patient data. To address these challenges, we propose (1) a continuous-time version of the Gated Recurrent Unit, building upon the recent Neural Ordinary Differential Equations (Chen et al., 2018), and (2) a Bayesian update network that processes the sporadic observations. We bring these two ideas together in our GRU-ODE-Bayes method. We then demonstrate that the proposed method encodes a continuity prior for the latent process and that it can exactly represent the Fokker-Planck dynamics of complex processes driven by a multidimensional stochastic differential equation. Additionally, empirical evaluation shows that our method outperforms the state of the art on both synthetic data and real-world data with applications in healthcare and climate forecast. What is more, the continuity prior is shown to be well suited for low number of samples settings.},
+  langid = {english},
+  pubstate = {prepublished},
+  keywords = {Computer Science - Machine Learning,Statistics - Machine Learning},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Brouwer et al. - 2019 - GRU-ODE-Bayes Continuous modeling of sporadically-observed time series.pdf}
 }
 
 @inbook{brunton2019a,
@@ -220,6 +308,14 @@
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\CHEN and BILLINGS - 1992 - Neural networks for nonlinear dynamic system modelling and identification.pdf}
 }
 
+@article{chenNeuralOrdinaryDifferential,
+  title = {Neural {{Ordinary Differential Equations}}},
+  author = {Chen, Ricky T Q and Rubanova, Yulia and Bettencourt, Jesse and Duvenaud, David},
+  abstract = {We introduce a new family of deep neural network models. Instead of specifying a discrete sequence of hidden layers, we parameterize the derivative of the hidden state using a neural network. The output of the network is computed using a blackbox differential equation solver. These continuous-depth models have constant memory cost, adapt their evaluation strategy to each input, and can explicitly trade numerical precision for speed. We demonstrate these properties in continuous-depth residual networks and continuous-time latent variable models. We also construct continuous normalizing flows, a generative model that can train by maximum likelihood, without partitioning or ordering the data dimensions. For training, we show how to scalably backpropagate through any ODE solver, without access to its internal operations. This allows end-to-end training of ODEs within larger models.},
+  langid = {english},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Chen et al. - Neural Ordinary Differential Equations.pdf}
+}
+
 @article{crnjaric-zicKoopmanOperatorSpectrum2020,
   title = {Koopman {{Operator Spectrum}} for {{Random Dynamical Systems}}},
   author = {Črnjarić-Žic, Nelida and Maćešić, Senka and Mezić, Igor},
@@ -298,7 +394,7 @@
   doi = {10.3990/1.9789036550307},
   url = {http://purl.org/utwente/doi/10.3990/1.9789036550307},
   urldate = {2025-11-19},
-  isbn = {9789036550307},
+  isbn = {978-90-365-5030-7},
   langid = {dutch},
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\De Vries - 2020 - Efficient modelling of offshore pipe-laying.pdf}
 }
@@ -390,6 +486,56 @@
   abstract = {This paper introduces a novel computational methodology, supported by robust numerical algorithms, for performing time-dependent uncertainty quantification (UQ) analysis on complex dynamical systems. The proposed approach consists of three key components: (1) a new stochastic adaptation of the nonlinear autoregressive with exogenous input (NARX) model, utilizing dimension-wise tensor product expansion to effectively capture the behavior of dynamical systems, (2) a polynomial dimensional decomposition (PDD) technique to propagate uncertainty in input random variables to the NARX coefficients, and (3) a unique integration between NARX and PDD, resulting in the PDD-NARX approximation for time-dependent UQ analysis. The PDD-NARX method distinguishes itself from conventional deterministic system identification tools by considering uncertainties originating from both the system’s dynamic properties (e.g., mass, stiffness, and damping) and external forces (e.g., amplitude and frequency content of excitation time series). Unlike traditional methods, which rely on an intuitive selection of NARX basis functions, this approach employs dimensional decomposition and importance factors to systematically construct the NARX model function. Furthermore, PDD, due to its hierarchical, dimension-wise expansion, is better equipped to handle high-dimensional UQ problems than many existing methods, including the widely recognized polynomial chaos expansion. Numerical results demonstrate that low-order PDD-NARX approximations provide accurate and computationally efficient estimates of the probabilistic characteristics of simple dynamical systems. Moreover, the probabilistic vehicle dynamic analysis of a pick-up truck traversing road bumps underscores the effectiveness of the PDD-NARX method in addressing industrial-scale complex problems.},
   keywords = {Dimensional decomposition,NARX,Orthogonal polynomials,Polynomial chaos expansion,Polynomial dimensional decomposition,Vehicle dynamics},
   file = {C\:\\Users\\AAg\\OneDrive - Allseas Engineering BV\\Documents\\Thesis\\Thesis-Literature - Documents\\Ebadollahi and Rahman - 2025 - Time-dependent uncertainty quantification analysis of complex dynamical systems.pdf;C\:\\Users\\AAg\\Zotero\\storage\\WM8SB297\\S0266892025000487.html}
+}
+
+@article{ehlersStochasticReservoirComputers2025,
+  title = {Stochastic Reservoir Computers},
+  author = {Ehlers, Peter J. and Nurdin, Hendra I. and Soh, Daniel},
+  date = {2025-03-29},
+  journaltitle = {Nature Communications},
+  shortjournal = {Nat Commun},
+  volume = {16},
+  number = {1},
+  pages = {3070},
+  issn = {2041-1723},
+  doi = {10.1038/s41467-025-58349-6},
+  url = {https://www.nature.com/articles/s41467-025-58349-6},
+  urldate = {2026-01-07},
+  langid = {english},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Ehlers et al. - 2025 - Stochastic reservoir computers.pdf}
+}
+
+@online{el-lahamVariationalNeuralStochastic2025,
+  title = {Variational {{Neural Stochastic Differential Equations}} with {{Change Points}}},
+  author = {El-Laham, Yousef and Sun, Zhongchang and Zhu, Haibei and Balch, Tucker and Vyetrenko, Svitlana},
+  date = {2025-06-13},
+  eprint = {2411.00635},
+  eprinttype = {arXiv},
+  eprintclass = {cs},
+  doi = {10.48550/arXiv.2411.00635},
+  url = {http://arxiv.org/abs/2411.00635},
+  urldate = {2026-01-20},
+  abstract = {In this work, we explore modeling change points in time-series data using neural stochastic differential equations (neural SDEs). We propose a novel model formulation and training procedure based on the variational autoencoder (VAE) framework for modeling time-series as a neural SDE. Unlike existing algorithms training neural SDEs as VAEs, our proposed algorithm only necessitates a Gaussian prior of the initial state of the latent stochastic process, rather than a Wiener process prior on the entire latent stochastic process. We develop two methodologies for modeling and estimating change points in time-series data with distribution shifts. Our iterative algorithm alternates between updating neural SDE parameters and updating the change points based on either a maximum likelihood-based approach or a change point detection algorithm using the sequential likelihood ratio test. We provide a theoretical analysis of this proposed change point detection scheme. Finally, we present an empirical evaluation that demonstrates the expressive power of our proposed model, showing that it can effectively model both classical parametric SDEs and some real datasets with distribution shifts.},
+  pubstate = {prepublished},
+  keywords = {Computer Science - Machine Learning,Statistics - Machine Learning},
+  file = {C\:\\Users\\AAg\\OneDrive - Allseas Engineering BV\\Documents\\Thesis\\Thesis-Literature - Documents\\El-Laham et al. - 2025 - Variational Neural Stochastic Differential Equations with Change Points.pdf;C\:\\Users\\AAg\\Zotero\\storage\\R97NDCB2\\2411.html}
+}
+
+@article{fengEarlyWarningIndicators2024,
+  title = {Early Warning Indicators via Latent Stochastic Dynamical Systems},
+  author = {Feng, Lingyu and Gao, Ting and Xiao, Wang and Duan, Jinqiao},
+  date = {2024-03-05},
+  journaltitle = {Chaos: An Interdisciplinary Journal of Nonlinear Science},
+  shortjournal = {Chaos},
+  volume = {34},
+  number = {3},
+  pages = {031101},
+  issn = {1054-1500},
+  doi = {10.1063/5.0195042},
+  url = {https://doi.org/10.1063/5.0195042},
+  urldate = {2026-01-07},
+  abstract = {Detecting early warning indicators for abrupt dynamical transitions in complex systems or high-dimensional observation data are essential in many real-world applications, such as brain diseases, natural disasters, and engineering reliability. To this end, we develop a novel approach: the directed anisotropic diffusion map that captures the latent evolutionary dynamics in the low-dimensional manifold. Then three effective warning signals (Onsager–Machlup indicator, sample entropy indicator, and transition probability indicator) are derived through the latent coordinates and the latent stochastic dynamical systems. To validate our framework, we apply this methodology to authentic electroencephalogram data. We find that our early warning indicators are capable of detecting the tipping point during state transition. This framework not only bridges the latent dynamics with real-world data but also shows the potential ability for automatic labeling on complex high-dimensional time series.},
+  file = {C\:\\Users\\AAg\\OneDrive - Allseas Engineering BV\\Documents\\Thesis\\Thesis-Literature - Documents\\Feng et al. - 2024 - Early warning indicators via latent stochastic dynamical systems.pdf;C\:\\Users\\AAg\\Zotero\\storage\\SD6UQNJI\\5.html}
 }
 
 @online{ferrandisLearningFunctionalsLSTM2019,
@@ -588,6 +734,20 @@
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Ghosh and Iaccarino - Applicability of the spectral stochastic ﬁnite element method in time-dependent uncertain problems.pdf}
 }
 
+@online{ghoshVariationalInferenceLearning,
+  title = {Variational {{Inference}} and {{Learning}} of {{Koopman Invariant Subspaces}}},
+  author = {Ghosh, Ramen},
+  number = {hal-05016523},
+  eprint = {hal-05016523},
+  eprinttype = {HAL},
+  url = {https://hal.science/hal-05016523v1},
+  abstract = {We propose a novel variational inference framework for discovering Koopmaninvariant subspaces from time series data, with applications to forecasting and dimensionality reduction in high-dimensional nonlinear systems. The Koopman operator provides a linear, infinite-dimensional representation of nonlinear dynamics through the evolution of observables. However, identifying finite-dimensional subspaces that are approximately invariant under Koopman evolution remains a core challenge, which our framework addresses.},
+  langid = {english},
+  pubstate = {prepublished},
+  keywords = {Computational modeling},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Ghosh - Variational Inference and Learning of Koopman Invariant Subspaces.pdf}
+}
+
 @article{gneitingProbabilisticForecasting2014,
   title = {Probabilistic {{Forecasting}}},
   author = {Gneiting, Tilmann and Katzfuss, Matthias},
@@ -763,6 +923,41 @@
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Jeon et al. - 2018 - Prediction of ship fuel consumption by using an artificial neural network.pdf}
 }
 
+@article{jospinHandsOnBayesianNeural2022,
+  title = {Hands-{{On Bayesian Neural Networks}}—{{A Tutorial}} for {{Deep Learning Users}}},
+  author = {Jospin, Laurent Valentin and Laga, Hamid and Boussaid, Farid and Buntine, Wray and Bennamoun, Mohammed},
+  date = {2022-05},
+  journaltitle = {IEEE Computational Intelligence Magazine},
+  volume = {17},
+  number = {2},
+  pages = {29--48},
+  issn = {1556-6048},
+  doi = {10.1109/MCI.2022.3155327},
+  url = {https://ieeexplore.ieee.org/document/9756596/},
+  urldate = {2026-01-07},
+  abstract = {Modern deep learning methods constitute incredibly powerful tools to tackle a myriad of challenging problems. However, since deep learning methods operate as black boxes, the uncertainty associated with their predictions is often challenging to quantify. Bayesian statistics offer a formalism to understand and quantify the uncertainty associated with deep neural network predictions. This tutorial provides deep learning practitioners with an overview of the relevant literature and a complete toolset to design, implement, train, use and evaluate Bayesian neural networks, i.e., stochastic artificial neural networks trained using Bayesian methods.},
+  keywords = {Bayes methods,Computational modeling,Deep learning,Design methodology,Neural networks,Stochastic processes,Training data,Tutorials,Uncertainty},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Jospin et al. - 2022 - Hands-On Bayesian Neural Networks—A Tutorial for Deep Learning Users.pdf}
+}
+
+@online{karlDeepVariationalBayes2017,
+  title = {Deep {{Variational Bayes Filters}}: {{Unsupervised Learning}} of {{State Space Models}} from {{Raw Data}}},
+  shorttitle = {Deep {{Variational Bayes Filters}}},
+  author = {Karl, Maximilian and Soelch, Maximilian and Bayer, Justin and family=Smagt, given=Patrick, prefix=van der, useprefix=false},
+  date = {2017-03-03},
+  eprint = {1605.06432},
+  eprinttype = {arXiv},
+  eprintclass = {stat},
+  doi = {10.48550/arXiv.1605.06432},
+  url = {http://arxiv.org/abs/1605.06432},
+  urldate = {2026-01-05},
+  abstract = {We introduce Deep Variational Bayes Filters (DVBF), a new method for unsupervised learning and identification of latent Markovian state space models. Leveraging recent advances in Stochastic Gradient Variational Bayes, DVBF can overcome intractable inference distributions via variational inference. Thus, it can handle highly nonlinear input data with temporal and spatial dependencies such as image sequences without domain knowledge. Our experiments show that enabling backpropagation through transitions enforces state space assumptions and significantly improves information content of the latent embedding. This also enables realistic long-term prediction.},
+  langid = {english},
+  pubstate = {prepublished},
+  keywords = {Computer Science - Machine Learning,Electrical Engineering and Systems Science - Systems and Control,Statistics - Machine Learning},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Karl et al. - 2017 - Deep Variational Bayes Filters Unsupervised Learning of State Space Models from Raw Data.pdf}
+}
+
 @inproceedings{kimPreliminaryStudyWave2021,
   title = {Preliminary {{Study}} on {{Wave Height Prediction}} with {{Convolution Neural Network}}},
   author = {Kim, Yunho and Ha, Yoonjin and Choi, Jongsu},
@@ -774,6 +969,40 @@
   eventtitle = {The 31st {{International Ocean}} and {{Polar Engineering Conference}}},
   langid = {english},
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Kim et al. - 2021 - Preliminary Study on Wave Height Prediction with Convolution Neural Network.pdf}
+}
+
+@article{kingmaAutoEncodingVariationalBayes2014,
+  title = {Auto-{{Encoding Variational Bayes}}},
+  author = {Kingma, D. P. and Welling, M.},
+  date = {2014},
+  publisher = {Ithaca, NYArXiv},
+  doi = {10.48550/arXiv.1312.6114},
+  url = {https://dare.uva.nl/search?identifier=cf65ba0f-d88f-4a49-8ebd-3a7fce86edd7},
+  urldate = {2026-01-07},
+  langid = {english},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Kingma and Welling - 2014 - Auto-Encoding Variational Bayes.pdf}
+}
+
+@article{klusNumericalApproximationPerronFrobenius2016,
+  title = {On the Numerical Approximation of the {{Perron-Frobenius}} and {{Koopman}} Operator},
+  author = {Klus, Stefan and Koltai, Péter and Schütte, Christof},
+  date = {2016-09},
+  journaltitle = {Journal of Computational Dynamics},
+  shortjournal = {JCD},
+  volume = {3},
+  number = {1},
+  eprint = {1512.05997},
+  eprinttype = {arXiv},
+  eprintclass = {math},
+  pages = {1--12},
+  issn = {2158-2491},
+  doi = {10.3934/jcd.2016003},
+  url = {http://arxiv.org/abs/1512.05997},
+  urldate = {2026-01-06},
+  abstract = {Information about the behavior of dynamical systems can often be obtained by analyzing the eigenvalues and corresponding eigenfunctions of linear operators associated with a dynamical system. Examples of such operators are the Perron–Frobenius and the Koopman operator. In this paper, we will review different methods that have been developed over the last decades to compute finite-dimensional approximations of these infinite-dimensional operators – in particular Ulam’s method and Extended Dynamic Mode Decomposition (EDMD) – and highlight the similarities and differences between these approaches. The results will be illustrated using simple stochastic differential equations and molecular dynamics examples.},
+  langid = {english},
+  keywords = {Mathematics - Dynamical Systems,Mathematics - Numerical Analysis},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Klus et al. - 2016 - On the numerical approximation of the Perron-Frobenius and Koopman operator.pdf}
 }
 
 @article{koopmanHamiltonianSystemsTransformation1931,
@@ -791,6 +1020,23 @@
   urldate = {2025-12-17},
   langid = {english},
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Koopman - 1931 - Hamiltonian Systems and Transformation in Hilbert Space.pdf}
+}
+
+@online{kosticLearningInvariantRepresentations2024,
+  title = {Learning Invariant Representations of Time-Homogeneous Stochastic Dynamical Systems},
+  author = {Kostic, Vladimir R. and Novelli, Pietro and Grazzi, Riccardo and Lounici, Karim and Pontil, Massimiliano},
+  date = {2024-03-14},
+  eprint = {2307.09912},
+  eprinttype = {arXiv},
+  eprintclass = {cs},
+  doi = {10.48550/arXiv.2307.09912},
+  url = {http://arxiv.org/abs/2307.09912},
+  urldate = {2026-01-07},
+  abstract = {We consider the general class of time-homogeneous stochastic dynamical systems, both discrete and continuous, and study the problem of learning a representation of the state that faithfully captures its dynamics. This is instrumental to learning the transfer operator or the generator of the system, which in turn can be used for numerous tasks, such as forecasting and interpreting the system dynamics. We show that the search for a good representation can be cast as an optimization problem over neural networks. Our approach is supported by recent results in statistical learning theory, highlighting the role of approximation error and metric distortion in the learning problem. The objective function we propose is associated with projection operators from the representation space to the data space, overcomes metric distortion, and can be empirically estimated from data. In the discrete-time setting, we further derive a relaxed objective function that is differentiable and numerically well-conditioned. We compare our method against state-of-the-art approaches on different datasets, showing better performance across the board.},
+  langid = {english},
+  pubstate = {prepublished},
+  keywords = {Computer Science - Machine Learning},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Kostic et al. - 2024 - Learning invariant representations of time-homogeneous stochastic dynamical systems.pdf}
 }
 
 @article{leAssessmentStatisticalMethods2013,
@@ -824,6 +1070,43 @@
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Li-ping et al. - 2014 - Coupling Time-Domain Analysis for Dynamic Positioning during S-Lay Installation.pdf}
 }
 
+@inproceedings{liuHowDoesNoise2020,
+  title = {How {{Does Noise Help Robustness}}? {{Explanation}} and {{Exploration}} under the {{Neural SDE Framework}}},
+  shorttitle = {How {{Does Noise Help Robustness}}?},
+  booktitle = {2020 {{IEEE}}/{{CVF Conference}} on {{Computer Vision}} and {{Pattern Recognition}} ({{CVPR}})},
+  author = {Liu, Xuanqing and Xiao, Tesi and Si, Si and Cao, Qin and Kumar, Sanjiv and Hsieh, Cho-Jui},
+  date = {2020-06},
+  pages = {279--287},
+  publisher = {IEEE},
+  location = {Seattle, WA, USA},
+  doi = {10.1109/CVPR42600.2020.00036},
+  url = {https://ieeexplore.ieee.org/document/9157003/},
+  urldate = {2026-01-07},
+  abstract = {Neural Ordinary Differential Equation (Neural ODE) has been proposed as a continuous approximation to the ResNet architecture. Some commonly used regularization mechanisms in discrete neural networks (e.g., dropout, Gaussian noise) are missing in current Neural ODE networks. In this paper, we propose a new continuous neural network framework called Neural Stochastic Differential Equation (Neural SDE), which naturally incorporates various commonly used regularization mechanisms based on random noise injection. For regularization purposes, our framework includes multiple types of noise patterns, such as dropout, additive, and multiplicative noise, which are common in plain neural networks. We provide some theoretical analyses explaining the improved robustness of our models against input perturbations. Furthermore, we demonstrate that the Neural SDE network can achieve better generalization than the Neural ODE and is more resistant to adversarial and non-adversarial input perturbations.},
+  eventtitle = {2020 {{IEEE}}/{{CVF Conference}} on {{Computer Vision}} and {{Pattern Recognition}} ({{CVPR}})},
+  isbn = {978-1-7281-7168-5},
+  langid = {english},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Liu et al. - 2020 - How Does Noise Help Robustness Explanation and Exploration under the Neural SDE Framework.pdf}
+}
+
+@online{liuNeuralSDEStabilizing2019,
+  title = {Neural {{SDE}}: {{Stabilizing Neural ODE Networks}} with {{Stochastic Noise}}},
+  shorttitle = {Neural {{SDE}}},
+  author = {Liu, Xuanqing and Xiao, Tesi and Si, Si and Cao, Qin and Kumar, Sanjiv and Hsieh, Cho-Jui},
+  date = {2019-06-05},
+  eprint = {1906.02355},
+  eprinttype = {arXiv},
+  eprintclass = {cs},
+  doi = {10.48550/arXiv.1906.02355},
+  url = {http://arxiv.org/abs/1906.02355},
+  urldate = {2026-01-07},
+  abstract = {Neural Ordinary Differential Equation (Neural ODE) has been proposed as a continuous approximation to the ResNet architecture. Some commonly used regularization mechanisms in discrete neural networks (e.g. dropout, Gaussian noise) are missing in current Neural ODE networks. In this paper, we propose a new continuous neural network framework called Neural Stochastic Differential Equation (Neural SDE) network, which naturally incorporates various commonly used regularization mechanisms based on random noise injection. Our framework can model various types of noise injection frequently used in discrete networks for regularization purpose, such as dropout and additive/multiplicative noise in each block. We provide theoretical analysis explaining the improved robustness of Neural SDE models against input perturbations/adversarial attacks. Furthermore, we demonstrate that the Neural SDE network can achieve better generalization than the Neural ODE and is more resistant to adversarial and non-adversarial input perturbations.},
+  langid = {english},
+  pubstate = {prepublished},
+  keywords = {Computer Science - Artificial Intelligence,Computer Science - Computer Vision and Pattern Recognition,Computer Science - Machine Learning,Statistics - Machine Learning},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Liu et al. - 2019 - Neural SDE Stabilizing Neural ODE Networks with Stochastic Noise.pdf}
+}
+
 @inproceedings{luebckeFastMethodEvaluation2015,
   title = {A {{Fast Method}} for the {{Evaluation}} of the {{Dynamic Positioning Capability}} in {{Time Domain}} in the {{Early Design Stage}}},
   author = {Luebcke, Adele and Augener, Philip and Falkenhorst, Arne},
@@ -836,6 +1119,26 @@
   eventtitle = {{{ASME}} 2015 34th {{International Conference}} on {{Ocean}}, {{Offshore}} and {{Arctic Engineering}}},
   langid = {english},
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Luebcke et al. - 2015 - A Fast Method for the Evaluation of the Dynamic Positioning Capability in Time Domain in the Early D.pdf}
+}
+
+@article{luschDeepLearningUniversal2018,
+  title = {Deep Learning for Universal Linear Embeddings of Nonlinear Dynamics},
+  author = {Lusch, Bethany and Kutz, J. Nathan and Brunton, Steven L.},
+  date = {2018-11-23},
+  journaltitle = {Nature Communications},
+  shortjournal = {Nat Commun},
+  volume = {9},
+  number = {1},
+  pages = {4950},
+  publisher = {Nature Publishing Group},
+  issn = {2041-1723},
+  doi = {10.1038/s41467-018-07210-0},
+  url = {https://www.nature.com/articles/s41467-018-07210-0},
+  urldate = {2025-12-18},
+  abstract = {Identifying coordinate transformations that make strongly nonlinear dynamics approximately linear has the potential to enable nonlinear prediction, estimation, and control using linear theory. The Koopman operator is a leading data-driven embedding, and its eigenfunctions provide intrinsic coordinates that globally linearize the dynamics. However, identifying and representing these eigenfunctions has proven challenging. This work leverages deep learning to discover representations of Koopman eigenfunctions from data. Our network is parsimonious and interpretable by construction, embedding the dynamics on a low-dimensional manifold. We identify nonlinear coordinates on which the dynamics are globally linear using a modified auto-encoder. We also generalize Koopman representations to include a ubiquitous class of systems with continuous spectra. Our framework parametrizes the continuous frequency using an auxiliary network, enabling a compact and efficient embedding, while connecting our models to decades of asymptotics. Thus, we benefit from the power of deep learning, while retaining the physical interpretability of Koopman embeddings.},
+  langid = {english},
+  keywords = {Applied mathematics,Nonlinear phenomena},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Lusch et al. - 2018 - Deep learning for universal linear embeddings of nonlinear dynamics.pdf}
 }
 
 @online{maiSurrogateModellingStochastic2016,
@@ -853,6 +1156,26 @@
   pubstate = {prepublished},
   keywords = {Statistics - Methodology},
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Mai et al. - 2016 - Surrogate modelling for stochastic dynamical systems by combining NARX models and polynomial chaos e.pdf}
+}
+
+@article{mardtVAMPnetsDeepLearning2018,
+  title = {{{VAMPnets}} for Deep Learning of Molecular Kinetics},
+  author = {Mardt, Andreas and Pasquali, Luca and Wu, Hao and Noé, Frank},
+  date = {2018-01-02},
+  journaltitle = {Nature Communications},
+  shortjournal = {Nat Commun},
+  volume = {9},
+  number = {1},
+  pages = {5},
+  publisher = {Nature Publishing Group},
+  issn = {2041-1723},
+  doi = {10.1038/s41467-017-02388-1},
+  url = {https://www.nature.com/articles/s41467-017-02388-1},
+  urldate = {2026-01-05},
+  abstract = {There is an increasing demand for computing the relevant structures, equilibria, and long-timescale kinetics of biomolecular processes, such as protein-drug binding, from high-throughput molecular dynamics simulations. Current methods employ transformation of simulated coordinates into structural features, dimension reduction, clustering the dimension-reduced data, and estimation of a Markov state model or related model of the interconversion rates between molecular structures. This handcrafted approach demands a substantial amount of modeling expertise, as poor decisions at any step will lead to large modeling errors. Here we employ the variational approach for Markov processes (VAMP) to develop a deep learning framework for molecular kinetics using neural networks, dubbed VAMPnets. A VAMPnet encodes the entire mapping from molecular coordinates to Markov states, thus combining the whole data processing pipeline in a single end-to-end framework. Our method performs equally or better than state-of-the-art Markov modeling methods and provides easily interpretable few-state kinetic models.},
+  langid = {english},
+  keywords = {Machine learning,Molecular modelling,Theoretical chemistry},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Mardt et al. - 2018 - VAMPnets for deep learning of molecular kinetics.pdf}
 }
 
 @article{martelliTimedomainMethodologyAssess2022,
@@ -920,11 +1243,111 @@
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Mavkov et al. - 2020 - Integrated Neural Networks for Nonlinear Continuous-Time System Identification.pdf}
 }
 
+@article{mentzelopoulosVariationalAutoencodersTransformers2024,
+  title = {Variational Autoencoders and Transformers for Multivariate Time-Series Generative Modeling and Forecasting: {{Applications}} to Vortex-Induced Vibrations},
+  shorttitle = {Variational Autoencoders and Transformers for Multivariate Time-Series Generative Modeling and Forecasting},
+  author = {Mentzelopoulos, Andreas P. and Fan, Dixia and Sapsis, Themistoklis P. and Triantafyllou, Michael S.},
+  date = {2024-10},
+  journaltitle = {Ocean Engineering},
+  shortjournal = {Ocean Engineering},
+  volume = {310},
+  pages = {118639},
+  issn = {00298018},
+  doi = {10.1016/j.oceaneng.2024.118639},
+  url = {https://linkinghub.elsevier.com/retrieve/pii/S0029801824019772},
+  urldate = {2026-01-20},
+  abstract = {This study employs a data-driven approach to studying physical system vibrations, focusing on two main aspects: using variational autoencoders (VAEs) to generate physical data (i.e. data ‘‘similar’’ to those obtained via real-world processes) and using transformers in order to continuously forecast flexible body nonstationary vibrations (2D time-series) in time–space using information from sparse sensors on the body (observers). A VAE is trained on vortex-induced vibrations (VIV) data collected from experiments conducted by the authors and is then tasked with generating synthetic VIV data similar to the experimental. The synthetic data are then used to train a transformer architecture whose objective is to continuously forecast the vibrations in time–space using sparse observations. The transformer (which has never seen real data) is tested against real experiments and its performance is compared to that of the same architecture trained on real data. In doing so, the ability of VAEs to generate data which preserve their training data’s intrinsic properties (i.e. physicality) is evaluated. Finally a comparison between the forecasting performance of the transformer architecture, an LSTM, and a DNN is presented.},
+  langid = {english},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Mentzelopoulos et al. - 2024 - Variational autoencoders and transformers for multivariate time-series generative modeling and forec.pdf}
+}
+
+@article{mesterDifferentialMethodsAssessing2022,
+  title = {Differential Methods for Assessing Sensitivity in Biological Models},
+  author = {Mester, Rachel and Landeros, Alfonso and Rackauckas, Chris and Lange, Kenneth},
+  date = {2022},
+  journaltitle = {PLoS Computational Biology},
+  shortjournal = {PLoS Comput. Biol.},
+  volume = {18},
+  number = {6},
+  publisher = {Public Library of Science},
+  issn = {1553-734X},
+  doi = {10.1371/journal.pcbi.1009598},
+  abstract = {Differential sensitivity analysis is indispensable in fitting parameters, understanding uncertainty, and forecasting the results of both thought and lab experiments. Although there are many methods currently available for performing differential sensitivity analysis of biological models, it can be difficult to determine which method is best suited for a particular model. In this paper, we explain a variety of differential sensitivity methods and assess their value in some typical biological models. First, we explain the mathematical basis for three numerical methods: adjoint sensitivity analysis, complex perturbation sensitivity analysis, and forward mode sensitivity analysis. We then carry out four instructive case studies. (a) The CARRGO model for tumor-immune interaction highlights the additional information that differential sensitivity analysis provides beyond traditional naive sensitivity methods, (b) the deterministic SIR model demonstrates the value of using second-order sensitivity in refining model predictions, (c) the stochastic SIR model shows how differential sensitivity can be attacked in stochastic modeling, and (d) a discrete birth-death-migration model illustrates how the complex perturbation method of differential sensitivity can be generalized to a broader range of biological models. Finally, we compare the speed, accuracy, and ease of use of these methods. We find that forward mode automatic differentiation has the quickest computational time, while the complex perturbation method is the simplest to implement and the most generalizable. © 2022 Mester et al. This is an open access article distributed under the terms of the Creative Commons Attribution License, which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.},
+  langid = {english},
+  file = {C\:\\Users\\AAg\\OneDrive - Allseas Engineering BV\\Documents\\Thesis\\Thesis-Literature - Documents\\Mester et al. - 2022 - Differential methods for assessing sensitivity in biological models.pdf;C\:\\Users\\AAg\\Zotero\\storage\\CPCA6PCM\\85133102740.html}
+}
+
+@article{mezicSpectralPropertiesDynamical2005,
+  title = {Spectral {{Properties}} of {{Dynamical Systems}}, {{Model Reduction}} and {{Decompositions}}},
+  author = {Mezić, Igor},
+  date = {2005-08-01},
+  journaltitle = {Nonlinear Dynamics},
+  shortjournal = {Nonlinear Dyn},
+  volume = {41},
+  number = {1},
+  pages = {309--325},
+  issn = {1573-269X},
+  doi = {10.1007/s11071-005-2824-x},
+  url = {https://doi.org/10.1007/s11071-005-2824-x},
+  urldate = {2026-01-06},
+  abstract = {In this paper we discuss two issues related to model reduction of deterministic or stochastic processes. The first is the relationship of the spectral properties of the dynamics on the attractor of the original, high-dimensional dynamical system with the properties and possibilities for model reduction. We review some elements of the spectral theory of dynamical systems. We apply this theory to obtain a decomposition of the process that utilizes spectral properties of the linear Koopman operator associated with the asymptotic dynamics on the attractor. This allows us to extract the almost periodic part of the evolving process. The remainder of the process has continuous spectrum. The second topic we discuss is that of model validation, where the original, possibly high-dimensional dynamics and the dynamics of the reduced model – that can be deterministic or stochastic – are compared in some norm. Using the “statistical Takens theorem” proven in (Mezić, I. and Banaszuk, A. Physica D, 2004) we argue that comparison of average energy contained in the finite-dimensional projection is one in the hierarchy of functionals of the field that need to be checked in order to assess the accuracy of the projection.},
+  langid = {english},
+  keywords = {model reduction,spectral theory of dynamical systems},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Mezić - 2005 - Spectral Properties of Dynamical Systems, Model Reduction and Decompositions.pdf}
+}
+
+@article{mortonDeepDynamicalModeling,
+  title = {Deep Dynamical Modeling and Control of Unsteady Fluid Flows},
+  author = {Morton, Jeremy and Witherden, Freddie David and Jameson, Antony and Kochenderfer, Mykel John},
+  abstract = {The design of flow control systems remains a challenge due to the nonlinear nature of the equations that govern fluid flow. However, recent advances in computational fluid dynamics (CFD) have enabled the simulation of complex fluid flows with high accuracy, opening the possibility of using learning-based approaches to facilitate controller design. We present a method for learning the forced and unforced dynamics of airflow over a cylinder directly from CFD data. The proposed approach, grounded in Koopman theory, is shown to produce stable dynamical models that can predict the time evolution of the cylinder system over extended time horizons. Finally, by performing model predictive control with the learned dynamical models, we are able to find a straightforward, interpretable control law for suppressing vortex shedding in the wake of the cylinder.},
+  langid = {english},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Morton et al. - Deep dynamical modeling and control of unsteady fluid flows.pdf}
+}
+
+@inproceedings{mortonDeepVariationalKoopman2019,
+  title = {Deep {{Variational Koopman Models}}: {{Inferring Koopman Observations}} for {{Uncertainty-Aware Dynamics Modeling}} and {{Control}}},
+  shorttitle = {Deep {{Variational Koopman Models}}},
+  booktitle = {Proceedings of the {{Twenty-Eighth International Joint Conference}} on {{Artificial Intelligence}}},
+  author = {Morton, Jeremy and Witherden, Freddie D. and Kochenderfer, Mykel J.},
+  date = {2019-08},
+  pages = {3173--3179},
+  publisher = {International Joint Conferences on Artificial Intelligence Organization},
+  location = {Macao, China},
+  doi = {10.24963/ijcai.2019/440},
+  url = {https://www.ijcai.org/proceedings/2019/440},
+  urldate = {2026-01-05},
+  abstract = {Koopman theory asserts that a nonlinear dynamical system can be mapped to a linear system, where the Koopman operator advances observations of the state forward in time. However, the observable functions that map states to observations are generally unknown. We introduce the Deep Variational Koopman (DVK) model, a method for inferring distributions over observations that can be propagated linearly in time. By sampling from the inferred distributions, we obtain a distribution over dynamical models, which in turn provides a distribution over possible outcomes as a modeled system advances in time. Experiments show that the DVK model is effective at long-term prediction for a variety of dynamical systems. Furthermore, we describe how to incorporate the learned models into a control framework, and demonstrate that accounting for the uncertainty present in the distribution over dynamical models enables more effective control.},
+  eventtitle = {Twenty-{{Eighth International Joint Conference}} on {{Artificial Intelligence}} \{{{IJCAI-19}}\}},
+  isbn = {978-0-9992411-4-1},
+  langid = {english},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Morton et al. - 2019 - Deep Variational Koopman Models Inferring Koopman Observations for Uncertainty-Aware Dynamics Model.pdf}
+}
+
 @online{MTMScGuidelinesMaster,
   title = {{{MT-MSc}} Guidelines - {{Master Marine Technology}}},
   url = {https://brightspace.tudelft.nl/d2l/le/content/43177/viewContent/3485613/View},
   urldate = {2025-11-25},
   file = {C:\Users\AAg\Zotero\storage\MY2MF5AB\View.html}
+}
+
+@article{nathanielDeepKoopmanOperators2025,
+  title = {Deep {{Koopman}} Operators for Causal Discovery},
+  author = {Nathaniel, Juan and Roesch, Carla and Buch, Jatan and DeSantis, Derek and Rupe, Adam and Lamb, Kara D. and Gentine, Pierre},
+  date = {2025-11-20},
+  journaltitle = {Communications Physics},
+  shortjournal = {Commun Phys},
+  volume = {8},
+  number = {1},
+  pages = {513},
+  publisher = {Nature Publishing Group},
+  issn = {2399-3650},
+  doi = {10.1038/s42005-025-02426-1},
+  url = {https://www.nature.com/articles/s42005-025-02426-1},
+  urldate = {2026-01-06},
+  abstract = {Causal discovery aims to identify cause-effect mechanisms for better scientific understanding, explainable decision-making, and more accurate modeling. Standard statistical frameworks, such as Granger causality, lack the ability to quantify causal relationships in nonlinear dynamics due to the presence of complex feedback mechanisms, timescale mixing, and nonstationarity. Thus, applying these methods to study causal dynamics in real-world systems, such as the Earth, is a major challenge. Addressing this shortcoming, we leverage deep learning and a Koopman operator-theoretic formalism to present a class of causal discovery algorithms. Kausal uses deep Koopman operator methods to approximate nonlinear dynamics in a linearized vector space in which traditional causal inference methods such as Granger causality can be more easily applied. Our idealized experiments demonstrate Kausal’s superior ability in discovering and characterizing causal signals compared to existing deep learning and non-deep learning state-of-the-art approaches. Finally, the successful identification of major El Niño and La Niña events in observations showcases Kausal’s skill to handle real-world applications.},
+  langid = {english},
+  keywords = {Applied mathematics,Nonlinear phenomena},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Nathaniel et al. - 2025 - Deep Koopman operators for causal discovery.pdf}
 }
 
 @inproceedings{NEURIPS2019_118921ef,
@@ -1054,6 +1477,23 @@
   file = {C\:\\Users\\AAg\\OneDrive - Allseas Engineering BV\\Documents\\Thesis\\Thesis-Literature - Documents\\Øvereng et al. - 2021 - Dynamic Positioning using Deep Reinforcement Learning.pdf;C\:\\Users\\AAg\\Zotero\\storage\\NPKAFKPS\\S0029801821008398.html}
 }
 
+@inproceedings{palOpeningBlackboxAccelerating2021,
+  title = {Opening the {{Blackbox}}: {{Accelerating Neural Differential Equations}} by {{Regularizing Internal Solver Heuristics}}},
+  shorttitle = {Opening the {{Blackbox}}},
+  booktitle = {Proceedings of the 38th {{International Conference}} on {{Machine Learning}}},
+  author = {Pal, Avik and Ma, Yingbo and Shah, Viral and Rackauckas, Christopher V.},
+  date = {2021-07-01},
+  pages = {8325--8335},
+  publisher = {PMLR},
+  issn = {2640-3498},
+  url = {https://proceedings.mlr.press/v139/pal21a.html},
+  urldate = {2026-01-07},
+  abstract = {Democratization of machine learning requires architectures that automatically adapt to new problems. Neural Differential Equations (NDEs) have emerged as a popular modeling framework by removing the need for ML practitioners to choose the number of layers in a recurrent model. While we can control the computational cost by choosing the number of layers in standard architectures, in NDEs the number of neural network evaluations for a forward pass can depend on the number of steps of the adaptive ODE solver. But, can we force the NDE to learn the version with the least steps while not increasing the training cost? Current strategies to overcome slow prediction require high order automatic differentiation, leading to significantly higher training time. We describe a novel regularization method that uses the internal cost heuristics of adaptive differential equation solvers combined with discrete adjoint sensitivities to guide the training process towards learning NDEs that are easier to solve. This approach opens up the blackbox numerical analysis behind the differential equation solver’s algorithm and directly uses its local error estimates and stiffness heuristics as cheap and accurate cost estimates. We incorporate our method without any change in the underlying NDE framework and show that our method extends beyond Ordinary Differential Equations to accommodate Neural Stochastic Differential Equations. We demonstrate how our approach can halve the prediction time and, unlike other methods which can increase the training time by an order of magnitude, we demonstrate similar reduction in training times. Together this showcases how the knowledge embedded within state-of-the-art equation solvers can be used to enhance machine learning.},
+  eventtitle = {International {{Conference}} on {{Machine Learning}}},
+  langid = {english},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Pal et al. - 2021 - Opening the Blackbox Accelerating Neural Differential Equations by Regularizing Internal Solver Heu.pdf}
+}
+
 @article{pedersenPredictionFullScalePropulsion,
   title = {Prediction of {{Full-Scale Propulsion Power}} Using {{Artificial Neural Networks}}},
   author = {Pedersen, Benjamin Pjedsted and Larsen, Jan},
@@ -1114,18 +1554,20 @@
   file = {C:\Users\AAg\Zotero\storage\CDJJ2U2N\conference-article.html}
 }
 
-@inproceedings{rackauckasHybridMechanisticNeural2021a,
-  title = {Hybrid {{Mechanistic}} + {{Neural Model}} of {{Laboratory Helicopter}}},
-  author = {Rackauckas, Christopher and Sharma, Roshan and Lie, Bernt},
-  date = {2021-03-03},
-  pages = {264--271},
-  doi = {10.3384/ecp20176264},
-  url = {https://ep.liu.se/en/conference-article.aspx?series=ecp&issue=176&Article_No=37},
-  urldate = {2025-12-16},
-  abstract = {There is a growing interest in data-driven models of dynamic systems developed from “Big Data”. Data-driven models have some limitations, e.g., without data, there is no model. Hybrid models consisting of relatively simple mechanistic models in tandem with data-driven models offer a compromise: physics understanding and design/synthesis of control structure prior to building the system, and improved model as data becomes available.},
-  eventtitle = {{{SIMS Conference}} on {{Simulation}} and {{Modelling SIMS}} 2020, {{September}} 22-24, {{Virtual Conference}}, {{Finland}}},
-  langid = {english},
-  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Rackauckas et al. - 2021 - Hybrid Mechanistic + Neural Model of Laboratory Helicopter.pdf}
+@inproceedings{rackauckasStabilityOptimizedHighOrder2020,
+  title = {Stability-{{Optimized High Order Methods}} and {{Stiffness Detection}} for {{Pathwise Stiff Stochastic Differential Equations}}},
+  booktitle = {2020 {{IEEE High Performance Extreme Computing Conference}} ({{HPEC}})},
+  author = {Rackauckas, Chris and Nie, Qing},
+  date = {2020-09},
+  pages = {1--8},
+  issn = {2643-1971},
+  doi = {10.1109/HPEC43674.2020.9286178},
+  url = {https://ieeexplore.ieee.org/abstract/document/9286178},
+  urldate = {2026-01-07},
+  abstract = {Stochastic differential equations (SDE) often exhibit large random transitions. This property, which we denote as pathwise stiffness, causes transient bursts of stiffness which limit the allowed step size for common fixed time step explicit and drift-implicit integrators. Here we present a HPC-driven method for deriving high strong order methods for stochastic differential equations. Utilizing GPU-accelerated global optimization, we numerically solve a constrained optimization problem which results stability-optimized adaptive methods of strong order 1.5 for SDEs. The resulting explicit methods are shown to exhibit substantially enlarged stability regions which allows for them to solve pathwise stiff biological models orders of magnitude more efficiently than previous methods like SRIW1 and Euler-Maruyama. These methods are benchmarked on a range of semi-stiff problems and demonstrate speedups between 6x previous adaptive algorithms while showing computationally infeasibility of fixed time step integrators on some of these test equations.},
+  eventtitle = {2020 {{IEEE High Performance Extreme Computing Conference}} ({{HPEC}})},
+  keywords = {Differential equations,Mathematical model,Numerical stability,Optimization,Stability analysis,Stochastic processes,Transient analysis},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Rackauckas and Nie - 2020 - Stability-Optimized High Order Methods and Stiffness Detection for Pathwise Stiff Stochastic Differe.pdf}
 }
 
 @article{rajendraModelingDynamicalSystems2020,
@@ -1181,6 +1623,53 @@
   file = {C:\Users\AAg\Zotero\storage\NH59SZDR\recurrent-neural-network.html}
 }
 
+@article{robertsContinuoustimeEchoState2022,
+  title = {Continuous-Time Echo State Networks for Predicting Power System Dynamics},
+  author = {Roberts, Ciaran and Lara, José Daniel and Henriquez-Auba, Rodrigo and Bossart, Matthew and Anantharaman, Ranjan and Rackauckas, Chris and Hodge, Bri-Mathias and Callaway, Duncan S.},
+  date = {2022-11-01},
+  journaltitle = {Electric Power Systems Research},
+  shortjournal = {Electric Power Systems Research},
+  volume = {212},
+  pages = {108562},
+  issn = {0378-7796},
+  doi = {10.1016/j.epsr.2022.108562},
+  url = {https://www.sciencedirect.com/science/article/pii/S0378779622006587},
+  urldate = {2026-01-07},
+  abstract = {With the growing penetration of converter-interfaced generation in power systems, the dynamical behavior of these systems is rapidly evolving. One of the challenges with converter-interfaced generation is the increased number of equations, as well as the required numerical timestep, involved in simulating these systems. Within this work, we explore the use of continuous-time echo state networks as a means to cheaply, and accurately, predict the dynamic response of power systems subject to a disturbance for varying system parameters. We show an application for predicting frequency dynamics following a loss of generation for varying penetrations of grid-following and grid-forming converters. We demonstrate that, after training on 20 solutions of the full-order system, we achieve a median nadir prediction error of 0.17 mHz with 95\% of all nadir prediction errors within ±4 mHz. We conclude with some discussion on how this approach can be used for parameter sensitivity analysis and within optimization algorithms to rapidly predict the dynamical behavior of the system.},
+  keywords = {Data-driven modeling techniques,Electro-magnetic transients,Machine learning,Power system dynamics},
+  file = {C\:\\Users\\AAg\\OneDrive - Allseas Engineering BV\\Documents\\Thesis\\Thesis-Literature - Documents\\Roberts et al. - 2022 - Continuous-time echo state networks for predicting power system dynamics.pdf;C\:\\Users\\AAg\\Zotero\\storage\\FIB56EB7\\S0378779622006587.html}
+}
+
+@inproceedings{rubanovaLatentODEsIrregularlySampled2019,
+  title = {Latent {{ODEs}} for {{Irregularly-Sampled Time Series}}},
+  booktitle = {Proceedings of the 33rd {{International Conference}} on {{Neural Information Processing Systems}}},
+  author = {Rubanova, Yulia and Chen, Ricky T Q and Duvenaud, David},
+  date = {2019-12},
+  pages = {5320--5330},
+  doi = {10.5555/3454287.3454765},
+  abstract = {Time series with non-uniform intervals occur in many applications, and are difficult to model using standard recurrent neural networks (RNNs). We generalize RNNs to have continuous-time hidden dynamics defined by ordinary differential equations (ODEs), a model we call ODE-RNNs. Furthermore, we use ODE-RNNs to replace the recognition network of the recently-proposed Latent ODE model. Both ODE-RNNs and Latent ODEs can naturally handle arbitrary time gaps between observations, and can explicitly model the probability of observation times using Poisson processes. We show experimentally that these ODE-based models outperform their RNN-based counterparts on irregularly-sampled data.},
+  langid = {english},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Rubanova et al. - Latent ODEs for Irregularly-Sampled Time Series.pdf}
+}
+
+@online{sabbarSelectiveReviewModern2025,
+  title = {A {{Selective Review}} of {{Modern Stochastic Modeling}}: {{SDE}}/{{SPDE Numerics}}, {{Data-Driven Identification}}, and {{Generative Methods}} with {{Applications}} in {{Biomathematics}}},
+  shorttitle = {A {{Selective Review}} of {{Modern Stochastic Modeling}}},
+  author = {Sabbar, Yassine and Nisar, Kottakkaran Sooppy},
+  date = {2025-10-23},
+  eprint = {2508.11004},
+  eprinttype = {arXiv},
+  eprintclass = {math},
+  doi = {10.48550/arXiv.2508.11004},
+  url = {http://arxiv.org/abs/2508.11004},
+  urldate = {2026-01-20},
+  abstract = {This review maps 2020-2025 developments in stochastic modeling, highlighting non-standard approaches and their applications to biology and epidemiology. It brings together four strands: (1) core models for systems that evolve with randomness; (2) learning key parts of those models directly from data; (3) methods that can generate realistic synthetic data in continuous time; and (4) numerical techniques that keep simulations stable, accurate, and faithful over long runs. The objective is practical: help researchers quickly see what is new, how the pieces fit together, and where important gaps remain. We summarize tools for estimating changing infection or reaction rates under noisy and incomplete observations, modeling spatial spread, accounting for sudden jumps and heavy tails, and reporting uncertainty in a way that is useful for decisions. We also highlight open problems that deserve near-term attention: separating true dynamics from noise when data are irregular; learning spatial dynamics under random influences with guarantees of stability; aligning training with the numerical method used in applications; preserving positivity and conservation in all simulations; reducing cost while controlling error for large studies; estimating rare but important events; and adopting clear, comparable reporting standards. By organizing the field around these aims, the review offers a concise guide to current methods, their practical use, and the most promising directions for future work in biology and epidemiology.},
+  langid = {english},
+  pubstate = {prepublished},
+  keywords = {Mathematics - Dynamical Systems,Quantitative Biology - Quantitative Methods},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Sabbar and Nisar - 2025 - A Selective Review of Modern Stochastic Modeling SDESPDE Numerics, Data-Driven Identification, and.pdf}
+}
+
 @article{sadamotoDynamicModelingStability2019,
   title = {Dynamic {{Modeling}}, {{Stability}}, and {{Control}} of {{Power Systems With Distributed Energy Resources}}: {{Handling Faults Using Two Control Methods}} in {{Tandem}}},
   shorttitle = {Dynamic {{Modeling}}, {{Stability}}, and {{Control}} of {{Power Systems With Distributed Energy Resources}}},
@@ -1216,6 +1705,14 @@
   abstract = {Probabilistic forecasting, i.e., estimating a time series’ future probability distribution given its past, is a key enabler for optimizing business processes. In retail businesses, for example, probabilistic demand forecasts are crucial for having the right inventory available at the right time and in the right place. This paper proposes DeepAR, a methodology for producing accurate probabilistic forecasts, based on training an autoregressive recurrent neural network model on a large number of related time series. We demonstrate how the application of deep learning techniques to forecasting can overcome many of the challenges that are faced by widely-used classical approaches to the problem. By means of extensive empirical evaluations on several real-world forecasting datasets, we show that our methodology produces more accurate forecasts than other state-of-the-art methods, while requiring minimal manual work.},
   keywords = {Big data,Deep learning,Demand forecasting,Neural networks,Probabilistic forecasting},
   file = {C\:\\Users\\AAg\\OneDrive - Allseas Engineering BV\\Documents\\Thesis\\Thesis-Literature - Documents\\Salinas et al. - 2020 - DeepAR Probabilistic forecasting with autoregressive recurrent networks.pdf;C\:\\Users\\AAg\\Zotero\\storage\\TTJBGAYR\\S0169207019301888.html}
+}
+
+@article{schreinerImplicitTransferOperator,
+  title = {Implicit {{Transfer Operator Learning}}: {{Multiple Time-Resolution Surrogates}} for {{Molecular Dynamics}}},
+  author = {Schreiner, Mathias and Winther, Ole and Olsson, Simon},
+  abstract = {Computing properties of molecular systems rely on estimating expectations of the (unnormalized) Boltzmann distribution. Molecular dynamics (MD) is a broadly adopted technique to approximate such quantities. However, stable simulations rely on very small integration time-steps (10 15 s), whereas convergence of some moments, e.g. binding free energy or rates, might rely on sampling processes on time-scales as long as 10 1 s, and these simulations must be repeated for every molecular system independently. Here, we present Implicit Transfer Operator (ITO) Learning, a framework to learn surrogates of the simulation process with multiple time-resolutions. We implement ITO with denoising diffusion probabilistic models with a new SE(3) equivariant architecture and show the resulting models can generate self-consistent stochastic dynamics across multiple time-scales, even when the system is only partially observed. Finally, we present a coarse-grained CG-SE3-ITO model which can quantitatively model all-atom molecular dynamics using only coarse molecular representations. As such, ITO provides an important step towards multiple time- and space-resolution acceleration of MD. Code is available at https://github.com/olsson-group/ito.},
+  langid = {english},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Schreiner et al. - Implicit Transfer Operator Learning Multiple Time-Resolution Surrogates for Molecular Dynamics.pdf}
 }
 
 @book{schulzInformedMachineLearning2025,
@@ -1280,6 +1777,23 @@
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Shi - 2011 - Operability Study for DP Vessel Operations at a Deep water Spar-A Decision Support Tool.pdf}
 }
 
+@online{sipDynamicalSystemReconstruction2025,
+  title = {Dynamical System Reconstruction from Partial Observations Using Stochastic Dynamics},
+  author = {Sip, Viktor and Breyton, Martin and Petkoski, Spase and Jirsa, Viktor},
+  date = {2025-10-01},
+  eprint = {2510.01089},
+  eprinttype = {arXiv},
+  eprintclass = {cs},
+  doi = {10.48550/arXiv.2510.01089},
+  url = {http://arxiv.org/abs/2510.01089},
+  urldate = {2026-01-20},
+  abstract = {Learning stochastic models of dynamical systems underlying observed data is of interest in many scientific fields. Here we propose a novel method for this task, based on the framework of variational autoencoders for dynamical systems. The method estimates from the data both the system state trajectories and noise time series. This approach allows to perform multi-step system evolution and supports a teacher forcing strategy, alleviating limitations of autoencoder-based approaches for stochastic systems. We demonstrate the performance of the proposed approach on six test problems, covering simulated and experimental data. We further show the effects of the teacher forcing interval on the nature of the internal dynamics, and compare it to the deterministic models with equivalent architecture.},
+  langid = {english},
+  pubstate = {prepublished},
+  keywords = {Computer Science - Machine Learning,Quantitative Biology - Quantitative Methods},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Sip et al. - 2025 - Dynamical system reconstruction from partial observations using stochastic dynamics.pdf}
+}
+
 @article{smogeliDynCapFullScale,
   title = {{{DynCap}} – {{Full}} Scale Validation of a Vessel’s Station-Keeping Capability Analysis},
   author = {Smogeli, Øyvind and Nguyen, Dong Trong and Eide, Kristoffer and Pivano, Luca},
@@ -1316,6 +1830,24 @@
   file = {C\:\\Users\\AAg\\OneDrive - Allseas Engineering BV\\Documents\\Thesis\\Thesis-Literature - Documents\\Spenke et al. - 2023 - On the number of subproblem iterations per coupling step in partitioned fluid-structure interaction.pdf;C\:\\Users\\AAg\\Zotero\\storage\\ICYJTVH7\\2303.html}
 }
 
+@article{strasserOverviewKoopmanbasedControl2026,
+  title = {An Overview of {{Koopman-based}} Control: {{From}} Error Bounds to Closed-Loop Guarantees},
+  shorttitle = {An Overview of {{Koopman-based}} Control},
+  author = {Strässer, Robin and Worthmann, Karl and Mezić, Igor and Berberich, Julian and Schaller, Manuel and Allgöwer, Frank},
+  date = {2026-01-01},
+  journaltitle = {Annual Reviews in Control},
+  shortjournal = {Annual Reviews in Control},
+  volume = {61},
+  pages = {101035},
+  issn = {1367-5788},
+  doi = {10.1016/j.arcontrol.2025.101035},
+  url = {https://www.sciencedirect.com/science/article/pii/S1367578825000495},
+  urldate = {2026-01-06},
+  abstract = {Controlling nonlinear dynamical systems remains a central challenge in a wide range of applications, particularly when accurate first-principle models are unavailable. Data-driven approaches offer a promising alternative by designing controllers directly from observed trajectories. A wide range of data-driven methods relies on the Koopman-operator framework that enables linear representations of nonlinear dynamics via lifting into higher-dimensional observable spaces. Finite-dimensional approximations, such as extended dynamic mode decomposition (EDMD) and its controlled variants, make prediction and feedback control tractable but introduce approximation errors that must be accounted for to provide rigorous closed-loop guarantees. This survey provides a systematic overview of Koopman-based control, emphasizing the connection between data-driven surrogate models, approximation errors, controller design, and closed-loop guarantees. We review theoretical foundations, error bounds, and both linear and bilinear EDMD-based control schemes, highlighting robust strategies that ensure stability and performance. Finally, we discuss open challenges and future directions at the interface of operator theory, approximation theory, and nonlinear control.},
+  keywords = {Closed-loop guarantees,Extended dynamic mode decomposition,Finite-data error bounds,Koopman operator,Nonlinear data-driven control},
+  file = {C\:\\Users\\AAg\\OneDrive - Allseas Engineering BV\\Documents\\Thesis\\Thesis-Literature - Documents\\Strässer et al. - 2026 - An overview of Koopman-based control From error bounds to closed-loop guarantees.pdf;C\:\\Users\\AAg\\Zotero\\storage\\65KGMZGY\\S1367578825000495.html}
+}
+
 @book{sullivanIntroductionUncertaintyQuantification2015,
   title = {Introduction to {{Uncertainty Quantification}}},
   author = {Sullivan, T.J.},
@@ -1347,6 +1879,28 @@
   abstract = {Numerical simulations on fluid dynamics problems primarily rely on spatially or/and temporally discretization of the governing equation using polynomials into a finite-dimensional algebraic system. Due to the multi-scale nature of the physics and sensitivity from meshing a complicated geometry, such process can be computational prohibitive for most real-time applications (e.g., clinical diagnosis and surgery planning) and many-query analyses (e.g., optimization design and uncertainty quantification). Therefore, developing a cost-effective surrogate model is of great practical significance. Deep learning (DL) has shown new promises for surrogate modeling due to its capability of handling strong nonlinearity and high dimensionality. However, the off-the-shelf DL architectures, success of which heavily relies on the large amount of training data and interpolatory nature of the problem, fail to operate when the data becomes sparse. Unfortunately, data is often insufficient in most parametric fluid dynamics problems since each data point in the parameter space requires an expensive numerical simulation based on the first principle, e.g., Navier–Stokes equations. In this paper, we provide a physics-constrained DL approach for surrogate modeling of fluid flows without relying on any simulation data. Specifically, a structured deep neural network (DNN) architecture is devised to enforce the initial and boundary conditions, and the governing partial differential equations (i.e., Navier–Stokes equations) are incorporated into the loss of the DNN to drive the training. Numerical experiments are conducted on a number of internal flows relevant to hemodynamics applications, and the forward propagation of uncertainties in fluid properties and domain geometry is studied as well. The results show excellent agreement on the flow field and forward-propagated uncertainties between the DL surrogate approximations and the first-principle numerical simulations.},
   keywords = {Cardiovascular flows,Label-free,Navier-Stokes,Neural networks,Physics-informed machine learning,Uncertainty quantification},
   file = {C\:\\Users\\AAg\\OneDrive - Allseas Engineering BV\\Documents\\Thesis\\Thesis-Literature - Documents\\Sun et al. - 2020 - Surrogate modeling for fluid flows based on physics-constrained deep learning without simulation dat.pdf;C\:\\Users\\AAg\\Zotero\\storage\\GU2CVJYJ\\S004578251930622X.html}
+}
+
+@article{takeishiSubspaceDynamicMode2017,
+  title = {Subspace Dynamic Mode Decomposition for Stochastic {{Koopman}} Analysis},
+  author = {Takeishi, Naoya and Kawahara, Yoshinobu and Yairi, Takehisa},
+  date = {2017-09-18},
+  journaltitle = {Physical Review E},
+  shortjournal = {Phys. Rev. E},
+  volume = {96},
+  number = {3},
+  eprint = {1705.04908},
+  eprinttype = {arXiv},
+  eprintclass = {math},
+  pages = {033310},
+  issn = {2470-0045, 2470-0053},
+  doi = {10.1103/PhysRevE.96.033310},
+  url = {http://arxiv.org/abs/1705.04908},
+  urldate = {2026-01-06},
+  abstract = {The analysis of nonlinear dynamical systems based on the Koopman operator is attracting attention in various applications. Dynamic mode decomposition (DMD) is a data-driven algorithm for Koopman spectral analysis, and several variants with a wide range of applications have been proposed. However, popular implementations of DMD suffer from observation noise on random dynamical systems and generate an inaccurate estimation of the spectra of the stochastic Koopman operator. In this paper, we propose subspace DMD as an algorithm for the Koopman analysis of random dynamical systems with observation noise. Subspace DMD first computes the orthogonal projection of future snapshots to the space of past snapshots and then estimates the spectra of a linear model, and its output converges to the spectra of the stochastic Koopman operator under standard assumptions. We investigate the empirical performance of subspace DMD with several dynamical systems and show its utility for the Koopman analysis of random dynamical systems.},
+  langid = {english},
+  keywords = {Mathematics - Dynamical Systems,Mathematics - Numerical Analysis},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Takeishi et al. - 2017 - Subspace dynamic mode decomposition for stochastic Koopman analysis.pdf}
 }
 
 @inproceedings{tannuriUtilizationNumericalSimulation2011,
@@ -1450,6 +2004,23 @@
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\von Rueden et al. - 2020 - Combining Machine Learning and Simulation to a Hybrid Modelling Approach Current and Future Directi.pdf}
 }
 
+@article{wangFlowbasedBayesianFiltering2025,
+  title = {Flow-Based {{Bayesian}} Filtering for High-Dimensional Nonlinear Stochastic Dynamical Systems},
+  author = {Wang, Xintong and Guan, Xiaofei and Guo, Ling and Wu, Hao},
+  date = {2025-11-01},
+  journaltitle = {Computer Methods in Applied Mechanics and Engineering},
+  shortjournal = {Computer Methods in Applied Mechanics and Engineering},
+  volume = {446},
+  pages = {118285},
+  issn = {0045-7825},
+  doi = {10.1016/j.cma.2025.118285},
+  url = {https://www.sciencedirect.com/science/article/pii/S0045782525005572},
+  urldate = {2026-01-07},
+  abstract = {Bayesian filtering for high-dimensional nonlinear stochastic dynamical systems is a fundamental yet challenging problem in many fields of science and engineering. Existing methods face significant obstacles: Gaussian-based filters struggle with non-Gaussian distributions, while sequential Monte Carlo methods are computationally intensive and prone to particle degeneracy in high dimensions. Although generative models in machine learning have made significant progress in modeling high-dimensional non-Gaussian distributions, their inefficiency in online updating limits their applicability to filtering problems. To address these challenges, we propose a flow-based Bayesian filter (FBF) that integrates normalizing flows to construct a novel latent linear state-space model with Gaussian filtering distributions. This framework facilitates efficient density estimation and sampling using invertible transformations provided by normalizing flows, and it enables the construction of filters in a data-driven manner, without requiring prior knowledge of system dynamics or observation models. Numerical experiments demonstrate the superior accuracy and efficiency of FBF.},
+  keywords = {Bayesian filtering,Generative models,High-dimensional stochastic systems,Latent state-space modeling,Normalizing flows},
+  file = {C\:\\Users\\AAg\\OneDrive - Allseas Engineering BV\\Documents\\Thesis\\Thesis-Literature - Documents\\Wang et al. - 2025 - Flow-based Bayesian filtering for high-dimensional nonlinear stochastic dynamical systems.pdf;C\:\\Users\\AAg\\Zotero\\storage\\LIZG4ZBI\\S0045782525005572.html}
+}
+
 @article{wangIntelligentAdaptiveControl2025,
   title = {Intelligent Adaptive Control of Ship Dynamic Positioning Using Extreme Learning Machine and Disturbance Observer},
   author = {Wang, Hongdu and Zhao, Wenwen and Karkoub, Mansour and Wang, Junrong},
@@ -1518,6 +2089,24 @@
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Wee and Banister - 2016 - How to Write a Literature Review Paper.pdf}
 }
 
+@article{wehmeyerTimelaggedAutoencodersDeep2018,
+  title = {Time-Lagged Autoencoders: {{Deep}} Learning of Slow Collective Variables for Molecular Kinetics},
+  shorttitle = {Time-Lagged Autoencoders},
+  author = {Wehmeyer, Christoph and Noé, Frank},
+  date = {2018-03-15},
+  journaltitle = {The Journal of Chemical Physics},
+  shortjournal = {J. Chem. Phys.},
+  volume = {148},
+  number = {24},
+  pages = {241703},
+  issn = {0021-9606},
+  doi = {10.1063/1.5011399},
+  url = {https://doi.org/10.1063/1.5011399},
+  urldate = {2026-01-05},
+  abstract = {Inspired by the success of deep learning techniques in the physical and chemical sciences, we apply a modification of an autoencoder type deep neural network to the task of dimension reduction of molecular dynamics data. We can show that our time-lagged autoencoder reliably finds low-dimensional embeddings for high-dimensional feature spaces which capture the slow dynamics of the underlying stochastic processes—beyond the capabilities of linear dimension reduction techniques.},
+  file = {C\:\\Users\\AAg\\OneDrive - Allseas Engineering BV\\Documents\\Thesis\\Thesis-Literature - Documents\\Wehmeyer and Noé - 2018 - Time-lagged autoencoders Deep learning of slow collective variables for molecular kinetics.pdf;C\:\\Users\\AAg\\Zotero\\storage\\J9PF8R5Q\\1.html}
+}
+
 @letter{weymouthGuidanceWritingYour,
   type = {Letter},
   title = {Guidance for {{Writing}} Your {{Master}}’s {{Thesis}}},
@@ -1564,6 +2153,40 @@
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Wit - 2009 - Optimal Thrust Allocation Methods for Dynamic Positioning of Ships.pdf}
 }
 
+@online{wuVariationalApproachLearning2019,
+  title = {Variational Approach for Learning {{Markov}} Processes from Time Series Data},
+  author = {Wu, Hao and Noé, Frank},
+  date = {2019-08-16},
+  eprint = {1707.04659},
+  eprinttype = {arXiv},
+  eprintclass = {stat},
+  doi = {10.48550/arXiv.1707.04659},
+  url = {http://arxiv.org/abs/1707.04659},
+  urldate = {2026-01-07},
+  abstract = {Inference, prediction and control of complex dynamical systems from time series is important in many areas, including financial markets, power grid management, climate and weather modeling, or molecular dynamics. The analysis of such highly nonlinear dynamical systems is facilitated by the fact that we can often find a (generally nonlinear) transformation of the system coordinates to features in which the dynamics can be excellently approximated by a linear Markovian model. Moreover, the large number of system variables often change collectively on large time- and length-scales, facilitating a low-dimensional analysis in feature space. In this paper, we introduce a variational approach for Markov processes (VAMP) that allows us to find optimal feature mappings and optimal Markovian models of the dynamics from given time series data. The key insight is that the best linear model can be obtained from the top singular components of the Koopman operator. This leads to the definition of a family of score functions called VAMP-r which can be calculated from data, and can be employed to optimize a Markovian model. In addition, based on the relationship between the variational scores and approximation errors of Koopman operators, we propose a new VAMP-E score, which can be applied to cross-validation for hyper-parameter optimization and model selection in VAMP. VAMP is valid for both reversible and nonreversible processes and for stationary and non-stationary processes or realizations.},
+  langid = {english},
+  pubstate = {prepublished},
+  keywords = {Mathematics - Dynamical Systems,Statistics - Machine Learning},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Wu and Noé - 2019 - Variational approach for learning Markov processes from time series data.pdf}
+}
+
+@online{wuVariationalApproachLearning2019a,
+  title = {Variational Approach for Learning {{Markov}} Processes from Time Series Data},
+  author = {Wu, Hao and Noé, Frank},
+  date = {2019-08-16},
+  eprint = {1707.04659},
+  eprinttype = {arXiv},
+  eprintclass = {stat},
+  doi = {10.48550/arXiv.1707.04659},
+  url = {http://arxiv.org/abs/1707.04659},
+  urldate = {2026-01-07},
+  abstract = {Inference, prediction and control of complex dynamical systems from time series is important in many areas, including financial markets, power grid management, climate and weather modeling, or molecular dynamics. The analysis of such highly nonlinear dynamical systems is facilitated by the fact that we can often find a (generally nonlinear) transformation of the system coordinates to features in which the dynamics can be excellently approximated by a linear Markovian model. Moreover, the large number of system variables often change collectively on large time- and length-scales, facilitating a low-dimensional analysis in feature space. In this paper, we introduce a variational approach for Markov processes (VAMP) that allows us to find optimal feature mappings and optimal Markovian models of the dynamics from given time series data. The key insight is that the best linear model can be obtained from the top singular components of the Koopman operator. This leads to the definition of a family of score functions called VAMP-r which can be calculated from data, and can be employed to optimize a Markovian model. In addition, based on the relationship between the variational scores and approximation errors of Koopman operators, we propose a new VAMP-E score, which can be applied to cross-validation for hyper-parameter optimization and model selection in VAMP. VAMP is valid for both reversible and nonreversible processes and for stationary and non-stationary processes or realizations.},
+  langid = {english},
+  pubstate = {prepublished},
+  keywords = {Mathematics - Dynamical Systems,Statistics - Machine Learning},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Wu and Noé - 2019 - Variational approach for learning Markov processes from time series data 1.pdf}
+}
+
 @article{xiuWienerAskeyPolynomial2002,
   title = {The {{Wiener}}–{{Askey Polynomial Chaos}} for {{Stochastic Differential Equations}}},
   author = {Xiu, Dongbin and Karniadakis, George Em},
@@ -1592,6 +2215,43 @@
   langid = {english},
   keywords = {Epistemic Uncertainty,Heave  Response,Hydrodynamic Modelling,Interval Arithmetic,Marine Structures,Wave-Induced Motion,α-Cut Interval Analysis},
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Yogeesh et al. - 2025 - Interval-Based Multi-Body Dynamics Simulation of Special-Purpose Vessels in Rough Sea Conditions.pdf}
+}
+
+@article{zhaoDatadrivenProbabilityDensity2023,
+  title = {Data-Driven Probability Density Forecast for Stochastic Dynamical Systems},
+  author = {Zhao, Meng and Jiang, Lijian},
+  date = {2023},
+  journaltitle = {Journal of Computational Physics},
+  shortjournal = {J. Comput. Phys.},
+  volume = {492},
+  publisher = {Academic Press Inc.},
+  issn = {0021-9991},
+  doi = {10.1016/j.jcp.2023.112422},
+  abstract = {In this paper, a data-driven non-parametric approach is presented for forecasting the probability density evolution of stochastic dynamical systems. The method is based on stochastic Koopman operator and extended dynamic mode decomposition (EDMD). To approximate the finite-dimensional eigendecomposition of the stochastic Koopman operator, EDMD is applied to the training data set sampled from the stationary distribution of the underlying stochastic dynamical system. The family of the Koopman operators form a semigroup, which is generated by the infinitesimal generator of the stochastic dynamical system. A significant connection between the generator and Fokker-Planck operator is leveraged to construct an orthonormal basis of a weighted Hilbert space, enabling a spectral decomposition of the probability density function to be performed in this space. This approach is a data-driven method and used to predict the probability density evolution and real-time moment estimation. In the limit of the large number of snapshots and observables, the data-driven probability density approximation converges to the Galerkin projection of the semigroup solution of Fokker-Planck equation on a basis adapted to an invariant measure. This method shares similarities with diffusion forecasting but is capable of producing more accurate probability density forecasts than diffusion forecasting. A few numerical examples are presented to illustrate the performance of the proposed data-driven probability density forecast. © 2023 Elsevier Inc.},
+  langid = {english},
+  keywords = {Diffusion forecast,Probability density decomposition,Stochastic dynamical system,Stochastic Koopman operator},
+  file = {C\:\\Users\\AAg\\OneDrive - Allseas Engineering BV\\Documents\\Thesis\\Thesis-Literature - Documents\\Zhao and Jiang - 2023 - Data-driven probability density forecast for stochastic dynamical systems.pdf;C\:\\Users\\AAg\\Zotero\\storage\\24L5KJLZ\\85168805458.html}
+}
+
+@article{zhongPIVAEPhysicsInformedVariational2023,
+  title = {{{PI-VAE}}: {{Physics-Informed Variational Auto-Encoder}} for Stochastic Differential Equations},
+  shorttitle = {{{PI-VAE}}},
+  author = {Zhong, Weiheng and Meidani, Hadi},
+  date = {2023-01},
+  journaltitle = {Computer Methods in Applied Mechanics and Engineering},
+  shortjournal = {Computer Methods in Applied Mechanics and Engineering},
+  volume = {403},
+  eprint = {2203.11363},
+  eprinttype = {arXiv},
+  eprintclass = {stat},
+  pages = {115664},
+  issn = {00457825},
+  doi = {10.1016/j.cma.2022.115664},
+  url = {http://arxiv.org/abs/2203.11363},
+  urldate = {2026-01-20},
+  abstract = {We propose a new class of physics-informed neural networks, called physics-informed Variational Autoencoder (PI-VAE), to solve stochastic differential equations (SDEs) or inverse problems involving SDEs. In these problems the governing equations are known but only a limited number of measurements of system parameters are available. PI-VAE consists of a variational autoencoder (VAE), which generates samples of system variables and parameters. This generative model is integrated with the governing equations. In this integration, the derivatives of VAE outputs are readily calculated using automatic differentiation, and used in the physics-based loss term. In this work, the loss function is chosen to be the Maximum Mean Discrepancy (MMD) for improved performance, and neural network parameters are updated iteratively using the stochastic gradient descent algorithm. We first test the proposed method on approximating stochastic processes. Then we study three types of problems related to SDEs: forward and inverse problems together with mixed problems where system parameters and solutions are simultaneously calculated. The satisfactory accuracy and efficiency of the proposed method are numerically demonstrated in comparison with physics-informed generative adversarial network (PI-WGAN).},
+  keywords = {Computer Science - Machine Learning,Statistics - Machine Learning},
+  file = {C\:\\Users\\AAg\\OneDrive - Allseas Engineering BV\\Documents\\Thesis\\Thesis-Literature - Documents\\Zhong and Meidani - 2023 - PI-VAE Physics-Informed Variational Auto-Encoder for stochastic differential equations.pdf;C\:\\Users\\AAg\\Zotero\\storage\\ZJGZ8NJM\\2203.html}
 }
 
 @book{zotero-item-1214,

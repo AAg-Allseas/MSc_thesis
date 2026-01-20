@@ -188,12 +188,12 @@
     \def\largetitleseries{}
     \def\largetitlestyle{\largetitlefont\largetitleseries\largetitleshape}
     \def\chaptitlefamily{\tudsffamily}
-    
+
     \def\titlestyle{\titlefont\titleshape}
     \def\sectitlestyle{\tudsffamily\titleshape\bfseries}
     \def\chaptitlestyle{\chaptitlefamily}
 
-    \def\headerstyle{\titlestyle}
+    \def\headerstyle{\titlestyle\bfseries}
 \fi
 
 % Use roman (Georgia) in quote environment
