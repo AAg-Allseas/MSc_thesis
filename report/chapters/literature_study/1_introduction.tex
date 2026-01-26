@@ -1,4 +1,4 @@
-\chapter{Introduction}
+\chapter{Introduction -5p}
 In this section the background and scope of the literature study will be presented. First some background information on
 dynamic positioning industry practices will be given followed by a motivation for the thesis that will follow. This will
 culminate in the research question and subsequent goals of the thesis.
@@ -154,9 +154,22 @@ Based on this research gap, the following research question is defined:
 To answer this question, a series of research goals will be persued:
 
 \begin{enumerate}
-\item What simulation framework gives the best trade-off between accuracy and computational efficiency?
-\item How can uncertainty in model parameters and external inputs be quantified and propagated through the forecasting
-model
-\item How does the forecasting model perform compared to traditional DP simulation methods in terms of speed and test
-accuracy?
+    \item Identify existing methods for simulating stochastic dynamical systems under uncertainty that are applicable to marine dynamic positioning problems.
+    \item Analyse how candidate methods mathematically represent, quantify, and propagate uncertainty through nonlinear DP ship models.
+    \item Implement a selected uncertainty quantification method for short-term time-domain DP forecasting of a pipelay vessel, integrating environmental excitation and system dynamics.
+    \item Quantitatively compare the proposed probabilistic approach with deterministic and Monte-Carlo-based DP simulations in terms of accuracy, uncertainty representation, and computational efficiency.
 \end{enumerate}
+
+\section{Report structure}
+In this section the general structure of this literature review will be outlined. 
+
+First, a general overview of the
+dynamic positioning system and existing efforts to simulate it will be given in \cref{chapter:DP_simulation}. This
+includes an overview of of the system components, mathematical descriptions of the system and an overview of existing
+simulation tools.
+
+Next, uncertainty quantification will be exlained in \cref{chapter:uncertainty_quantification}. This will start with a
+general overview of the concepts behind uncertainty quantification and will then cover commonly used methods.
+
+\Cref{chapter:dynamic_modelling} will discuss various methods to handle the simulation of dynamical systems. Two main
+concepts will be investigated: latent space models and Neural ODE approaches. Hybrid methods will also be discussed. 
