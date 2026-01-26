@@ -17,6 +17,7 @@
 @inproceedings{akaBalancedNeuralODEs2025,
   title = {Balanced {{Neural ODEs}}: Nonlinear Model Order Reduction and {{Koopman}} Operator Approximations},
   shorttitle = {Balanced {{Neural ODEs}}},
+  booktitle = {2025 {{International Conference}} on {{Learning Representations}}},
   author = {Aka, Julius and Brunnemann, Johannes and Eiden, Jörg and Speerforck, Arne and Mikelsons, Lars},
   date = {2025-02-26},
   eprint = {2410.10174},
@@ -308,9 +309,14 @@
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\CHEN and BILLINGS - 1992 - Neural networks for nonlinear dynamic system modelling and identification.pdf}
 }
 
-@article{chenNeuralOrdinaryDifferential,
+@article{chenNeuralOrdinaryDifferential2018,
   title = {Neural {{Ordinary Differential Equations}}},
   author = {Chen, Ricky T Q and Rubanova, Yulia and Bettencourt, Jesse and Duvenaud, David},
+  date = {2018},
+  journaltitle = {Advances in Neural Information Processing Systems},
+  volume = {31},
+  publisher = {Curran Associates, Inc},
+  url = {arXiv:1806.07366},
   abstract = {We introduce a new family of deep neural network models. Instead of specifying a discrete sequence of hidden layers, we parameterize the derivative of the hidden state using a neural network. The output of the network is computed using a blackbox differential equation solver. These continuous-depth models have constant memory cost, adapt their evaluation strategy to each input, and can explicitly trade numerical precision for speed. We demonstrate these properties in continuous-depth residual networks and continuous-time latent variable models. We also construct continuous normalizing flows, a generative model that can train by maximum likelihood, without partitioning or ordering the data dimensions. For training, we show how to scalably backpropagate through any ODE solver, without access to its internal operations. This allows end-to-end training of ODEs within larger models.},
   langid = {english},
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Chen et al. - Neural Ordinary Differential Equations.pdf}
@@ -343,6 +349,27 @@
   publisher = {David Taylor Model Basin},
   location = {Washington DC},
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\DTMB_1962_1661.pdf}
+}
+
+@article{daemsEfficientTrainingNeural2025,
+  title = {Efficient {{Training}} of {{Neural SDEs Using Stochastic Optimal Control}}},
+  author = {Daems, Rembert and Opper, Manfred and Crevecoeur, Guillaume and Birdal, Tolga},
+  date = {2025},
+  abstract = {We present a hierarchical, control theory inspired method for variational inference (VI) for neural stochastic differential equations (SDEs). While VI for neural SDEs is a promising avenue for uncertaintyaware reasoning in time-series, it is computationally challenging due to the iterative nature of maximizing the ELBO. In this work, we propose to decompose the control term into linear and residual non-linear components and derive an optimal control term for linear SDEs, using stochastic optimal control. Modeling the non-linear component by a neural network, we show how to efficiently train neural SDEs without sacrificing their expressive power. Since the linear part of the control term is optimal and does not need to be learned, the training is initialized at a lower cost and we observe faster convergence.},
+  langid = {english},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Daems et al. - 2025 - Efficient Training of Neural SDEs Using Stochastic Optimal Control.pdf}
+}
+
+@inproceedings{daemsEfficientTrainingNeural2025a,
+  title = {Efficient {{Training}} of {{Neural SDEs Using Stochastic Optimal Control}}},
+  booktitle = {European {{Symposium}} on {{Artificial Neural Networks}}, {{Computational Intelligence}} and {{Machine Learning}}},
+  author = {Daems, Rembert and Opper, Manfred and Crevecoeur, Guillaume and Birdal, Tolga},
+  date = {2025-04-23/2025-04-25},
+  location = {ruges (Belgium)},
+  abstract = {We present a hierarchical, control theory inspired method for variational inference (VI) for neural stochastic differential equations (SDEs). While VI for neural SDEs is a promising avenue for uncertaintyaware reasoning in time-series, it is computationally challenging due to the iterative nature of maximizing the ELBO. In this work, we propose to decompose the control term into linear and residual non-linear components and derive an optimal control term for linear SDEs, using stochastic optimal control. Modeling the non-linear component by a neural network, we show how to efficiently train neural SDEs without sacrificing their expressive power. Since the linear part of the control term is optimal and does not need to be learned, the training is initialized at a lower cost and we observe faster convergence.},
+  isbn = {978-2-87587-093-3},
+  langid = {english},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Daems et al. - 2025 - Efficient Training of Neural SDEs Using Stochastic Optimal Control 1.pdf}
 }
 
 @online{dandekarBayesianNeuralOrdinary2022,
@@ -488,6 +515,13 @@
   file = {C\:\\Users\\AAg\\OneDrive - Allseas Engineering BV\\Documents\\Thesis\\Thesis-Literature - Documents\\Ebadollahi and Rahman - 2025 - Time-dependent uncertainty quantification analysis of complex dynamical systems.pdf;C\:\\Users\\AAg\\Zotero\\storage\\WM8SB297\\S0266892025000487.html}
 }
 
+@online{EfficientTrainingNeural,
+  title = {Efficient {{Training}} of {{Neural SDEs Using Stochastic Optimal Control}}},
+  url = {https://arxiv.org/html/2505.17150v1},
+  urldate = {2026-01-23},
+  file = {C:\Users\AAg\Zotero\storage\DBIUXUP3\2505.html}
+}
+
 @article{ehlersStochasticReservoirComputers2025,
   title = {Stochastic Reservoir Computers},
   author = {Ehlers, Peter J. and Nurdin, Hendra I. and Soh, Daniel},
@@ -612,6 +646,20 @@
   file = {C\:\\Users\\AAg\\OneDrive - Allseas Engineering BV\\Documents\\Thesis\\Thesis-Literature - Documents\\Fossen and Wiley - Handbook_of_Marine_Craft_Hydrodynamics_and_Motion_..._----_(Chapter_5_Seakeeping_Theory) 1.pdf;C\:\\Users\\AAg\\OneDrive - Allseas Engineering BV\\Documents\\Thesis\\Thesis-Literature - Documents\\Fossen and Wiley - Handbook_of_Marine_Craft_Hydrodynamics_and_Motion_..._----_(Chapter_5_Seakeeping_Theory) 2.pdf;C\:\\Users\\AAg\\OneDrive - Allseas Engineering BV\\Documents\\Thesis\\Thesis-Literature - Documents\\Fossen and Wiley - Handbook_of_Marine_Craft_Hydrodynamics_and_Motion_..._----_(Chapter_5_Seakeeping_Theory).pdf}
 }
 
+@article{foxDistinguishingTwoDimensions2011,
+  title = {Distinguishing {{Two Dimensions}} of {{Uncertainty}}},
+  author = {Fox, Craig R. and Ulkumen, Gulden},
+  date = {2011},
+  journaltitle = {SSRN Electronic Journal},
+  shortjournal = {SSRN Journal},
+  issn = {1556-5068},
+  doi = {10.2139/ssrn.3695311},
+  url = {https://www.ssrn.com/abstract=3695311},
+  urldate = {2026-01-23},
+  langid = {english},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Fox and Ulkumen - 2011 - Distinguishing Two Dimensions of Uncertainty.pdf}
+}
+
 @article{fruzzettiProbabilisticOperabilityGreenhouse2024,
   title = {Probabilistic Operability and Greenhouse Gas Assessment during Dynamic Positioning Operations},
   author = {Fruzzetti, Camilla and Donnarumma, Silvia and Maggiani, Francesca and Martelli, Michele},
@@ -629,6 +677,16 @@
   abstract = {A Dynamic Positioning system automatically maintains both the position and heading of a vessel by using its thrusters in the presence of external disturbances. This goal is ensured by a controller that compensates for the environmental disturbances and computes the proper set-points for each actuator. The core of such a system is composed of force and thrust allocation modules that tailor the required forces and moment over the available actuators. The propulsion systems used are often over-actuated and the thrust allocation algorithm implies an infinite number of solutions since it is impossible to solve analytically the problem. Over the years efforts from the research community dealt with the optimization in terms of accuracy, energy consumption, and maintenance with innovative allocation strategies were investigated. However, no publications or rules indicate the procedure for the evaluation of exhaust gas emission during dynamic positioning operations. For such a reason, the paper aims to develop an optimization procedure that includes an ad-hoc objective function with relative non-linear constraints for the thrust allocation logic that tends to minimize the actuators’ thrust. The procedure accounts for non-linear hydrodynamic effects on the thrust generation, including thruster-thruster and thruster-hull interactions, to obtain the most realistic results as possible. Moreover, following the IMO suggestions, the production of greenhouses gases emissions is evaluated in probabilistic terms. The proposed approach provides indicators in terms of yearly operability, fuel consumption, and environmental footprint during dynamic positioning operations that could be used for proper decisions in ship deployment.},
   langid = {english},
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Fruzzetti et al. - 2024 - Probabilistic operability and greenhouse gas assessment during dynamic positioning operations.pdf}
+}
+
+@thesis{galUncertaintyDeepLearning2016,
+  type = {phdthesis},
+  title = {Uncertainty in {{Deep Learning}}},
+  author = {Gal, Yarin},
+  date = {2016},
+  institution = {University of Cambridge},
+  langid = {english},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Gal - Uncertainty in Deep Learning.pdf}
 }
 
 @online{garciaApplicationDrivenLearningClosedLoop2024,
@@ -764,6 +822,14 @@
   abstract = {A probabilistic forecast takes the form of a predictive probability distribution over future quantities or events of interest. Probabilistic forecasting aims to maximize the sharpness of the predictive distributions, subject to calibration, on the basis of the available information set. We formalize and study notions of calibration in a prediction space setting. In practice, probabilistic calibration can be checked by examining probability integral transform (PIT) histograms. Proper scoring rules such as the logarithmic score and the continuous ranked probability score serve to assess calibration and sharpness simultaneously. As a special case, consistent scoring functions provide decision-theoretically coherent tools for evaluating point forecasts. We emphasize methodological links to parametric and nonparametric distributional regression techniques, which attempt to model and to estimate conditional distribution functions; we use the context of statistically postprocessed ensemble forecasts in numerical weather prediction as an example. Throughout, we illustrate concepts and methodologies in data examples.},
   langid = {english},
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Gneiting and Katzfuss - 2014 - Probabilistic Forecasting.pdf}
+}
+
+@article{gravesPracticalVariationalInference,
+  title = {Practical {{Variational Inference}} for {{Neural Networks}}},
+  author = {Graves, Alex},
+  abstract = {Variational methods have been previously explored as a tractable approximation to Bayesian inference for neural networks. However the approaches proposed so far have only been applicable to a few simple network architectures. This paper introduces an easy-to-implement stochastic variational method (or equivalently, minimum description length loss function) that can be applied to most neural networks. Along the way it revisits several common regularisers from a variational perspective. It also provides a simple pruning heuristic that can both drastically reduce the number of network weights and lead to improved generalisation. Experimental results are provided for a hierarchical multidimensional recurrent neural network applied to the TIMIT speech corpus.},
+  langid = {english},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Graves - Practical Variational Inference for Neural Networks.pdf}
 }
 
 @article{guo-qingContinuousTimeModelIdentification2016,
@@ -923,6 +989,25 @@
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Jeon et al. - 2018 - Prediction of ship fuel consumption by using an artificial neural network.pdf}
 }
 
+@inproceedings{jiaNeuralJumpStochastic2020,
+  title = {Neural {{Jump Stochastic Differential Equations}}},
+  booktitle = {33rd {{Conference}} on {{Neural Information Processing Systems}}},
+  author = {Jia, Junteng and Benson, Austin R.},
+  date = {2020-01-07},
+  eprint = {1905.10403},
+  eprinttype = {arXiv},
+  eprintclass = {cs},
+  publisher = {arXiv},
+  location = {Vancouver, Canada},
+  doi = {10.48550/arXiv.1905.10403},
+  url = {http://arxiv.org/abs/1905.10403},
+  urldate = {2026-01-26},
+  abstract = {Many time series are effectively generated by a combination of deterministic continuous flows along with discrete jumps sparked by stochastic events. However, we usually do not have the equation of motion describing the flows, or how they are affected by jumps. To this end, we introduce Neural Jump Stochastic Differential Equations that provide a data-driven approach to learn continuous and discrete dynamic behavior, i.e., hybrid systems that both flow and jump. Our approach extends the framework of Neural Ordinary Differential Equations with a stochastic process term that models discrete events. We then model temporal point processes with a piecewise-continuous latent trajectory, where the discontinuities are caused by stochastic events whose conditional intensity depends on the latent state. We demonstrate the predictive capabilities of our model on a range of synthetic and real-world marked point process datasets, including classical point processes (such as Hawkes processes), awards on Stack Overflow, medical records, and earthquake monitoring.},
+  langid = {english},
+  keywords = {Computer Science - Machine Learning,Statistics - Machine Learning},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Jia and Benson - 2020 - Neural Jump Stochastic Differential Equations.pdf}
+}
+
 @article{jospinHandsOnBayesianNeural2022,
   title = {Hands-{{On Bayesian Neural Networks}}—{{A Tutorial}} for {{Deep Learning Users}}},
   author = {Jospin, Laurent Valentin and Laga, Hamid and Boussaid, Farid and Buntine, Wray and Bennamoun, Mohammed},
@@ -938,6 +1023,23 @@
   abstract = {Modern deep learning methods constitute incredibly powerful tools to tackle a myriad of challenging problems. However, since deep learning methods operate as black boxes, the uncertainty associated with their predictions is often challenging to quantify. Bayesian statistics offer a formalism to understand and quantify the uncertainty associated with deep neural network predictions. This tutorial provides deep learning practitioners with an overview of the relevant literature and a complete toolset to design, implement, train, use and evaluate Bayesian neural networks, i.e., stochastic artificial neural networks trained using Bayesian methods.},
   keywords = {Bayes methods,Computational modeling,Deep learning,Design methodology,Neural networks,Stochastic processes,Training data,Tutorials,Uncertainty},
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Jospin et al. - 2022 - Hands-On Bayesian Neural Networks—A Tutorial for Deep Learning Users.pdf}
+}
+
+@online{jurgensEpistemicUncertaintyFaithfully2024,
+  title = {Is {{Epistemic Uncertainty Faithfully Represented}} by {{Evidential Deep Learning Methods}}?},
+  author = {Jürgens, Mira and Meinert, Nis and Bengs, Viktor and Hüllermeier, Eyke and Waegeman, Willem},
+  date = {2024-09-09},
+  eprint = {2402.09056},
+  eprinttype = {arXiv},
+  eprintclass = {cs},
+  doi = {10.48550/arXiv.2402.09056},
+  url = {http://arxiv.org/abs/2402.09056},
+  urldate = {2026-01-23},
+  abstract = {Trustworthy ML systems should not only return accurate predictions, but also a reliable representation of their uncertainty. Bayesian methods are commonly used to quantify both aleatoric and epistemic uncertainty, but alternative approaches, such as evidential deep learning methods, have become popular in recent years. The latter group of methods in essence extends empirical risk minimization (ERM) for predicting second-order probability distributions over outcomes, from which measures of epistemic (and aleatoric) uncertainty can be extracted. This paper presents novel theoretical insights of evidential deep learning, highlighting the difficulties in optimizing second-order loss functions and interpreting the resulting epistemic uncertainty measures. With a systematic setup that covers a wide range of approaches for classification, regression and counts, it provides novel insights into issues of identifiability and convergence in second-order loss minimization, and the relative (rather than absolute) nature of epistemic uncertainty measures.},
+  langid = {english},
+  pubstate = {prepublished},
+  keywords = {Computer Science - Artificial Intelligence,Computer Science - Machine Learning},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Jürgens et al. - 2024 - Is Epistemic Uncertainty Faithfully Represented by Evidential Deep Learning Methods.pdf}
 }
 
 @online{karlDeepVariationalBayes2017,
@@ -958,6 +1060,54 @@
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Karl et al. - 2017 - Deep Variational Bayes Filters Unsupervised Learning of State Space Models from Raw Data.pdf}
 }
 
+@inproceedings{kendallWhatUncertaintiesWe2017,
+  title = {What {{Uncertainties Do We Need}} in {{Bayesian Deep Learning}} for {{Computer Vision}}?},
+  booktitle = {Advances in Neural Information Processing Systems},
+  author = {Kendall, Alex and Gal, Yarin},
+  date = {2017},
+  pages = {5574--5584},
+  abstract = {There are two major types of uncertainty one can model. Aleatoric uncertainty captures noise inherent in the observations. On the other hand, epistemic uncertainty accounts for uncertainty in the model – uncertainty which can be explained away given enough data. Traditionally it has been difficult to model epistemic uncertainty in computer vision, but with new Bayesian deep learning tools this is now possible. We study the benefits of modeling epistemic vs. aleatoric uncertainty in Bayesian deep learning models for vision tasks. For this we present a Bayesian deep learning framework combining input-dependent aleatoric uncertainty together with epistemic uncertainty. We study models under the framework with per-pixel semantic segmentation and depth regression tasks. Further, our explicit uncertainty formulation leads to new loss functions for these tasks, which can be interpreted as learned attenuation. This makes the loss more robust to noisy data, also giving new state-of-the-art results on segmentation and depth regression benchmarks.},
+  langid = {english},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Kendall and Gal - What Uncertainties Do We Need in Bayesian Deep Learning for Computer Vision.pdf}
+}
+
+@article{kidgerEfficientAccurateGradients,
+  title = {Efficient and {{Accurate Gradients}} for {{Neural SDEs}}},
+  author = {Kidger, Patrick and Foster, James and Li, Xuechen and Lyons, Terry},
+  abstract = {Neural SDEs combine many of the best qualities of both RNNs and SDEs: memory efficient training, high-capacity function approximation, and strong priors on model space. This makes them a natural choice for modelling many types of temporal dynamics. Training a Neural SDE (either as a VAE or as a GAN) requires backpropagating through an SDE solve. This may be done by solving a backwards-in-time SDE whose solution is the desired parameter gradients. However, this has previously suffered from severe speed and accuracy issues, due to high computational cost and numerical truncation errors. Here, we overcome these issues through several technical innovations. First, we introduce the reversible Heun method. This is a new SDE solver that is algebraically reversible: eliminating numerical gradient errors, and the first such solver of which we are aware. Moreover it requires half as many function evaluations as comparable solvers, giving up to a 1.98× speedup. Second, we introduce the Brownian Interval: a new, fast, memory efficient, and exact way of sampling and reconstructing Brownian motion. With this we obtain up to a 10.6× speed improvement over previous techniques, which in contrast are both approximate and relatively slow. Third, when specifically training Neural SDEs as GANs (Kidger et al. 2021), we demonstrate how SDE-GANs may be trained through careful weight clipping and choice of activation function. This reduces computational cost (giving up to a 1.87× speedup) and removes the numerical truncation errors associated with gradient penalty. Altogether, we outperform the state-of-the-art by substantial margins, with respect to training speed, and with respect to classification, prediction, and MMD test metrics. We have contributed implementations of all of our techniques to the torchsde library to help facilitate their adoption.},
+  langid = {english},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Kidger et al. - Efﬁcient and Accurate Gradients for Neural SDEs.pdf}
+}
+
+@inproceedings{kidgerEfficientAccurateGradients2021,
+  title = {Efficient and {{Accurate Gradients}} for {{Neural SDEs}}},
+  booktitle = {35th {{Conference}} on {{Neural Information Processing Systems}}},
+  author = {Kidger, Patrick and Foster, James and Li, Xuechen and Lyons, Terry},
+  date = {2021},
+  abstract = {Neural SDEs combine many of the best qualities of both RNNs and SDEs: memory efficient training, high-capacity function approximation, and strong priors on model space. This makes them a natural choice for modelling many types of temporal dynamics. Training a Neural SDE (either as a VAE or as a GAN) requires backpropagating through an SDE solve. This may be done by solving a backwards-in-time SDE whose solution is the desired parameter gradients. However, this has previously suffered from severe speed and accuracy issues, due to high computational cost and numerical truncation errors. Here, we overcome these issues through several technical innovations. First, we introduce the reversible Heun method. This is a new SDE solver that is algebraically reversible: eliminating numerical gradient errors, and the first such solver of which we are aware. Moreover it requires half as many function evaluations as comparable solvers, giving up to a 1.98× speedup. Second, we introduce the Brownian Interval: a new, fast, memory efficient, and exact way of sampling and reconstructing Brownian motion. With this we obtain up to a 10.6× speed improvement over previous techniques, which in contrast are both approximate and relatively slow. Third, when specifically training Neural SDEs as GANs (Kidger et al. 2021), we demonstrate how SDE-GANs may be trained through careful weight clipping and choice of activation function. This reduces computational cost (giving up to a 1.87× speedup) and removes the numerical truncation errors associated with gradient penalty. Altogether, we outperform the state-of-the-art by substantial margins, with respect to training speed, and with respect to classification, prediction, and MMD test metrics. We have contributed implementations of all of our techniques to the torchsde library to help facilitate their adoption.},
+  langid = {english},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Kidger et al. - Efﬁcient and Accurate Gradients for Neural SDEs 1.pdf}
+}
+
+@inproceedings{kidgerNeuralSDEsInfiniteDimensional2021,
+  title = {Neural {{SDEs}} as {{Infinite-Dimensional GANs}}},
+  booktitle = {Proceedings of the 38 Th {{International Conference}} on {{Machine Learning}}},
+  author = {Kidger, Patrick and Foster, James and Li, Xuechen and Oberhauser, Harald and Lyons, Terry},
+  date = {2021-05-11},
+  eprint = {2102.03657},
+  eprinttype = {arXiv},
+  eprintclass = {cs},
+  publisher = {arXiv},
+  location = {2021},
+  doi = {10.48550/arXiv.2102.03657},
+  url = {http://arxiv.org/abs/2102.03657},
+  urldate = {2026-01-23},
+  abstract = {Stochastic differential equations (SDEs) are a staple of mathematical modelling of temporal dynamics. However, a fundamental limitation has been that such models have typically been relatively inflexible, which recent work introducing Neural SDEs has sought to solve. Here, we show that the current classical approach to fitting SDEs may be approached as a special case of (Wasserstein) GANs, and in doing so the neural and classical regimes may be brought together. The input noise is Brownian motion, the output samples are time-evolving paths produced by a numerical solver, and by parameterising a discriminator as a Neural Controlled Differential Equation (CDE), we obtain Neural SDEs as (in modern machine learning parlance) continuous-time generative time series models. Unlike previous work on this problem, this is a direct extension of the classical approach without reference to either prespecified statistics or density functions. Arbitrary drift and diffusions are admissible, so as the Wasserstein loss has a unique global minima, in the infinite data limit any SDE may be learnt. Example code has been made available as part of the torchsde repository.},
+  langid = {english},
+  keywords = {Computer Science - Machine Learning},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Kidger et al. - 2021 - Neural SDEs as Infinite-Dimensional GANs.pdf}
+}
+
 @inproceedings{kimPreliminaryStudyWave2021,
   title = {Preliminary {{Study}} on {{Wave Height Prediction}} with {{Convolution Neural Network}}},
   author = {Kim, Yunho and Ha, Yoonjin and Choi, Jongsu},
@@ -969,6 +1119,23 @@
   eventtitle = {The 31st {{International Ocean}} and {{Polar Engineering Conference}}},
   langid = {english},
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Kim et al. - 2021 - Preliminary Study on Wave Height Prediction with Convolution Neural Network.pdf}
+}
+
+@article{kimStiffNeuralOrdinary2021,
+  title = {Stiff Neural Ordinary Differential Equations},
+  author = {Kim, Suyong and Ji, Weiqi and Deng, Sili and Ma, Yingbo and Rackauckas, Christopher},
+  date = {2021-09-20},
+  journaltitle = {Chaos: An Interdisciplinary Journal of Nonlinear Science},
+  shortjournal = {Chaos},
+  volume = {31},
+  number = {9},
+  pages = {093122},
+  issn = {1054-1500},
+  doi = {10.1063/5.0060697},
+  url = {https://doi.org/10.1063/5.0060697},
+  urldate = {2026-01-23},
+  abstract = {Neural Ordinary Differential Equations (ODEs) are a promising approach to learn dynamical models from time-series data in science and engineering applications. This work aims at learning neural ODEs for stiff systems, which are usually raised from chemical kinetic modeling in chemical and biological systems. We first show the challenges of learning neural ODEs in the classical stiff ODE systems of Robertson’s problem and propose techniques to mitigate the challenges associated with scale separations in stiff systems. We then present successful demonstrations in stiff systems of Robertson’s problem and an air pollution problem. The demonstrations show that the usage of deep networks with rectified activations, proper scaling of the network outputs as well as loss functions, and stabilized gradient calculations are the key techniques enabling the learning of stiff neural ODEs. The success of learning stiff neural ODEs opens up possibilities of using neural ODEs in applications with widely varying time-scales, such as chemical dynamics in energy conversion, environmental engineering, and life sciences.},
+  file = {C\:\\Users\\AAg\\OneDrive - Allseas Engineering BV\\Documents\\Thesis\\Thesis-Literature - Documents\\Kim et al. - 2021 - Stiff neural ordinary differential equations.pdf;C\:\\Users\\AAg\\Zotero\\storage\\S46CJ84C\\5.html}
 }
 
 @article{kingmaAutoEncodingVariationalBayes2014,
@@ -1022,19 +1189,20 @@
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Koopman - 1931 - Hamiltonian Systems and Transformation in Hilbert Space.pdf}
 }
 
-@online{kosticLearningInvariantRepresentations2024,
+@inproceedings{kosticLearningInvariantRepresentations2024,
   title = {Learning Invariant Representations of Time-Homogeneous Stochastic Dynamical Systems},
+  booktitle = {{{ICLR}} 2024},
   author = {Kostic, Vladimir R. and Novelli, Pietro and Grazzi, Riccardo and Lounici, Karim and Pontil, Massimiliano},
   date = {2024-03-14},
   eprint = {2307.09912},
   eprinttype = {arXiv},
   eprintclass = {cs},
+  publisher = {arXiv},
   doi = {10.48550/arXiv.2307.09912},
   url = {http://arxiv.org/abs/2307.09912},
   urldate = {2026-01-07},
   abstract = {We consider the general class of time-homogeneous stochastic dynamical systems, both discrete and continuous, and study the problem of learning a representation of the state that faithfully captures its dynamics. This is instrumental to learning the transfer operator or the generator of the system, which in turn can be used for numerous tasks, such as forecasting and interpreting the system dynamics. We show that the search for a good representation can be cast as an optimization problem over neural networks. Our approach is supported by recent results in statistical learning theory, highlighting the role of approximation error and metric distortion in the learning problem. The objective function we propose is associated with projection operators from the representation space to the data space, overcomes metric distortion, and can be empirically estimated from data. In the discrete-time setting, we further derive a relaxed objective function that is differentiable and numerically well-conditioned. We compare our method against state-of-the-art approaches on different datasets, showing better performance across the board.},
   langid = {english},
-  pubstate = {prepublished},
   keywords = {Computer Science - Machine Learning},
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Kostic et al. - 2024 - Learning invariant representations of time-homogeneous stochastic dynamical systems.pdf}
 }
@@ -1068,6 +1236,26 @@
   urldate = {2025-11-18},
   abstract = {In order to study the performance of dynamic positioning system during S-lay operations, dynamic positioning system is simulated with the hull-stinger-pipe coupling effect. The roller of stinger is simulated by the generalized elastic contact theory. The stinger is composed of Morrison members. Force on pipe is calculated by lumped mass method. Time domain of fully coupled barge model is analyzed combining with PID controller, Kalman filter and allocation of thrust using Sequential Quadratic Programming method. It is also analyzed that the effect of hull wave frequency motion on pipe-stinger coupling force and dynamic positioning system. Besides, it is studied that how S-lay operations affect the dynamic positioning accuracy. The simulation results are proved to be available by checking pipe stress with API criterion. The effect of heave and yaw motion cannot be ignored on hull-stinger-pipe coupling force and dynamic positioning system. It is important to decrease the barge’s pitch motion and lay pipe in head sea in order to improve safety of the S-lay installation and dynamic positioning},
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Li-ping et al. - 2014 - Coupling Time-Domain Analysis for Dynamic Positioning during S-Lay Installation.pdf}
+}
+
+@inproceedings{liScalableGradientsStochastic2020,
+  title = {Scalable {{Gradients}} for {{Stochastic Differential Equations}}},
+  booktitle = {Proceedings of the {{23rdInternational Conference}} on {{Artificial Intelligence}} and {{Statistic}}},
+  author = {Li, Xuechen and Wong, Ting-Kam Leonard and Chen, Ricky T. Q. and Duvenaud, David},
+  date = {2020-10-18},
+  volume = {108},
+  eprint = {2001.01328},
+  eprinttype = {arXiv},
+  eprintclass = {cs},
+  publisher = {arXiv},
+  location = {Palermo, Italy},
+  doi = {10.48550/arXiv.2001.01328},
+  url = {http://arxiv.org/abs/2001.01328},
+  urldate = {2026-01-23},
+  abstract = {The adjoint sensitivity method scalably computes gradients of solutions to ordinary differential equations. We generalize this method to stochastic differential equations, allowing time-efficient and constant-memory computation of gradients with high-order adaptive solvers. Specifically, we derive a stochastic differential equation whose solution is the gradient, a memory-efficient algorithm for caching noise, and conditions under which numerical solutions converge. In addition, we combine our method with gradient-based stochastic variational inference for latent stochastic differential equations. We use our method to fit stochastic dynamics defined by neural networks, achieving competitive performance on a 50-dimensional motion capture dataset.},
+  langid = {english},
+  keywords = {Computer Science - Machine Learning,Mathematics - Numerical Analysis,Statistics - Machine Learning},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Li et al. - 2020 - Scalable Gradients for Stochastic Differential Equations.pdf}
 }
 
 @inproceedings{liuHowDoesNoise2020,
@@ -1296,6 +1484,14 @@
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Mezić - 2005 - Spectral Properties of Dynamical Systems, Model Reduction and Decompositions.pdf}
 }
 
+@article{morrillNeuralRoughDifferential,
+  title = {Neural {{Rough Differential Equations}} for {{Long Time Series}}},
+  author = {Morrill, James and Salvi, Cristopher and Kidger, Patrick and Foster, James},
+  abstract = {Neural controlled differential equations (CDEs) are the continuous-time analogue of recurrent neural networks, as Neural ODEs are to residual networks, and offer a memory-efficient continuoustime way to model functions of potentially irregular time series. Existing methods for computing the forward pass of a Neural CDE involve embedding the incoming time series into path space, often via interpolation, and using evaluations of this path to drive the hidden state. Here, we use rough path theory to extend this formulation. Instead of directly embedding into path space, we instead represent the input signal over small time intervals through its log-signature, which are statistics describing how the signal drives a CDE. This is the approach for solving rough differential equations (RDEs), and correspondingly we describe our main contribution as the introduction of Neural RDEs. This extension has a purpose: by generalising the Neural CDE approach to a broader class of driving signals, we demonstrate particular advantages for tackling long time series. In this regime, we demonstrate efficacy on problems of length up to 17k observations and observe significant training speed-ups, improvements in model performance, and reduced memory requirements compared to existing approaches.},
+  langid = {english},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Morrill et al. - Neural Rough Differential Equations for Long Time Series.pdf}
+}
+
 @article{mortonDeepDynamicalModeling,
   title = {Deep Dynamical Modeling and Control of Unsteady Fluid Flows},
   author = {Morton, Jeremy and Witherden, Freddie David and Jameson, Antony and Kochenderfer, Mykel John},
@@ -1415,6 +1611,42 @@
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Nowotarski and Weron - 2018 - Recent advances in electricity price forecasting A review of probabilistic forecasting.pdf}
 }
 
+@inproceedings{ohStableNeuralStochastic2025,
+  title = {Stable {{Neural Stochastic Differential Equations}} in {{Analyzing Irregular Time Series Data}}},
+  booktitle = {Proceedings of {{The Twelfth International Conference}} on {{Learning Representations}}},
+  author = {Oh, YongKyung and Lim, Dong-Young and Kim, Sungil},
+  date = {2025-01-24},
+  eprint = {2402.14989},
+  eprinttype = {arXiv},
+  eprintclass = {cs},
+  publisher = {arXiv},
+  doi = {10.48550/arXiv.2402.14989},
+  url = {http://arxiv.org/abs/2402.14989},
+  urldate = {2026-01-23},
+  abstract = {Irregular sampling intervals and missing values in real-world time series data present challenges for conventional methods that assume consistent intervals and complete data. Neural Ordinary Differential Equations (Neural ODEs) offer an alternative approach, utilizing neural networks combined with ODE solvers to learn continuous latent representations through parameterized vector fields. Neural Stochastic Differential Equations (Neural SDEs) extend Neural ODEs by incorporating a diffusion term, although this addition is not trivial, particularly when addressing irregular intervals and missing values. Consequently, careful design of drift and diffusion functions is crucial for maintaining stability and enhancing performance, while incautious choices can result in adverse properties such as the absence of strong solutions, stochastic destabilization, or unstable Euler discretizations, significantly affecting Neural SDEs’ performance. In this study, we propose three stable classes of Neural SDEs: Langevin-type SDE, Linear Noise SDE, and Geometric SDE. Then, we rigorously demonstrate their robustness in maintaining excellent performance under distribution shift, while effectively preventing overfitting. To assess the effectiveness of our approach, we conduct extensive experiments on four benchmark datasets for interpolation, forecasting, and classification tasks, and analyze the robustness of our methods with 30 public datasets under different missing rates. Our results demonstrate the efficacy of the proposed method in handling real-world irregular time series data.},
+  langid = {english},
+  keywords = {Computer Science - Artificial Intelligence,Computer Science - Machine Learning},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Oh et al. - 2025 - Stable Neural Stochastic Differential Equations in Analyzing Irregular Time Series Data.pdf}
+}
+
+@article{oleksiienkoVariationalNeuralNetworks2023,
+  title = {Variational {{Neural Networks}}},
+  author = {Oleksiienko, Illia and Tran, Dat Thanh and Iosifidis, Alexandros},
+  date = {2023-01-01},
+  journaltitle = {Procedia Computer Science},
+  shortjournal = {Procedia Computer Science},
+  series = {International {{Neural Network Society Workshop}} on {{Deep Learning Innovations}} and {{Applications}} ({{INNS DLIA}} 2023)},
+  volume = {222},
+  pages = {104--113},
+  issn = {1877-0509},
+  doi = {10.1016/j.procs.2023.08.148},
+  url = {https://www.sciencedirect.com/science/article/pii/S1877050923009134},
+  urldate = {2026-01-23},
+  abstract = {Bayesian Neural Networks provide a tool to estimate the uncertainty of a neural network by considering a distribution over weights and sampling different models for each input. In this paper, we propose a method for uncertainty estimation in neural networks which, instead of considering a distribution over weights, samples outputs of each layer from a corresponding Gaussian distribution, parametrized by the predictions of mean and variance sub-layers. In uncertainty quality estimation experiments, we show that the proposed method achieves better uncertainty quality than other single-bin Bayesian Model Averaging methods, such as Monte Carlo Dropout or Bayes By Backpropagation methods.},
+  keywords = {Bayesian Deep Learning,Bayesian Neural Networks,Uncertainty Estimation},
+  file = {C\:\\Users\\AAg\\OneDrive - Allseas Engineering BV\\Documents\\Thesis\\Thesis-Literature - Documents\\Oleksiienko et al. - 2023 - Variational Neural Networks 1.pdf;C\:\\Users\\AAg\\Zotero\\storage\\6PVRLRHA\\S1877050923009134.html}
+}
+
 @article{opreaDistributionalKoopmanOperator2025,
   title = {The Distributional {{Koopman}} Operator for Random Dynamical Systems},
   author = {Oprea, Maria and Townsend, Alex and Yang, Yunan},
@@ -1494,12 +1726,42 @@
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Pal et al. - 2021 - Opening the Blackbox Accelerating Neural Differential Equations by Regularizing Internal Solver Heu.pdf}
 }
 
+@article{parkNEURALMARKOVCONTROLLED2022,
+  title = {{{NEURAL MARKOV CONTROLLED SDE}}: {{STOCHASTIC OPTIMIZATION FOR CONTINUOUS-TIME DATA}}},
+  author = {Park, Sung Woo and Lee, Kyungjae and Kwon, Junseok},
+  date = {2022},
+  abstract = {We propose a novel probabilistic framework for modeling stochastic dynamics with the rigorous use of stochastic optimal control theory. The proposed model called the neural Markov controlled stochastic differential equation (CSDE) overcomes the fundamental and structural limitations of conventional dynamical models by introducing the following two components: (1) Markov dynamic programming to efficiently train the proposed CSDE and (2) multi-conditional forward-backward losses to provide information for accurate inference and to assure theoretical optimality. We demonstrate that our dynamical model efficiently generates a complex time series in the data space without extra networks while showing comparable performance against existing model-based methods on several datasets.},
+  langid = {english},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Park et al. - 2022 - NEURAL MARKOV CONTROLLED SDE STOCHASTIC OPTIMIZATION FOR CONTINUOUS-TIME DATA.pdf}
+}
+
+@article{parkNEURALMARKOVCONTROLLED2022a,
+  title = {{{NEURAL MARKOV CONTROLLED SDE}}: {{STOCHASTIC OPTIMIZATION FOR CONTINUOUS-TIME DATA}}},
+  author = {Park, Sung Woo and Lee, Kyungjae and Kwon, Junseok},
+  date = {2022},
+  abstract = {We propose a novel probabilistic framework for modeling stochastic dynamics with the rigorous use of stochastic optimal control theory. The proposed model called the neural Markov controlled stochastic differential equation (CSDE) overcomes the fundamental and structural limitations of conventional dynamical models by introducing the following two components: (1) Markov dynamic programming to efficiently train the proposed CSDE and (2) multi-conditional forward-backward losses to provide information for accurate inference and to assure theoretical optimality. We demonstrate that our dynamical model efficiently generates a complex time series in the data space without extra networks while showing comparable performance against existing model-based methods on several datasets.},
+  langid = {english},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Park et al. - 2022 - NEURAL MARKOV CONTROLLED SDE STOCHASTIC OPTIMIZATION FOR CONTINUOUS-TIME DATA 1.pdf}
+}
+
 @article{pedersenPredictionFullScalePropulsion,
   title = {Prediction of {{Full-Scale Propulsion Power}} Using {{Artificial Neural Networks}}},
   author = {Pedersen, Benjamin Pjedsted and Larsen, Jan},
   abstract = {Full scale measurements of the propulsion power, ship speed, wind speed and direction, sea and air temperature from four different loading conditions, together with hind cast data of wind and sea properties; and noon report data has been used to train an Artificial Neural Network for prediction of propulsion power. The model was optimized using a double cross validation procedure. The network was able to predict the propulsion power with accuracy between 0.8-1.7\% using onboard measurement system data and 7\% from manually acquired noon reports.},
   langid = {english},
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Pedersen and Larsen - Prediction of Full-Scale Propulsion Power using Artificial Neural Networks.pdf}
+}
+
+@inproceedings{peluchettiInfinitelyDeepNeural2020,
+  title = {Infinitely Deep Neural Networks as Diffusion Processes},
+  booktitle = {Proceedings of the {{Twenty Third International Conference}} on {{Artificial Intelligence}} and {{Statistics}},},
+  author = {Peluchetti, Stefano and Favaro, Stefano},
+  date = {2020},
+  volume = {108},
+  pages = {1126--1136},
+  abstract = {When the parameters are independently and identically distributed (initialized) neural networks exhibit undesirable properties that emerge as the number of layers increases, e.g. a vanishing dependency on the input and a concentration on restrictive families of functions including constant functions. We consider parameter distributions that shrink as the number of layers increases in order to recover well-behaved stochastic processes in the limit of infinite depth. This leads to set forth a link between infinitely deep residual networks and solutions to stochastic differential equations, i.e. diffusion processes. We show that these limiting processes do not suffer from the aforementioned issues and investigate their properties.},
+  langid = {english},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Peluchetti and Favaro - Inﬁnitely deep neural networks as diﬀusion processes 1.pdf}
 }
 
 @article{peralaArtificialIntelligenceassistedStation2025,
@@ -1568,6 +1830,23 @@
   eventtitle = {2020 {{IEEE High Performance Extreme Computing Conference}} ({{HPEC}})},
   keywords = {Differential equations,Mathematical model,Numerical stability,Optimization,Stability analysis,Stochastic processes,Transient analysis},
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Rackauckas and Nie - 2020 - Stability-Optimized High Order Methods and Stiffness Detection for Pathwise Stiff Stochastic Differe.pdf}
+}
+
+@online{rackauckasUniversalDifferentialEquations2021,
+  title = {Universal {{Differential Equations}} for {{Scientific Machine Learning}}},
+  author = {Rackauckas, Christopher and Ma, Yingbo and Martensen, Julius and Warner, Collin and Zubov, Kirill and Supekar, Rohit and Skinner, Dominic and Ramadhan, Ali and Edelman, Alan},
+  date = {2021-11-02},
+  eprint = {2001.04385},
+  eprinttype = {arXiv},
+  eprintclass = {cs},
+  doi = {10.48550/arXiv.2001.04385},
+  url = {http://arxiv.org/abs/2001.04385},
+  urldate = {2026-01-23},
+  abstract = {In the context of science, the well-known adage “a picture is worth a thousand words” might well be “a model is worth a thousand datasets.” In this manuscript we introduce the SciML software ecosystem as a tool for mixing the information of physical laws and scientific models with data-driven machine learning approaches. We describe a mathematical object, which we denote universal differential equations (UDEs), as the unifying framework connecting the ecosystem. We show how a wide variety of applications, from automatically discovering biological mechanisms to solving high-dimensional Hamilton-Jacobi-Bellman equations, can be phrased and efficiently handled through the UDE formalism and its tooling. We demonstrate the generality of the software tooling to handle stochasticity, delays, and implicit constraints. This funnels the wide variety of SciML applications into a core set of training mechanisms which are highly optimized, stabilized for stiff equations, and compatible with distributed parallelism and GPU accelerators.},
+  langid = {english},
+  pubstate = {prepublished},
+  keywords = {Computer Science - Machine Learning,Mathematics - Dynamical Systems,Quantitative Biology - Quantitative Methods,Statistics - Machine Learning},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Rackauckas et al. - 2021 - Universal Differential Equations for Scientific Machine Learning.pdf}
 }
 
 @article{rajendraModelingDynamicalSystems2020,
@@ -1958,6 +2237,49 @@
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Tsiakalos and Tsiakalos - 2026 - Scalable probabilistic load forecasting and advanced clustering for smart grids using high-frequency.pdf}
 }
 
+@online{turriSelfSupervisedEvolutionOperator2025,
+  title = {Self-{{Supervised Evolution Operator Learning}} for {{High-Dimensional Dynamical Systems}}},
+  author = {Turri, Giacomo and Bonati, Luigi and Zhu, Kai and Pontil, Massimiliano and Novelli, Pietro},
+  date = {2025-05-24},
+  eprint = {2505.18671},
+  eprinttype = {arXiv},
+  eprintclass = {cs},
+  doi = {10.48550/arXiv.2505.18671},
+  url = {http://arxiv.org/abs/2505.18671},
+  urldate = {2026-01-21},
+  abstract = {We introduce an encoder-only approach to learn the evolution operators of largescale non-linear dynamical systems, such as those describing complex natural phenomena. Evolution operators are particularly well-suited for analyzing systems that exhibit complex spatio-temporal patterns and have become a key analytical tool across various scientific communities. As terabyte-scale weather datasets and simulation tools capable of running millions of molecular dynamics steps per day are becoming commodities, our approach provides an effective tool to make sense of them from a data-driven perspective. The core of it lies in a remarkable connection between self-supervised representation learning methods and the recently established learning theory of evolution operators. To show the usefulness of the proposed method, we test it across multiple scientific domains: explaining the folding dynamics of small proteins, the binding process of drug-like molecules in host sites, and autonomously finding patterns in climate data. Code and data to reproduce the experiments are made available open source1.},
+  langid = {english},
+  pubstate = {prepublished},
+  keywords = {Computer Science - Machine Learning,Mathematics - Dynamical Systems},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Turri et al. - 2025 - Self-Supervised Evolution Operator Learning for High-Dimensional Dynamical Systems.pdf}
+}
+
+@online{tzenNeuralStochasticDifferential2019,
+  title = {Neural {{Stochastic Differential Equations}}: {{Deep Latent Gaussian Models}} in the {{Diffusion Limit}}},
+  shorttitle = {Neural {{Stochastic Differential Equations}}},
+  author = {Tzen, Belinda and Raginsky, Maxim},
+  date = {2019-10-28},
+  eprint = {1905.09883},
+  eprinttype = {arXiv},
+  eprintclass = {cs},
+  doi = {10.48550/arXiv.1905.09883},
+  url = {http://arxiv.org/abs/1905.09883},
+  urldate = {2026-01-23},
+  abstract = {In deep latent Gaussian models, the latent variable is generated by a time-inhomogeneous Markov chain, where at each time step we pass the current state through a parametric nonlinear map, such as a feedforward neural net, and add a small independent Gaussian perturbation. This work considers the diffusion limit of such models, where the number of layers tends to infinity, while the step size and the noise variance tend to zero. The limiting latent object is an Itô diffusion process that solves a stochastic differential equation (SDE) whose drift and diffusion coefficient are implemented by neural nets. We develop a variational inference framework for these neural SDEs via stochastic automatic differentiation in Wiener space, where the variational approximations to the posterior are obtained by Girsanov (mean-shift) transformation of the standard Wiener process and the computation of gradients is based on the theory of stochastic flows. This permits the use of black-box SDE solvers and automatic differentiation for end-to-end inference. Experimental results with synthetic data are provided.},
+  langid = {english},
+  pubstate = {prepublished},
+  keywords = {Computer Science - Machine Learning,Statistics - Machine Learning},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Tzen and Raginsky - 2019 - Neural Stochastic Differential Equations Deep Latent Gaussian Models in the Diffusion Limit.pdf}
+}
+
+@article{tzenTheoreticalGuaranteesSampling,
+  title = {Theoretical Guarantees for Sampling and Inference in Generative Models with Latent Diffusions},
+  author = {Tzen, Belinda and Raginsky, Maxim},
+  abstract = {We introduce and study a class of probabilistic generative models, where the latent object is a finite-dimensional diffusion process on a finite time interval and the observed variable is drawn conditionally on the terminal point of the diffusion. We make the following contributions: We provide a unified viewpoint on both sampling and variational inference in such generative models through the lens of stochastic control. We quantify the expressiveness of diffusion-based generative models. Specifically, we show that one can efficiently sample from a wide class of terminal target distributions by choosing the drift of the latent diffusion from the class of multilayer feedforward neural nets, with the accuracy of sampling measured by the Kullback–Leibler divergence to the target distribution.},
+  langid = {english},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Tzen and Raginsky - Theoretical guarantees for sampling and inference in generative models with latent diffusions.pdf}
+}
+
 @article{vanessenRequiredTestDurations2023,
   title = {Required Test Durations for Converged Short-Term Wave and Impact Extreme Value Statistics — {{Part}} 1: {{Ferry}} Dataset},
   shorttitle = {Required Test Durations for Converged Short-Term Wave and Impact Extreme Value Statistics — {{Part}} 1},
@@ -2201,6 +2523,16 @@
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Xiu and Karniadakis - The Wiener–Askey Polynomial Chaos for Stochastic Differential Equations.pdf}
 }
 
+@inproceedings{xuInfinitelyDeepBayesian2022,
+  title = {Infinitely {{Deep Bayesian Neural Networks}} with {{Stochastic Diﬀerential Equations}}},
+  booktitle = {International {{Conference}} on {{Artificial Intelligence}} and {{Statistics}}},
+  author = {Xu, Winnie and Chen, Ricky T Q and Li, Xuechen and Duvenaud, David},
+  date = {2022},
+  abstract = {We perform scalable approximate inference in continuous-depth Bayesian neural networks. In this model class, uncertainty about separate weights in each layer gives hidden units that follow a stochastic differential equation. We demonstrate gradient-based stochastic variational inference in this infinite-parameter setting, producing arbitrarily-flexible approximate posteriors. We also derive a novel gradient estimator that approaches zero variance as the approximate posterior over weights approaches the true posterior. This approach brings continuous-depth Bayesian neural nets to a competitive comparison against discrete-depth alternatives, while inheriting the memory-efficient training and tunable precision of Neural ODEs.},
+  langid = {english},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Xu et al. - Inﬁnitely Deep Bayesian Neural Networks with Stochastic Diﬀerential Equations.pdf}
+}
+
 @article{yogeeshIntervalBasedMultiBodyDynamics2025,
   title = {Interval-{{Based Multi-Body Dynamics Simulation}} of {{Special-Purpose Vessels}} in {{Rough Sea Conditions}}},
   author = {Yogeesh, Nijalingappa and Mohammad, Suleiman Ibrahim Shelash and Raja, Natarajan and Vasudevan, Asokan and Rangaswamy, Thirumalesha Babu Tumkur and Siddagangaiah, Ashalatha Kodihalli and Mohammad, Anber Abraheem},
@@ -2215,6 +2547,23 @@
   langid = {english},
   keywords = {Epistemic Uncertainty,Heave  Response,Hydrodynamic Modelling,Interval Arithmetic,Marine Structures,Wave-Induced Motion,α-Cut Interval Analysis},
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Yogeesh et al. - 2025 - Interval-Based Multi-Body Dynamics Simulation of Special-Purpose Vessels in Rough Sea Conditions.pdf}
+}
+
+@article{zhangQuantifyingTotalUncertainty2019,
+  title = {Quantifying Total Uncertainty in Physics-Informed Neural Networks for Solving Forward and Inverse Stochastic Problems},
+  author = {Zhang, Dongkun and Lu, Lu and Guo, Ling and Karniadakis, George Em},
+  date = {2019-11-15},
+  journaltitle = {Journal of Computational Physics},
+  shortjournal = {Journal of Computational Physics},
+  volume = {397},
+  pages = {108850},
+  issn = {0021-9991},
+  doi = {10.1016/j.jcp.2019.07.048},
+  url = {https://www.sciencedirect.com/science/article/pii/S0021999119305340},
+  urldate = {2026-01-21},
+  abstract = {Physics-informed neural networks (PINNs) have recently emerged as an alternative way of numerically solving partial differential equations (PDEs) without the need of building elaborate grids, instead, using a straightforward implementation. In particular, in addition to the deep neural network (DNN) for the solution, an auxiliary DNN is considered that represents the residual of the PDE. The residual is then combined with the mismatch in the given data of the solution in order to formulate the loss function. This framework is effective but is lacking uncertainty quantification of the solution due to the inherent randomness in the data or due to the approximation limitations of the DNN architecture. Here, we propose a new method with the objective of endowing the DNN with uncertainty quantification for both sources of uncertainty, i.e., the parametric uncertainty and the approximation uncertainty. We first account for the parametric uncertainty when the parameter in the differential equation is represented as a stochastic process. Multiple DNNs are designed to learn the modal functions of the arbitrary polynomial chaos (aPC) expansion of its solution by using stochastic data from sparse sensors. We can then make predictions from new sensor measurements very efficiently with the trained DNNs. Moreover, we employ dropout to quantify the uncertainty of DNNs in approximating the modal functions. We then design an active learning strategy based on the dropout uncertainty to place new sensors in the domain in order to improve the predictions of DNNs. Several numerical tests are conducted for both the forward and the inverse problems to demonstrate the effectiveness of PINNs combined with uncertainty quantification. This NN-aPC new paradigm of physics-informed deep learning with uncertainty quantification can be readily applied to other types of stochastic PDEs in multi-dimensions.},
+  keywords = {Arbitrary polynomial chaos,Dropout,Physics-informed neural networks,Stochastic differential equations,Uncertainty quantification},
+  file = {C\:\\Users\\AAg\\OneDrive - Allseas Engineering BV\\Documents\\Thesis\\Thesis-Literature - Documents\\Zhang et al. - 2019 - Quantifying total uncertainty in physics-informed neural networks for solving forward and inverse st.pdf;C\:\\Users\\AAg\\Zotero\\storage\\6LBPX4HA\\S0021999119305340.html}
 }
 
 @article{zhaoDatadrivenProbabilityDensity2023,
