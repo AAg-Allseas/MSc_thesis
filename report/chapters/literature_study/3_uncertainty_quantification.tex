@@ -1,11 +1,12 @@
-\chapter{Uncertainty Quantification}
+\chapter{Uncertainty Quantification - 8p}
+\label{chapter:uncertainty_quantification}
 
 
 
 This chapter will investigate the fundamentals of uncertainty quantification. Techniques and methods relevant to the
 prediction of DP performance will be identified and documented.
 
-\section{What is Uncertainty Quantification?}
+\section{What is Uncertainty Quantification? - 1p}
 A typical uncertainty quantification problem involves a mathematical model, subject to
 uncertainty about the correct parameter values \parencite{sullivanIntroductionUncertaintyQuantification2015}.
 \textcite{higdonUncertaintyQuantificationError2009} define uncertainty quantification as follows:
@@ -24,50 +25,134 @@ are the forward and the inverse problem \parencite{sullivanIntroductionUncertain
 we will consider a general model of a physical system:
 
 \begin{equation}
-z = f(x, y)
+y = f(x)
 \end{equation}
 
-In the forward problem, \(f, \, x, \, y\) are known. \(z\) can be calculated. However, if \(f\) is an imperfect model or 
-\(x,\, y\) are subject to some uncertainty, then this uncertainty will in some way affect \(z\). This is known as the 
+In the forward problem, \(f, \, x \) are known. \(y\) can be calculated. However, if \(f\) is an imperfect model or 
+\(x\) is subject to some uncertainty, then this uncertainty will in some way affect \(y\). This is known as the 
 \textit{forward propegation of uncertainty}.
 
-In the inverse problem \(z, \, x,\, y\) are measured. We are interested in determining \(f\). These measurements are subject to noise and as \(f\) is a model of a
+In the inverse problem \(y, \, x\) are measured. We are interested in determining \(f\). These measurements are subject to noise and as \(f\) is a model of a
 real system and thus has infinitely many degrees of freedom, the problem is undetermined. 
 
-\section{Types of uncertainty}
-Aleatoric uncertainty: inherent, irreducable randomness or noise in data. Eg. 
-Epistemic uncertainty: Uncertainty due to unknowns. 
+For the considered case of a DP system, the forward problem is primarily of relevance, as the dynamics of the system are
+known and the effect of uncertainty in the model and inputs is of relevance to the forecasted behavior.
 
+\section{Types of uncertainty - 1p}
+In general, sources can of uncertainty can be divided into two categories, based on their source. These are aleatoric
+uncertainty and epistemic uncertainty \parencite{sullivanIntroductionUncertaintyQuantification2015}. Within any given system, these two forms of uncertainty are not mutually exclusive
+\parencite{foxDistinguishingTwoDimensions2011}. 
 
-\section{Sensitivity analysis}
-In this section sensitivity analysis will be discussed. Sensitivity analysis is the understanding of how a function
-\(f(x_1, \dots, x_n)\) depends on variations in \(x_i\), both individually and in combinanation with other \(x_i\)
-\parencite{sullivanIntroductionUncertaintyQuantification2015}. There are two approaches: local sensitivity analysis and
-global sensitivity analysis. Local analyses study how the system responds to input variations around a point
-\(\overbar{x}\). Global sensitivity analyes study the average sensitivity of \(f\) to variations across the entire domain. A
-practical application is that understanding the sensitivity of a system can allow an engineer to decide which variables
-to include uncertainty of in their uncertainty modelling. 
+Aleatoric uncertainty refers to uncertainty inherent in a system. It is irreducable, regardless of the accuracy of the
+model or amount of training data. Pure aleatoric uncertainty is interpreted as the relative frequency of observations in
+a class of possible outcomes \parencite{foxDistinguishingTwoDimensions2011}. It is attributed to stochastic behaviour. An example of aleatoric uncertainty could be noise in a measurement sensor. 
 
+Epistemic uncertainty is uncertainty due of a lack of knowledge. Pure epistemic uncertainty can be seen as the
+confidence one has in a single observation.
+This can be due to uncertainty in parameter values or
+in the accuracy of the model. Epistemic uncertainty can be improved by obtaining more data or using a higher fidelity
+model. 
 
+When modelling a dynamic positioning system, both forms of uncertainty are present. The system is subject to stochastic
+wave and wind loading, as well as noise in sensor measurements. These are sources of aleatoric uncertainty. The fact
+that the system is being modelled means epistemic uncertainty is being introduced, as no model will fully capture every
+part of the system with complete accuracy. Additional epistemic uncertainty is added in the model parameters, as factors
+such as hydrodynamic coefficients are unlikely to be completely accurate at any given time.  
 
+\section{Spectral methods - 2p}
+Spectral methods are numerical techniques that represent stochastic processes as series expansions using an orthogonal
+basis of functions. They decompose random variables into components, similar to Fourier analysis
+\parencite{heuvelineHybridGeneralizedPolynomial2014}. Polynomial Chaos Expansions (PCE) are a common spectral method for
+uncertainty quantification.
 
+\subsection{Generalised Polynomial chaos}
+PCE uses polynomials as the orthogonal basis. Originally developed to model Wiener processes using Hermite polynomials, it was extended by
+\textcite{xiuWienerAskeyPolynomial2002} to use other polynomials and thus represent other probability distributions. The
+generalised polynomial chaos expansion (gPC) works as follows:
 
-% \section{Intrusive Methods}
-% Intrusive methods for uncertainty quantification are methods that require alteration of the governing equations ot
-% incorporate uncertainty directly.
+Let \(X\) be a random variable in probability space \(\left(\Omega, \mathcal{F}, \mathbb{P}\right)\), where \(\Omega\) is
+the sample space with \(\omega \in \Omega\). \(X\) can then be formulated as follows
+\parencite{heuvelineHybridGeneralizedPolynomial2014}:
 
-% \section{Non-intrusive methods}
-% Non-intrusive methods for uncertainty quantification are methods that allow the use of existing models as a black box
-% without adjusting their internal structure for UQ. 
+\begin{equation}
+\label{eq:gPC_explain_X}
+X(\omega) = \sum_{i = 0}^{\infty}c_i\boldsymbol{\Psi}_i(\boldsymbol{\xi})
+\end{equation}
 
-% \textcite{sullivanIntroductionUncertaintyQuantification2015} discusses several of these methods. The guiding principle
-% of these is that the function is evaluated at a number of points. A surrogate model is then made based on these samples.
-% The first method discussed is a non-intrusive spectral projection. With this method the aim is to select the best
-% polynomial chaos coefficients so as to model the function best using a set of orthogonal polynomials.
-% The second method, stochastic collocation, creates an interpolant between chosen nodes. The third method is gaussian
-% process regression. This method, in contrast to the two previous methods, does not assume perfectly accurate
-% observations. The function is assumed to be a random gaussian field and any observations made reduce the uncertainty at
-% those points.
+\(\boldsymbol{\xi}\) is a random variable subject to some probability distribution.\({\boldsymbol{\Psi}}\) is a set of orthogonal polynomials that describes the
+distribution of the random variable. \(c_i\) is a weight given to each term of the polynomial. These are determined by
+pointwise sampling at a given point in time. Given a time dependent process \(X = X(t, \omega)\), \(c_i\) has to be
+re-evaluated at each timestep. 
 
-% One important aspect to note is that these methods all assume the function does not change in time. This makes these
-% methods as is unsuitable for dynamic systems. 
+infinite sums are not possible in reality, so the sum is truncated at point \(M\). This gives an approximation of \(X\)
+defined as:
+
+\begin{equation}
+X^M(t, \omega) \coloneq \sum_{i = 0}^{M}c_i(t)\boldsymbol{\Psi_i}(\boldsymbol{\xi})
+\end{equation}
+Where M is given by:
+\begin{equation}
+M = \frac{(P + L)!}{P!L!} - 1
+\end{equation}
+
+The truncation order \(M\) is dependent on two discretisation parameters, \(L\) and \(P\). \(P\) is the maximal polynomial order
+used, and \(L\) is the dimension of the vector of random variables \(\boldsymbol{\xi} = (\xi_1, \dots, \xi_L)\). The value of M
+grows rapidly as the dimensionality of the problem increases. The mean and variance of the result can be determined from
+the resulting expansion. 
+
+\begin{align}
+    \overbar{X}(t) &= c_0(t) \\
+    \mathit{Var} \, \left[ X(t) \right] &= \sum_{i = 1}^{M} c_i(t)^2
+\end{align}
+
+Overall this method works more efficiently than Monte-Carlo as the coefficients for the sum can be estimated using far
+fewer model evaluations. Additionally, once the polynomial surrogate model is constructed, it can be evaluated quickly
+for any variations of the input values. 
+
+\subsection{Time dependent generalised polynomial chaos}
+\textcite{gerritsmaTimedependentGeneralizedPolynomial2010} introduced the concept of time-dependent generalised
+polynomial chaos (TD-gPC). One of the limitaions of gPC is a lack of convergence when the dependence on \(\boldsymbol{\xi}\) is
+strongly non-linear. This is especially the case when considering long term integration
+\parencite{heuvelineHybridGeneralizedPolynomial2014}. The difference between this method and the time independent method
+is that with TD-gPC, the orthogonal polynomials can be adjusted if the distributions of \( \boldsymbol{\xi} \) changes.
+This increases the accuracy of the PCE over long-term simulations. 
+
+The TD-gPC approach does have some limitations in the application to dynamic systems. For longer simulations, the
+accuracy of the method decreases \parencite{gerritsmaTimedependentGeneralizedPolynomial2010}, thus needing recalculation
+and adding extra computing cost. \textcite{ebadollahiTimedependentUncertaintyQuantification2025} also mentions a
+deterioration of the performance of TD-gPC for longer simulations. The computational cost rapidly increases as the
+required polynomial order increases as time evolves. This makes it inefficient for strongly nonlinear dynamic systems.
+The technique does not scale well for higher dimension problems
+\parencites{heuvelineHybridGeneralizedPolynomial2014}{maiSurrogateModellingStochastic2016}. 
+
+\subsection{Limitations}
+
+Although spectral methods are powerful for problems with smooth responses and low-dimensional uncertainty, they become
+impractical for dynamic positioning systems. DP models involve high-dimensional, nonlinear dynamics and stochastic
+environmental inputs, which lead to rapid growth in computational cost and poor convergence for spectral approaches.
+
+Additionally, Polynomial Chaos Expansions (PCE) and other spectral decompositions are typically constructed for a
+specific set of uncertain parameters and their probability distributions. If these distributions change or new 
+parameters are introduced, the expansion must be recomputed or retrained. This means that a tool intended to evaluate
+behavior under varying conditions would require repeated recalculation of the PCE, making it inefficient compared to
+more flexible approaches such as neural network-based surrogate models. 
+
+\todo{Reformat naming of these sections}
+\section{Neural network approaches}
+
+This section outlines existing methods used to capture epistemic and aleatoric uncertainty with neural networks. In
+general, approaches capture either epistemic or aleatoric uncertainty seperately \parencite{galUncertaintyDeepLearning2016}. Epistemic uncertainty is modelled by
+placing prior distributions over the weights of the model and capturing how these vary given input data. Aleatoric
+uncertainty is quantified by placing a distribution over the output of the model \parencite{kendallWhatUncertaintiesWe2017}
+
+\TODO{Decide what to discuss here. I want to talk about different methods used to capture uncertainty commonly used\\
+- Bayesian Neural Networks \\
+- Monte Carlo Dropout\\
+}
+\subsection{Bayesian Neural Networks}
+\subsection{Monte Carlo Dropout}
+\subsection{Bayes by backpropagation}
+\subsection{Deep ensembles}
+\subsection{Hypermodels}
+\subsection{Variational neural networks}
+\subsection{Neural SDEs}
