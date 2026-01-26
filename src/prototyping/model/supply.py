@@ -126,12 +126,12 @@ class SupplyVessel:
         # Thrust_max(i) = K(i) * n_max(i)^2
         # Tunnel thruster: 3.2 * 250^2 = 200 kN
         # Main propeller: 31.2 * 160^2 = 799 kN
-        K = np.diag([3.2, 3.2, 3.2, 3.2, 31.2, 31.2])
-        T = np.array(
+        self.K = np.diag([3.2, 3.2, 3.2, 3.2, 31.2, 31.2])
+        self.T = np.array(
             [ [0, 0, 0, 0, 1, 1], [1, 1, 1, 1, 0, 0], 
               [30, 22, -22, -30, -8, 8] ], float
         )
-        self.B = T @ K
+        self.B =  self.T @ self.K
 
         # Tbis = np.diag( [1, 1, 1 / self.L],float)
         Tbis_inv = np.diag([1.0, 1.0, self.L])
@@ -245,3 +245,18 @@ class SupplyVessel:
         u_control = n
 
         return u_control
+
+    def thrusterFailure(self, thruster_number: int) -> None:
+        """ 
+        Method to simulate a thruster failure. Sets the current rpm to zero and disables the allocation to it.
+
+        args:
+            thruster_number: The index of the thruster to have disabled
+        """
+
+        if thruster_number > self.dimU:
+            raise IndexError("Thruster number out of range")
+        
+        self.K[thruster_number - 1] = 0
+        self.B = self.T @ self.K
+        self.u_actual[thruster_number - 1] = 0

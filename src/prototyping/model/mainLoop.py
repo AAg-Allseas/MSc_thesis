@@ -77,6 +77,9 @@ def simulate(N: int,
         [nu, u_actual]  = vessel.dynamics(eta,nu,u_actual,u_control,sampleTime, f_external=f_ext)
         eta = attitudeEuler(eta,nu,sampleTime)
 
+        if t == 120:
+            vessel.thrusterFailure(5) # Thruster failure of main propeller
+
     # Store simulation time vector
     simTime = np.arange(start=0, stop=t+sampleTime, step=sampleTime)[:, None]
 
@@ -87,13 +90,13 @@ def R2D(value):  # radians to degrees
 
 
 if __name__ == "__main__":
-    vehicle = SupplyVessel('DPcontrol')
+    vehicle = SupplyVessel('DPcontrol', V_current=1)
 
     # Simulation parameters
     sampleTime = 0.02                   # sample time [seconds]
     N = 10000                         # number of samples
 
     printInfo(vehicle, sampleTime, N)
-    [simTime, simData] = simulate(N, sampleTime, vehicle, np.array([100e3, 0, 0]), np.array([80e3, 0, 0]))
+    [simTime, simData] = simulate(N, sampleTime, vehicle, np.array([0, 0, 0]), np.array([0, 0, 0]))
     plotTimeSeries.plotVehicleStates(simTime, simData, 1)    
     plt.show()
