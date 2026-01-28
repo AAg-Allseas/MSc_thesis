@@ -238,6 +238,7 @@ activation functions are also Lipschitz continuous.
 Due to the sequential nature of neural ODEs, it is challenging to run them parallel on modern hardware such as GPUs.
 
 \subsection{Neural SDE - 3p}
+\label{subsec:neural_sde}
 A limitation primarily relevant to this study is that in the form of neural ODEs given in \eqref{eq:neural_ode}, the network is unable
 to deal with stochastic systems. Stochastic differential equations (SDEs) can similarily be approximated by neural
 networks to give a neural SDE. The general form of these is given as follows \parencites{jiaNeuralJumpStochastic2020}{liuHowDoesNoise2020}{tzenNeuralStochasticDifferential2019}:
