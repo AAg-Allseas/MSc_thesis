@@ -151,9 +151,10 @@ class SupplyVessel:
 
         # DP control system
         self.e_int = np.array([0, 0, 0], float)  # integral states
-        self.x_d = 0.0  # setpoints
+        self.x_d = 0.0  # Estimates
         self.y_d = 0.0
         self.psi_d = 0.0
+        self.gains = (np.zeros(3), np.zeros(3), np.zeros(3)) # Force per gain for debugging
         self.wn = np.diag([0.1, 0.1, 0.2])    # PID pole placement
         self.zeta = np.diag([1.0, 1.0, 1.0])
 
@@ -220,7 +221,7 @@ class SupplyVessel:
         eta3 = np.array([eta[0], eta[1], eta[5]])
         nu3 = np.array([nu[0], nu[1], nu[5]])
 
-        [tau3, self.e_int, self.x_d, self.y_d, self.psi_d] = DPpolePlacement(
+        [tau3, self.e_int, self.x_d, self.y_d, self.psi_d, self.gains] = DPpolePlacement(
             self.e_int,
             self.M3,
             self.D3,
@@ -260,3 +261,7 @@ class SupplyVessel:
         self.K[thruster_number - 1] = 0
         self.B = self.T @ self.K
         self.u_actual[thruster_number - 1] = 0
+
+    @property
+    def pos_est(self):
+        return self.x_d, self.y_d, self.psi_d

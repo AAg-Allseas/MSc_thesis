@@ -50,10 +50,14 @@ def simulate(N: int,
     # Initialization of table used to store the simulation data
     simData = np.empty( [0, 2*DOF + 9], float)
 
+    # Debug data storage
+    # 3x3 controller gains. 3x estimated position, 3x e_int, 6x rpm actuators = 9+3+3+6 = 21
+    debugData = np.zeros([N+1, 21])
+
     rng = np.random.default_rng()
     lambda_ = 0.01 # Speed of noise
     f_ext = random_mean + random_std * rng.standard_normal(3)
-    rt_dt = np.sqrt(sampleTime)
+    sqrt_dt = np.sqrt(sampleTime)
 
     # Main simulation loop
     for i in range(0,N+1):
@@ -63,40 +67,49 @@ def simulate(N: int,
             print(f"time: {t}s")
    
         u_control = vessel.DPcontrol(eta,nu,sampleTime)
-        f_ext = f_ext - lambda_*(f_ext - random_mean) * sampleTime + random_std * rt_dt * rng.standard_normal(3)
-
-        # Store simulation data in simData
-        tau_control = vessel.B @ u_control ** 2
-        tau_actual = vessel.B @ u_actual ** 2
-        signals = np.hstack([eta, nu, tau_control, tau_actual, f_ext])
-        simData = np.vstack( [simData, signals] ) 
+        # u_control = np.zeros(6)
 
         # Sample random forcing from normal distribution
+        f_ext = f_ext - lambda_*(f_ext - random_mean) * sampleTime + random_std * sqrt_dt * rng.standard_normal(3)
+
+        # Store simulation data in simData
+        tau_control = vessel.B @ (np.abs(u_control) * u_control)
+        tau_actual = vessel.B @ (np.abs(u_actual) * u_actual)
+        signals = np.hstack([eta, nu, tau_control, tau_actual, f_ext])
+        simData = np.vstack( [simData, signals] )
+        
+        for j in range(3):
+            debugData[i, 3 * j : 3 * (j + 1)] = vessel.gains[j]
+            debugData[i, 9+j] = vessel.pos_est[j]
+        debugData[i, 12:15] = vessel.e_int
+        debugData[i, 15:21] = u_actual
+
 
         # Propagate vehicle and attitude dynamics
         [nu, u_actual]  = vessel.dynamics(eta,nu,u_actual,u_control,sampleTime, f_external=f_ext)
         eta = attitudeEuler(eta,nu,sampleTime)
 
-        if t == 120:
-            vessel.thrusterFailure(5) # Thruster failure of main propeller
+        # if t == 120:
+        #     vessel.thrusterFailure(5) # Thruster failure of main propeller
 
     # Store simulation time vector
     simTime = np.arange(start=0, stop=t+sampleTime, step=sampleTime)[:, None]
 
-    return(simTime,simData)
+    return(simTime,simData, debugData)
 
 def R2D(value):  # radians to degrees
     return value * 180 / np.pi
 
 
 if __name__ == "__main__":
-    vehicle = SupplyVessel('DPcontrol', V_current=1)
+    vehicle = SupplyVessel('DPcontrol')
 
     # Simulation parameters
     sampleTime = 0.02                   # sample time [seconds]
-    N = 10000                         # number of samples
+    N = 50000                        # number of samples
 
     printInfo(vehicle, sampleTime, N)
-    [simTime, simData] = simulate(N, sampleTime, vehicle, np.array([0, 0, 0]), np.array([0, 0, 0]))
-    plotTimeSeries.plotVehicleStates(simTime, simData, 1)    
+    [simTime, simData, debugData] = simulate(N, sampleTime, vehicle, np.array([100e3, 0, 0]), np.array([80e3, 0, 0]))
+    plotTimeSeries.displayPlot(simTime, simData)    
+    plotTimeSeries.debugPlot(simTime, simData, debugData, vehicle)
     plt.show()

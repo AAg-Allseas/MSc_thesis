@@ -16,11 +16,15 @@ import matplotlib.pyplot as plt
 from src.prototyping.model.gnc import ssa
 import mpl_toolkits.mplot3d.axes3d as p3
 import matplotlib.animation as animation
+import matplotlib.patches as patches
+from matplotlib.transforms import Affine2D
+
+from src.prototyping.model.supply import SupplyVessel
 
 legendSize = 10  # legend size
 figSize1 = [15, 10]  # figure1 size in cm
 figSize2 = [25, 13]  # figure2 size in cm
-dpiValue = 300  # figure dpi value
+dpiValue = 96  # figure dpi value
 
 
 def R2D(value):  # radians to degrees
@@ -33,7 +37,7 @@ def cm2inch(value):  # inch to cm
 
 # plotVehicleStates(simTime, simData, figNo) plots the 6-DOF vehicle
 # position/attitude and velocities versus time in figure no. figNo
-def plotVehicleStates(simTime, simData, figNo):
+def displayPlot(simTime: np.ndarray, simData: np.ndarray) -> None:
 
     # Time vector
     t = simTime
@@ -76,50 +80,149 @@ def plotVehicleStates(simTime, simData, figNo):
     chi = R2D(ssa(simData[:, 5] + np.arctan2(v, u)))  # course angle, chi=psi+beta_c
 
     # Plots
-    fig, ax = plt.subplots(3, 3, figsize=figSize1)
-    ax[0, 0].plot(y, x, label="North-East positions (m)")
-    ax[0, 0].legend(fontsize=legendSize)
-    ax[0, 0].grid()
+    
+    fig, axs = plt.subplots(3, 2, figsize=figSize1, dpi=dpiValue)
+    fig.suptitle("Vehicle states")
+    axs[0, 0].set_title("North-East positions (m)")
+    axs[0, 0].set_xlabel("East position (m)")
+    axs[0, 0].set_ylabel("North position (m)")
+    axs[0, 0].plot(y, x)
+    axs[0, 0].axis("equal")
+    t_flat = t.reshape(-1)
+    sample_times = np.arange(float(t_flat[0]), float(t_flat[-1]) + 1e-9, 25.0)
+    marker_idx = np.unique([np.abs(t_flat - ts).argmin() for ts in sample_times])
+    for i in marker_idx:
+        axs[0, 0].scatter(
+            y[i],
+            x[i],
+            s=60,
+            marker=(3, 0, psi[i]),
+            facecolor="tab:red",
+            edgecolor="k",
+            zorder=3,
+        )
+    axs[0, 0].grid()
 
-    fig.suptitle("Vehicle states", fontsize=12)
 
-    ax[1, 0].plot(t, U, label="Speed (m/s)")
-    ax[1, 0].legend(fontsize=legendSize)
-    ax[1, 0].grid()
+    axs[0, 1].set_title("Velocity")
+    axs[0, 1].set_xlabel("Time (s)")
+    axs[0, 1].set_ylabel("Velocity (m/s)")
+    axs[0, 1].plot(t, u, label="Surge")
+    axs[0, 1].plot(t, v, label="Sway")
+    axs[0, 1].legend(fontsize=legendSize)
+    axs[0, 1].grid()
+
+    axs[1, 0].set_title("Thruster force")
+    axs[1, 0].set_ylabel("Force (kN)")
+    axs[1, 0].set_xlabel("Time (s)")
+    axs[1, 0].plot(t, u_x_actual / 1e3, label="Surge")
+    axs[1, 0].plot(t, u_y_actual / 1e3, label="Sway")
+    axs[1, 0].legend(fontsize=legendSize)
+    axs[1, 0].grid()
+
+    axs[1, 1].set_title("External force")
+    axs[1, 1].set_ylabel("Force (kN)")
+    axs[1, 1].set_xlabel("Time (s)")
+    axs[1, 1].plot(t, f_ext_x / 1e3, label="Surge")
+    axs[1, 1].plot(t, f_ext_y / 1e3, label="Sway")
+    axs[1, 1].legend(fontsize=legendSize)
+    axs[1, 1].grid()
+
+    gs = axs[2, 0].get_gridspec()
+    for ax in axs[2, :]:
+        ax.remove()
+    axbig = fig.add_subplot(gs[2, :])
+    axbig.plot(t, x, label="Surge")
+    axbig.plot(t, y, label="Sway")
+    axbig.set_xlabel("Time (s)")
+    axbig.set_ylabel("Displacement (m)")
+    axbig.legend(fontsize=legendSize)
+    axbig.grid()
+
+    fig.tight_layout()
+    fig.savefig("plots/vehicleState.png")
 
 
-    ax[0, 1].plot(t, u, label="Surge velocity (m/s)")
-    ax[0, 1].plot(t, v, label="Sway velocity (m/s)")
-    ax[0, 1].set_xlabel("Time (s)", fontsize=12)
-    ax[0, 1].legend(fontsize=legendSize)
-    ax[0, 1].grid()
+def debugPlot(simTime: np.ndarray, simData: np.ndarray, debugData: np.ndarray, vehicle: SupplyVessel) -> None:
 
-    ax[1, 1].plot(t, r, label="Yaw rate (deg/s)")
-    ax[1, 1].set_xlabel("Time (s)", fontsize=12)
-    ax[1, 1].legend(fontsize=legendSize)
-    ax[1, 1].grid()
+    t = simTime
 
-    ax[0, 2].plot(t, chi, label="Course angle (deg)")
-    ax[0, 2].legend(fontsize=legendSize)
-    ax[0, 2].grid()
+    #eta
+    x = simData[:, 0]
+    y = simData[:, 1]
+    z = simData[:, 2]
+    phi = R2D(ssa(simData[:, 3]))
+    theta = R2D(ssa(simData[:, 4]))
+    psi = R2D(ssa(simData[:, 5]))
 
-    ax[1, 2].plot(t, psi, label="Yaw angle (deg)")
-    ax[1, 2].plot(t, beta_c, label="Crab angle (deg)")
-    ax[1, 2].set_xlabel("Time (s)", fontsize=12)
-    ax[1, 2].legend(fontsize=legendSize)
-    ax[1, 2].grid()
+    pos = (x, y, psi)
 
-    ax[2, 0].plot(t, u_x_control, label="Surge force")
-    ax[2, 0].plot(t, u_y_control, label="Sway force")
-    ax[2, 0].plot(t, u_r_control, label="Yaw moment")
+    #nu
+    u = simData[:, 6]
+    v = simData[:, 7]
+    w = simData[:, 8]
+    p = R2D(simData[:, 9])
+    q = R2D(simData[:, 10])
+    r = R2D(simData[:, 11])
 
-    ax[2, 1].plot(t, u_x_actual, label="Surge force")
-    ax[2, 1].plot(t, u_y_actual, label="Sway force")
-    ax[2, 1].plot(t, u_r_actual, label="Yaw moment")
+    # Actuator forces
+    u_x_control = simData[:, 12]
+    u_y_control = simData[:, 13]
+    u_r_control = simData[:, 14]
+    u_x_actual = simData[:, 15]
+    u_y_actual = simData[:, 16]
+    u_r_actual = simData[:, 17]
+    f_ext_x = simData[:, 18]
+    f_ext_y = simData[:, 19]
+    f_ext_r = simData[:, 20]
 
-    ax[2, 2].plot(t, f_ext_x, label="Surge force")
-    ax[2, 2].plot(t, f_ext_y, label="Sway force")
-    ax[2, 2].plot(t, f_ext_r, label="Yaw moment")
+    p_gains = debugData[:, :3]
+    i_gains = debugData[:, 3:6]
+    d_gains = debugData[:, 6:9]
+    gains = (p_gains, i_gains, d_gains)
+
+    pos_est = debugData[:, 9:12]
+    e_int = debugData[:, 12:15]
+    rpm_actual = debugData[:, 15:21]
+    dof_labels = ["Surge", "Sway", "Yaw"]
+    pid_labels = ["Proportional", "Integral", "Derivative"]
+    fig, axs = plt.subplots(ncols=3, nrows=4, figsize=figSize1, dpi=dpiValue)
+
+    for i in range(3): # DOF
+        for j in range(3): # PID
+            axs[0, i].plot(t, gains[j][:, i], label=pid_labels[j])
+        axs[0, i].set_title(f"PID gains in {dof_labels[i]}")
+        axs[0, i].set_xlabel("Gain (-)")
+        axs[0, i].set_ylabel("Time (s)")
+        axs[0, i].legend()
+
+        axs[1, 0].plot(t, pos_est[:, i], label=dof_labels[i])
+        axs[1, 1].plot(t, pos[i], label=dof_labels[i])
+        axs[1, 2].plot(t, e_int[:, i], label=dof_labels[i])
+
+    axs[1, 0].legend()
+    axs[1, 1].legend()
+    axs[1, 2].legend()
+
+    axs[1, 0].grid()
+    axs[1, 1].grid()
+    axs[1, 2].grid()
+
+
+    thruster_labels = ["Bow Thruster 1", "Bow Thruster 2", "Bow Thruster 3", "Bow Thruster 4", "Main Propeller 1", "Main Propeller 2"]
+
+    for i in range(6):
+        y = i % 2 + 2
+        x = (i) // 2
+        print(f"i: {i} -> ({x}, {y})")
+        axs[y, x].plot(t, rpm_actual[:, i])
+        axs[y, x].set_title(f"{thruster_labels[i]} RPS")
+        axs[y, x].axhline(vehicle.n_max[i], color="k", linestyle="--")
+        axs[y, x].axhline(-vehicle.n_max[i], color="k", linestyle="--")
+        axs[y, x].set_xlabel("Time (s)")
+        axs[y, x].set_ylabel("RPS")
+
+    fig.tight_layout()
 
 
 # plotControls(simTime, simData) plots the vehicle control inputs versus time
@@ -225,5 +328,5 @@ def plot3D(simData,numDataPoints,FPS,filename,figNo):
                          repeat=True)
     
     # Save the 3D animation as a gif file
-    ani.save(filename, writer=animation.PillowWriter(fps=FPS))  
+    ani.save(filename, writer=animation.PillowWriter(fps=FPS))
 

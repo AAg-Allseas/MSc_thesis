@@ -32,11 +32,11 @@ def DPpolePlacement(
     e = eta3 - np.array([x_d, y_d, psi_d])
     e[2] = ssa(e[2])
     R = Rzyx(0.0, 0.0, eta3[2])
-    tau = (
-        - np.matmul((R.T @ Kp), e)
-        - np.matmul(Kd, nu3)
-        - np.matmul((R.T @ Ki), e_int)
-    )
+    tau_p = - np.matmul((R.T @ Kp), e)
+    tau_i = - np.matmul((R.T @ Ki), e_int)
+    tau_d = - np.matmul(Kd, nu3)
+
+    tau = (tau_p + tau_i + tau_d)
 
     # Low-pass filters, Euler's method
     T = 5.0 * np.array([1 / wn[0][0], 1 / wn[1][1], 1 / wn[2][2]])
@@ -47,5 +47,5 @@ def DPpolePlacement(
     # Integral error, Euler's method
     e_int += sampleTime * e
 
-    return tau, e_int, x_d, y_d, psi_d
+    return tau, e_int, x_d, y_d, psi_d, (tau_p, tau_i, tau_d)
 
