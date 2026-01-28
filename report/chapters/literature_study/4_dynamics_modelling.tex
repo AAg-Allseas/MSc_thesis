@@ -15,7 +15,7 @@ A discrete time system can analogously be considered in the following form:
 
 As this only depends on the state at the current time, these processes can be considerd as markov processes.
 
-\section{Latent space models - 5p}
+\section{Operator learning}
 \subsection{Koopman operator theory - 3p}
 Koopman operator theory states that it is possible to represent a nonlinear dynamical system in terms of an
 infinite-dimensioned linear operator acting on a Hilbert space of measurement functions of the state of the system
@@ -186,10 +186,15 @@ where $\varphi$ are the eigenfunctions of the stochastic Koopman Operator and $\
 eigenvalues. The stochastic Koopman operator tracks how the expected state of the stochastic dynamical system develops
 in measurement space. It does not however track the variance of the the state. 
 
-\subsection{VAMPNets - 1p}
-\subsection{DPNets - 1p}
+\subsection{Variational approach for Markov processes}
 
-\section{Neural ODE - 4p}
+\section{Neural Stochastic Differential Equations}
+Neural Ordinary Differential Equations are a powerful tool for modelling dynamics of systems. Neural stochastic
+differential equations are their stochastic analogue. This section will discuss these approaches for use in modelling
+stochastic dynamical systems. First an overview will be given of neural ODEs, followed by an overview of neural
+stochastic differential equations. 
+
+\subsection{Neural Ordinary Differential Equations}
 A second method for modeling dynamics is neural ordinary differential equations (Neural ODEs). First published by
 \textcite{chenNeuralOrdinaryDifferential2018}, neural ODEs are derived from residual neural networks (ResNet). A ResNet
 works as follows:
@@ -237,7 +242,7 @@ activation functions are also Lipschitz continuous.
 
 Due to the sequential nature of neural ODEs, it is challenging to run them parallel on modern hardware such as GPUs.
 
-\subsection{Neural SDE - 3p}
+\subsection{Theoretical formulation of neural SDEs}
 \label{subsec:neural_sde}
 A limitation primarily relevant to this study is that in the form of neural ODEs given in \eqref{eq:neural_ode}, the network is unable
 to deal with stochastic systems. Stochastic differential equations (SDEs) can similarily be approximated by neural
@@ -253,8 +258,80 @@ of the system. The diffusion term, \(g\), models the stochastic components of th
 
 Similar to neural ODEs, this formulation results in a model that effectively defines the dynamics of the system in
 continuous time. To progress the model in time, a stochastic time integration scheme can be used such as Euler-Maruyama,
-Stochastic Runge-Kutta or stochastic Heun integration \textcite{kidgerEfficientAccurateGradients2021}.
+Stochastic Runge-Kutta or stochastic Heun integration \parencite{kidgerEfficientAccurateGradients2021}.
 
+\subsection{Adjoint method for neural SDEs}
 
+Training neural SDEs and ODEs ideally avoids storing the full forward path in GPU memory, but this conflicts with
+backpropagation requirements, which depend on intermediate states to compute gradients with respect to model parameters.
+To work around this limitation in neural ODEs, the adjoint sensitivity method is typically used: instead of
+backpropagating through every solver step, one solves an adjoint ODE backwards in
+time.\parencite{chenNeuralOrdinaryDifferential2018} \textcite{liScalableGradientsStochastic2020} adapted this idea to
+the stochastic setting, showing how to define and numerically solve a backward-in-time adjoint \emph{SDE} that yields
+gradients with constant memory cost.
 
--
+Consider a Stratonovich SDE with Lipschitz continuous drift \(b\) and diffusion \(\sigma\)
+
+\[
+Z_T = z_0 + \int_0^T b(Z_t, t)\,dt + \int_0^T \sigma(Z_t, t) \circ dW_t,
+\]
+
+and write \(\Phi_{s,t}(z) := Z_t^{s,z}\) for the solution at time \(t\) started from state \(z\) at time \(s\). For fixed \(s\) and \(t\), we can also view \(\Phi_{s,t}\) as a (random) change of variables on state space, with
+inverse map
+
+\[
+\check{\Psi}_{s,t} := \Phi_{s,t}^{-1}.
+\]
+
+\(\check{\Psi}_{s,t}(z)\) can be understood as: "which state at time \(s\) would have evolved into \(z\) at
+time \(t\), under this particular realization of the Brownian path?". \textcite{liScalableGradientsStochastic2020} show
+that \(\check{\Psi}_{s,t}\) itself satisfies a backward Stratonovich SDE. This backward SDE
+simply describes running the original dynamics in reverse time along the same stochastic path, with appropriate sign
+changes in the drift and diffusion terms.
+
+The goal of the adjoint method is to compute the gradient of a scalar loss \(\mathcal{L}\) that depends on the terminal
+state \(Z_T\), with respect to both the initial condition and the model parameters (which enter through \(b\) and
+\(\sigma\)). We define the adjoint process by
+
+\[
+A_{s,t}(z) := \frac{\partial \mathcal{L}(\Phi_{s,t}(z))}{\partial z},
+\]
+
+so that \(A_{s,t}(z)\) represents the sensitivity of the loss to perturbations of the state at time \(t\), when the
+system was started from \(z\) at time \(s\). In particular, \(A_{0,T}(z_0)\) is the gradient of the loss with respect to
+the terminal state produced by the forward SDE. 
+
+Crucially, \textcite{liScalableGradientsStochastic2020} show that this adjoint process can be characterized as the
+solution of a backward SDE that is coupled to the original dynamics: as we integrate backwards from \(T\) to
+\(0\), we jointly evolve the state via the backward flow \(\check{\Psi}\), and the adjoint via an SDE whose
+drift and diffusion depend on the Jacobians of \(b\) and \(\sigma\) with respect to the state and parameters. Instead of
+storing the entire forward trajectory and differentiating through the solver, the
+dynamics can be re-simulated in reverse time and propagate sensitivities through this backward SDE. This yields
+gradients with respect to initial conditions and parameters using only \(\mathcal{O}(1)\) memory, at the cost of solving
+an additional SDE backwards in time.
+
+The adjoint SDE is not solved analytically but numerically, using essentially the same solver infrastructure as for the
+forward dynamics. Following \textcite{liScalableGradientsStochastic2020}, the backward integration is done with a chosen
+timestep such that the adjoint variables and the backward flow are jointly evolved from $T$ back to~$0$. This timestep
+does not have to be the same as that of the forward SDE. This mirrors the continuous-time adjoint method for ODEs, but
+now in the stochastic setting.
+
+A challenge is that the backward SDE must reuse the identical Brownian path from the forward computation, while
+still avoiding storage of all forward-time increments. \textcite{liScalableGradientsStochastic2020} resolve this using
+the virtual Brownian tree (VBT), which reconstructs increments on demand via Brownian bridges and splittable
+random seeds, achieving $\mathcal{O}(1)$ memory and logarithmic-time generation for any interval. This enables adaptive
+step sizes in the forward solver without memory overhead. This method was improved upon by
+\textcite{kidgerEfficientAccurateGradients2021}. They introduce the Brownian Interval construction. Unlike VBT,
+which reconstructs increments in $\mathcal{O}(\log L)$ time and with small approximation errors, the Brownian Interval
+provides exact Brownian samples with average $\mathcal{O}(1)$ time and memory cost, using a binary interval tree together with a
+small LRU cache. This yields substantial speedups and improves stability of the backward SDE by avoiding stochastic noise from approximate reconstruction.
+
+From a numerical-analysis perspective, the backward SDE is expressed in Stratonovich form. Gradients with respect to
+parameters are accumulated using vector-Jacobian products at each backward step, keeping memory constant while
+remaining compatible with automatic differentiation. \textcite{kidgerEfficientAccurateGradients2021} propose an
+algebraically reversible solver for Stratonovich SDEs: the reversible Heun method. It allows exact
+reconstruction of all intermediate forward states during the backward pass, eliminating the gradient inaccuracies that
+arise when standard solvers must be (approximately) inverted in reverse-time adjoint integration. Its computational cost
+remains low—one function evaluation per step—while matching the strong convergence rates of classical midpoint/Heun schemes.
+
+\subsection{Training architectures}
