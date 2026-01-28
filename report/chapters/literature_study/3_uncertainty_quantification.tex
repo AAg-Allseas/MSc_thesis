@@ -137,7 +137,6 @@ parameters are introduced, the expansion must be recomputed or retrained. This m
 behavior under varying conditions would require repeated recalculation of the PCE, making it inefficient compared to
 more flexible approaches such as neural network-based surrogate models. 
 
-\todo{Reformat naming of these sections}
 \section{Neural network approaches}
 
 This section outlines existing methods used to capture epistemic and aleatoric uncertainty with neural networks. In
@@ -145,11 +144,75 @@ general, approaches capture either epistemic or aleatoric uncertainty seperately
 placing prior distributions over the weights of the model and capturing how these vary given input data. Aleatoric
 uncertainty is quantified by placing a distribution over the output of the model \parencite{kendallWhatUncertaintiesWe2017}
 
-\TODO{Decide what to discuss here. I want to talk about different methods used to capture uncertainty commonly used\\
-- Bayesian Neural Networks \\
-- Monte Carlo Dropout\\
-}
 \subsection{Bayesian Neural Networks}
+Bayesian neural networks offer a probabilistic extension of standard neural networks, replacing fixed model parameters
+with distributions to capture uncertainty in both learning and prediction. This Bayesian treatment provides a principled
+framework for understanding model confidence, especially in settings where data are limited, noisy, or shift over time.
+
+Based on Bayes' theorem
+\begin{equation}
+    P(H \mid D)
+    = \frac{P(D \mid H) P(H)}{P(D)}
+    = \frac{P(D, H)}{\int_H P(D, H')\,\mathrm{d}H'}.
+\end{equation}
+Here $H$ denotes a hypothesis (or model), with prior $P(H)$, and $D$ denotes the observed data.
+The term
+\[
+    P(D) = \int_H P(D, H')\,\mathrm{d}H'
+\]
+is called the evidence. The likelihood $P(D \mid H)$ describes how probable the data are under the hypothesis, and the posterior $P(H \mid D)$ tells us how likely each hypothesis is after observing the data.
+
+Bayesian neural networks (BNNs) are neural networks trained using this Bayesian approach.
+A stochastic neural network is a neural network that uses either stochastic weights or stochastic activation functions.
+A BNN is a stochastic neural network trained by Bayesian inference \parencite{mackayPracticalBayesianFramework1992}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{report/images/literature_study/jospinHandsOnBayesianNeural2022.png}
+    \caption{(a) Point-estimate neural network, (b) stochastic neural network with a probability distribution over the activations, and (c) stochastic neural network with a probability distribution over the weights. \parencite{jospinHandsOnBayesianNeural2022}}
+\end{figure}
+
+The stochastic model is chosen by the user and consists of a prior distribution over possible model parameterisations and a prior confidence.
+In the notation above, these correspond to $H$, with the training data playing the role of $D$.
+The choice of prior is an architectural decision similar to the choice of loss function in point-estimate networks.
+The goal of training is to obtain the posterior $p(\theta \mid D)$, the probability distribution of the weights $\theta$ given the observed data.
+
+The standard procedure is to use a Gaussian distribution over the weights as the prior
+\parencite{jospinHandsOnBayesianNeural2022}, though Gaussian priors are not necessarily better than other choices
+\parencite{silvestroPriorChoiceAffects2020}.
+
+When using a BNN for prediction, the marginal predictive distribution $p(y \mid x, D)$ quantifies the uncertainty in the prediction.
+In practice, this can be approximated by sampling weight configurations from the posterior $p(\theta \mid D)$ and evaluating the network, yielding a set of predictions that follow $p(y \mid x, D)$.
+
+BNNs quantify epistemic uncertainty through the posterior over weights $p(\theta \mid D)$ and aleatoric uncertainty through the data noise encoded in the likelihood $p(y \mid x, \theta)$ \parencite{jospinHandsOnBayesianNeural2022,kendallWhatUncertaintiesWe2017}.
+In practice, the evidence term $P(D)$ is not feasible to calculate exactly, meaning the posterior cannot be obtained in closed form.
+To address this, two main families of approximate inference methods are used: Markov chain Monte Carlo (MCMC) and variational inference (VI).
+
+MCMC constructs a Markov chain whose stationary distribution matches the desired posterior distribution.
+A common algorithm, the Metropolis-Hastings algorithm, starts from an initial random guess and then repeatedly samples new candidate points around the current state from a proposal distribution.
+The candidate is accepted with a probability given by the ratio between the target density at the candidate point and at the current point.
+Other algorithms, such as Hamiltonian Monte Carlo, exist to improve the efficiency of this process.
+Because successive samples are autocorrelated, the chain must be subsampled, which increases the number of samples required.
+MCMC approaches also suffer from a burn-in period, during which the initial samples do not yet follow the target distribution.
+Finally, designing efficient proposals becomes increasingly challenging in higher-dimensional parameter spaces.
+
+Variational inference works by introducing a variational distribution $q_\phi(\theta)$ parameterised by $\phi$, and then optimising $\phi$ so that $q_\phi(\theta)$ matches the true posterior $p(\theta \mid D)$ as closely as possible.
+The discrepancy between $q_\phi$ and the exact posterior is commonly measured using the Kullback-Leibler (KL) divergence.
+Directly minimising this KL divergence would require access to the exact posterior, which is unavailable.
+Instead, one maximises the evidence lower bound (ELBO), which can be written as the log evidence minus the KL divergence; maximising the ELBO is therefore equivalent to minimising the KL divergence
+\parencite{kingmaAutoEncodingVariationalBayes2014,blundellWeightUncertaintyNeural2015}.
+In practice, this is generally done using stochastic gradient descent, treating the negative ELBO as a loss function.
+
+However, naive stochastic gradients suffer from high variance due to the stochasticity in sampling from $q_\phi(\theta)$.
+To address this, methods such as Bayes by Backprop
+\parencite{blundellWeightUncertaintyNeural2015} use the reparameterisation trick
+\parencite{kingmaAutoEncodingVariationalBayes2014} to express samples from $q_\phi(\theta)$ as deterministic functions of fixed noise variables and the parameters~$\phi$.
+This moves the stochasticity outside the main computational graph, allowing unbiased, low-variance gradients of the ELBO to be propagated back through the network.
+
+BNN in practice suffer from high computational costs during training and inference due to the sampling required. This
+often makes them unsuitable for use in large, high dimensional systems
+\parencite{willardIntegratingPhysicsBasedModelling2022}. Furthermore, variational inference is know to underestimate
+uncertainty \parencite{kruegerBayesianHypernetworks2017}.
 \subsection{Monte Carlo Dropout}
 \subsection{Bayes by backpropagation}
 \subsection{Deep ensembles}
