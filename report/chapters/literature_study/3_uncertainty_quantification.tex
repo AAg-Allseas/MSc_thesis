@@ -213,8 +213,29 @@ BNN in practice suffer from high computational costs during training and inferen
 often makes them unsuitable for use in large, high dimensional systems
 \parencite{willardIntegratingPhysicsBasedModelling2022}. Furthermore, variational inference is know to underestimate
 uncertainty \parencite{kruegerBayesianHypernetworks2017}.
+
 \subsection{Monte Carlo Dropout}
-\subsection{Bayes by backpropagation}
+Dropout is a technique generally used to regularise neural nets to improve their robustness and generalisability. It is
+usually used during training and works by randomly enabling or disabling a set number of neurons.
+\textcite{galDropoutBayesianApproximation2016} showed that by enabling dropout not just during training allows the network to
+approximate a distributional posterior. Resampling the model multiple times with different dropout activations
+essentially results in sampling multiple similar models, each with their own parameterisation of the problem. This
+results in a distribution of output predictions, thus quantifying the uncertainty in the model.
+
+The theoretical basis is that dropout can be interpreted as variational inference over a BNN where
+the variational distribution is a Bernoulli distribution \parencite{galDropoutBayesianApproximation2016}. This allows
+the model to give a bayesian average without training a full ensemble. This allows the model to quantify epistemic
+uncertainty. An alternative interpretation of this approach is that dropout results in an ensemble of neural networks
+with shared parameters \parencite{lakshminarayananSimpleScalablePredictive2017}. 
+
+In practice, the approach is simple to implement as dropout is often already used for training regularisation. The only
+change needed to the architecture to enable dropout is adding dropout layers between the hidden layers
+\parencite{wabinaNeuralStochasticDifferential2023}. The approach is fast and scales well compared to BNNs, and still
+gives usable results. The prediction of the uncertainty is limited however, as the Bernoulli variational distribution is restrictive. This
+limits its ability to capture the true posterior distribution of the network. The quality of the uncertainty
+quantification is also sensitive to the dropout rate; the rate must therefore be tuned to get the desired behavior.
+Finally, by disabling parts of the network, the quality of each individual prediction will be worse. Overall, the
+uncertainty quantification is the crudest of the neural network approaches discussed in this section.
 \subsection{Deep ensembles}
 \subsection{Hypermodels}
 \subsection{Variational neural networks}
