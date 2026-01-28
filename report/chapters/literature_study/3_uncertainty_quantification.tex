@@ -250,7 +250,21 @@ approaches.
 In practice however hypernetworks tend to be expensive to train and sample as the full set of weights of the model
 network have to be generated each iteration. While the accuracy of the uncertainty estimate can theoretically exceed
 deep ensembles, real examples have shown they tend to perform similarly for capturing epistemic uncertainty.
+
 \subsection{Deep ensembles}
-\subsection{Hypermodels}
-\subsection{Variational neural networks}
-\subsection{Neural SDEs}
+
+Deep ensembles are a method to quantify epistemic uncertainty. Proposed in
+\citeyear{lakshminarayananSimpleScalablePredictive2017} by
+\citeauthor{lakshminarayananSimpleScalablePredictive2017} as a method for uncertainty quantification, they work by training multiple of the same neural network
+from different initial weights and biases. At inference time, each of these networks is sampled. If the networks are in
+agreement the epistemic uncertainty is low, wheras if the networks disagree the epistemic uncertainty is high. 
+
+The approach is simple and requires minimal modifications to the neural networks architecture to implement. The quality
+of the uncertainty quantification is high and the computation cost at inference time is low, as only a relatively small
+number of samples are needed compared to the other approaches discussed.
+\textcite{lakshminarayananSimpleScalablePredictive2017} found that random shuffling of the dataset and random
+initialisation of the weights was sufficient to obtain good results. This reinforces the observation
+\textcite{leeWhyHeadsAre2015} made while investigating how to create a diverse set of ensemble networks. 
+
+A major limitation of the deep ensemble approach is that the cost of training is high, as the same model needs to be
+trained repeatedly. For an ensemble of five networks, the training cost is fivefold. 
