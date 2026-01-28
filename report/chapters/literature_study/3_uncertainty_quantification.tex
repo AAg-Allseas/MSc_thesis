@@ -236,6 +236,20 @@ limits its ability to capture the true posterior distribution of the network. Th
 quantification is also sensitive to the dropout rate; the rate must therefore be tuned to get the desired behavior.
 Finally, by disabling parts of the network, the quality of each individual prediction will be worse. Overall, the
 uncertainty quantification is the crudest of the neural network approaches discussed in this section.
+
+\subsection{Hypernetworks}
+
+A hypernetwork is a network used to approximate the posterior of the weights of a network of interest. It does this by
+sampling random noise and outputting a sample from the approximate posterior of the network in the form of a set of
+weights and biases \parencite{kruegerBayesianHypernetworks2017}. The major advantage hypernetworks have over BNNs is
+that the posterior they estimated can be arbitrarily complex as opposed to being fit by variational distributions. This
+means the uncertainty quantification is much more accurate than other methods discussed, without the cost of MCMC. This
+is particularly useful when the system expresses strong multi-modality as this would likely be underestimated by other
+approaches.
+
+In practice however hypernetworks tend to be expensive to train and sample as the full set of weights of the model
+network have to be generated each iteration. While the accuracy of the uncertainty estimate can theoretically exceed
+deep ensembles, real examples have shown they tend to perform similarly for capturing epistemic uncertainty.
 \subsection{Deep ensembles}
 \subsection{Hypermodels}
 \subsection{Variational neural networks}
