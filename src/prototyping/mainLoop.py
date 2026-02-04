@@ -6,13 +6,15 @@ Main simulation loop called by main.py.
 Author:     Thor I. Fossen
 """
 
+from concurrent import futures
+import os
 from pathlib import Path
 import time
 from typing import Generator, Optional
 import numpy as np
 import matplotlib.pyplot as plt
 from src.prototyping.visualisation import plotTimeSeries
-from src.prototyping.data_handling import make_df, save_df_to_parquet, update_df
+from src.prototyping.data_handling import ParquetMetadata, make_df, save_df_to_parquet, update_df
 from src.prototyping.model.ornstein_uhlenbeck import ou_generate_uniform, resample_from_base
 from src.prototyping.model.supply import SupplyVessel
 from src.prototyping.model.gnc import attitudeEuler
@@ -20,6 +22,9 @@ from src.prototyping.model.gnc import attitudeEuler
 import numpy as np
 import hashlib
 import struct
+
+MODEL="ToyDPModel"
+VERSION="1.0"
 
 ###############################################################################    
 # Function printVehicleinfo(vehicle)
@@ -45,20 +50,20 @@ def simulate(N: int,
              sampleTime: float, 
              vessel: SupplyVessel,
              f_ext: np.ndarray,
-             f_ext_dt: float,
-             seed: int) -> tuple[np.ndarray, np.ndarray]:
+             meta: ParquetMetadata
+            ) -> tuple[np.ndarray, np.ndarray]:
     
     DOF = 6                     # degrees of freedom
     t = 0                       # initial simulation time
 
     # Initial state vectors
-    eta = np.array([0, 0, 0, 0, 0, 0], float)    # position/attitude, user editable
+    eta = vessel.eta                            # position/attitude, user editable
     nu = vessel.nu                              # velocity, defined by vehicle class
     u_actual = vessel.u_actual                  # actual inputs, defined by vehicle class
     
     df = make_df(N)
 
-    f_ext = resample_from_base(f_ext, f_ext_dt, sampleTime, N * sampleTime)
+
     # Main simulation loop
     for i in range(0,N+1):
         
@@ -79,30 +84,84 @@ def simulate(N: int,
 
         # if t == 120:
         #     vessel.thrusterFailure(5) # Thruster failure of main propeller
-    save_df_to_parquet(df, seed, sampleTime, (N+1) * sampleTime, path=Path(r"C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\data"))    
+    save_df_to_parquet(df, 
+                       metadata=meta,
+                       path=Path(r"C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\data"))    
 
 def R2D(value):  # radians to degrees
     return value * 180 / np.pi
 
+def run_sim(seed: int, 
+            runtime: float, 
+            mu_f: np.ndarray, 
+            sigma_f: np.ndarray, 
+            vessel: SupplyVessel, 
+            sampleTime: float) -> None:
+    
+    rng = np.random.default_rng(seed)
+    N = int(runtime // sampleTime)     # number of samples
+
+    # UO process for external forces - independent of timestep
+    noise_dt = 0.05
+    external_forces = ou_generate_uniform(int(runtime // noise_dt), noise_dt, mu= mu_f, sigma=sigma_f, rng=rng)
+    external_forces = resample_from_base(external_forces, noise_dt, sampleTime, N * sampleTime)
+
+    # Initial condition
+    x_0, y_0 = rng.uniform(low=-3, high=3, size=2)
+    psi_0 = rng.uniform(low=-0.15, high=0.15)
+    pos_0 = (x_0, y_0, psi_0)
+    vessel.eta[0] = x_0
+    vessel.eta[1] = y_0
+    vessel.eta[5] = psi_0
+
+    u_0 = vessel.DPcontrol(vessel.eta, vessel.nu, sampleTime)
+    vessel.u_actual = u_0
+
+
+
+    start_time = time.time_ns()
+    printInfo(vessel, sampleTime, N)
+
+    meta = ParquetMetadata(model=MODEL,
+                            version=VERSION,
+                            timestep=sampleTime,
+                            end_time=runtime,
+                            seed=seed,
+                            n_steps=N,
+                            mean_force=list(mu_f),
+                            var_force=list(sigma_f),
+                            inital_pos=pos_0)
+    simulate(N, sampleTime, vessel, f_ext=external_forces, meta=meta)
+    end_time = time.time_ns()
+    print(f"Time taken: {(end_time-start_time)/1e9:.3f}s")
+
 if __name__ == "__main__":
-    vehicle = SupplyVessel('DPcontrol')
-    runtime = 1000 # seconds
-    seeds = range(0, 11)
+    vessel = SupplyVessel('DPcontrol')
+    runtime = 3600 * 3 # seconds
+    sampleTime = 0.05 # Seconds [s]
 
-    for seed in seeds:
-        rng = np.random.default_rng(seed)
-        
-        noise_dt = 0.01
-        external_forces = ou_generate_uniform(int(runtime // noise_dt), noise_dt, mu=np.array([75e3, 75e3, 100e3]), sigma=np.array([50e3, 50e3, 50e3]), rng=rng)
+    # Number of runs and seeds
+    seeds = range(0, 50)
 
-        sampleTimes = [0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1]
+    # External forces
+    mu_f = np.array([75e3, 75e3, 100e3])  # Mean
+    sigma_f = np.array([50e3, 50e3, 50e3])  # Variance
 
-        for sampleTime in sampleTimes:
-
-            N = int(runtime // sampleTime)     # number of samples
-
-            start_time = time.time_ns()
-            printInfo(vehicle, sampleTime, N)
-            simulate(N, sampleTime, vehicle, f_ext=external_forces, f_ext_dt=noise_dt, seed=seed)
-            end_time = time.time_ns()
-            print(f"Time taken: {(end_time-start_time)/1e9:.3f}s")
+    with futures.ProcessPoolExecutor() as pool:
+        fs = []
+        for seed in seeds:
+            print(seed)
+            fs.append(
+                pool.submit(run_sim,
+                            seed=seed,
+                            runtime=runtime,
+                            mu_f=mu_f,
+                            sigma_f=sigma_f,
+                            vessel=vessel,
+                            sampleTime=sampleTime)
+                )
+        for future in futures.as_completed(fs):
+            try:
+                future.result()
+            except Exception as e:
+                print(f"Error in worker: {e}")

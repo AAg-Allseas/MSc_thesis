@@ -105,6 +105,7 @@ class SupplyVessel:
         self.T_n = 1.0      # prop. speed time constant (s)
         self.n_max = np.array([250, 250, 250, 250, 
                                160, 160], float) # RPM saturation limits
+        self.eta = np.array([0, 0, 0, 0, 0, 0], float) # initial position vector
         self.nu = np.array([0, 0, 0, 0, 0, 0], float) # initial velocity vector
         self.u_actual = np.array([0, 0, 0, 0, 0, 0], float) # RPM inputs
         self.name = "Offshore supply vessel (see 'supply.py' for more details)"
