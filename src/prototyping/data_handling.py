@@ -96,7 +96,7 @@ def find_parquet_files(
     folder: Path,
     filter_fn: Callable=lambda meta: True,
     meta_key: str="run_params"
-    ):
+    ) -> list[Path]:
     """
     Function to search for Parquet files based on their metadata.
 
