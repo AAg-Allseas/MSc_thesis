@@ -26,7 +26,6 @@ import logging
 import os
 from typing import Sequence
 
-import fire
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 import numpy as np
@@ -325,4 +324,4 @@ def main(
 
 
 if __name__ == "__main__":
-    fire.Fire(main)
+    main()
