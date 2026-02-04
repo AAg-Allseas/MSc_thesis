@@ -73,33 +73,31 @@ constraints such as ramp up periods and direction rate limitaions. These constra
 simulations are needed; else the ship would be able to maintain almost position perfectly \parencite{borhaugExperimentalValidationDynamic2012}. 
 
 \subsection{Vessel model}
-The general non-linear equation of motion for a floating structure can be formulated as follows
-\parencite{RecommendedPracticeGlobal2019}:
+A general manouvering model for ships is given by \textcite{fossenHandbookMarineCraft2014}. This model is valid for low
+speed manouvering. This model generally neglects fluid memory using a zero frequency assumption for the damping and
+added mass matrices. An alternative approach is using power averaged matrices based on the exciting wave spectrum.
 
-\[
-\label{eq:general_eq_motion}
-(M + A(\omega))\ddot{{\mathbf{x}}} + B(\omega)\dot{\mathbf{x}} + D_1\dot{\mathbf{x}} + D_2 \dot{\mathbf{x}} \odot |\mathbf{x}|+ K\mathbf{x} = F^{(1)}_{wave} + F^{(2)}_{wave} + F_{curr} + F_{wind} + F_{ext} + F_{thr}
-\]
+Ships on DP are generally viewed in either a body fixed reference frame or a north-east-down (NED) world fixed frame.
+Converting between the two is done with the following relation:
 
+\begin{equation}
+    \dot{\eta} = J(\eta)\nu
+\end{equation}
 
-\[
-\begin{split}
-    \text{Where:}   \quad & \\
-    x               \quad &\text{State of the system}\\
-    M               \quad &\text{Structural mass matrix}\\
-    A(\omega)       \quad &\text{Frequency dependent added mass matrix }\\
-    B(\omega)       \quad &\text{Frequency depended damping matrix}\\
-    D_1             \quad &\text{Linear damping matrix}\\
-    D_2             \quad &\text{Quadratic damping matrix}\\
-    K               \quad &\text{Hydrostatic stiffness matrix}\\
-    F^{(1)}_{wave}  \quad &\text{First order wave excitation force}\\
-    F^{(2)}_{wave}  \quad &\text{Second order wave excitation force}\\
-    F_{curr}        \quad &\text{Current drag force}\\
-    F_{wind}        \quad &\text{Wind drag force}\\
-    F_{ext}         \quad &\text{External forces}\\
-    F_{thr}         \quad &\text{Actuator forces}\\
-\end{split}
-\]
+Whereby \(\eta\) is the NED position,\(\nu\) is the body fixed velocity and \(J(\eta)\) is a rotation matrix mapping the
+body fixed velocity into NED velocity. In the body fixed rotating reference frame, the equations of motion become the following:
+
+\begin{equation}
+    \label{eq:general_eq_motion}
+    (M_{RB} + M_A) \dot{\nu} + (C_{RB}(\nu) + C_A(\nu))\nu + (D + D_n(\nu))\nu + G\eta = \tau
+\end{equation}
+
+In this formulation \(M_{RB}\) is the rigid body mass and \(M_A\) is the hydrodynamic added mass. \(D\) is the linear
+damping matrix and \(D_n(\nu)\) is the non-linear damping. The fact the body fixed reference frame can be rotating
+introduces a coriolis-centripetal force. This consists of two parts: that caused by rigid body mass \(C_{RB}(\nu)\)
+and from hydrodynamic added mass \(C_A(\nu)\). \(\tau\) consists of all the external forces acting on the ship. This is
+generally viewed as a linear superposition of environmental forces, actuator forces and other external forces such as
+moorings.
 
 \Cref{eq:general_eq_motion} has several non-linearities. In the hydrodynamics, the quadratic damping is proportional to
 the velocity squared. The thruster forcing is also non-linear due to the thruster dynamics and Kalman filtering.
@@ -108,7 +106,7 @@ Furthermore, the system is causal, dynamic and time-invarient.
 \section{Environmental forces}
 A significant portion of the external loading are environmental forces. In most cases where DP is considered, current is
 considerd constant as the timescale at which it changes is significantly longer than that of the system
-\parencite{RecommendedPracticeEnvironmental2019}. Both wind and waves are modelled using energy density spectra. This
+\parencite{RecommendedPracticeEnvironmental2019}. It can in most cases also be considered irrotational \parencite{fossenManouveringModels2014}. Both wind and waves are modelled using energy density spectra. This
 results in stochastic loading with known statistical properties. 
 
 A stochastic process is a process that when indexed at time \(t\) does not have a single deterministic trajectory but
