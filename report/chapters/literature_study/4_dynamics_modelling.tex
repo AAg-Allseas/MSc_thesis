@@ -187,6 +187,40 @@ eigenvalues. The stochastic Koopman operator tracks how the expected state of th
 in measurement space. It does not however track the variance of the the state. 
 
 \subsection{Variational approach for Markov processes}
+\textcite{wuVariationalApproachLearning2019} developed a method to approximate the Koopman operator from data of
+stochastic systems. Their approach is based off stochastic koopman theory coupled with canonical covariance analysis. This
+approach was extend by \textcite{mardtVAMPnetsDeepLearning2018} to use deep learning. 
+
+The method uses two neural encoders to estimate the measurement function at any given timestep. These are indicated as
+\(\mathcal{X}_0 \text{ and } \mathcal{X}_1\) respectively. By passing two states through these networks time lagged by
+by time \(\tau\), 
+the covariance can be calculated.
+
+\begin{equation}
+    \begin{aligned}
+        C_{00} &= \mathbb{E}_t \left[\mathcal{X}_0(\mathbf{x}_t)\mathcal{X}_0(\mathbf{x}_t)^T\right] \\
+        C_{01} &= \mathbb{E}_t \left[\mathcal{X}_0(\mathbf{x}_t)\mathcal{X}_1(\mathbf{x}_{t + \tau})^T\right] \\
+        C_{11} &= \mathbb{E}_{t + \tau} \left[\mathcal{X}_1(\mathbf{x}_{t + \tau})\mathcal{X}_1(\mathbf{x}_{t + \tau})^T\right] \\
+    \end{aligned}
+\end{equation}
+
+The optimal koopman operator can then be found by minimising the least square error between
+\(\mathcal{X}_1(\mathbf{x}_{t + \tau})\) and \(\mathcal{X}_0(\mathbf{x}_t)\). This becomes:
+
+\begin{equation}
+    \mathcal{K} = C_{00}^{-1} C_{01}
+\end{equation}
+
+Directly solving this would result in a trivial answer. To avoid that issue,
+\textcites{wuVariationalApproachLearning2019}{mardtVAMPnetsDeepLearning2018} use the VAMP-2 score. This additionally has
+an advantage for deep learning, as the gradients are easier to handle, making the approach simpler for time series data.
+
+\begin{equation}
+    \label{eq:VAMP_2}
+    \hat{R}_2\left[\mathcal{X}_0, \mathcal{X}_1\right] = \left|\left| C_{00}^\frac{-1}{2}C_{01} C_{11}^\frac{-1}{2}\right|\right|^2 
+\end{equation}
+
+By using \eqref{eq:VAMP_2} as a loss function for the two networks, these can be trained to learn \(\mathcal{X}_0 \text{ and } \mathcal{X}_1\).
 
 \section{Neural Stochastic Differential Equations}
 Neural Ordinary Differential Equations are a powerful tool for modelling dynamics of systems. Neural stochastic
