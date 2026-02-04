@@ -17,6 +17,9 @@ package-mode = false
 dependencies = [
     "matplotlib>=3.10.8",
     "numpy>=2.2.6",
+    "pandas>=2.3.3",
+    "pyarrow>=23.0.0",
+    "torchsde>=0.2.6",
 ]
 
 [tool.uv]

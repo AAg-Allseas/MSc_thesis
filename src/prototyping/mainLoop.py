@@ -6,12 +6,20 @@ Main simulation loop called by main.py.
 Author:     Thor I. Fossen
 """
 
+from pathlib import Path
+import time
+from typing import Generator, Optional
 import numpy as np
 import matplotlib.pyplot as plt
-from src.prototyping.model import plotTimeSeries
+from src.prototyping.visualisation import plotTimeSeries
+from src.prototyping.data_handling import make_df, save_df_to_parquet, update_df
+from src.prototyping.model.ornstein_uhlenbeck import ou_generate_uniform, resample_from_base
 from src.prototyping.model.supply import SupplyVessel
 from src.prototyping.model.gnc import attitudeEuler
 
+import numpy as np
+import hashlib
+import struct
 
 ###############################################################################    
 # Function printVehicleinfo(vehicle)
@@ -35,9 +43,10 @@ def printInfo(vehicle, sampleTime, N):
     
 def simulate(N: int, 
              sampleTime: float, 
-             vessel: SupplyVessel, 
-             random_mean: np.ndarray | float=np.zeros(3), 
-             random_std: np.ndarray | float=np.zeros(3)) -> tuple[np.ndarray, np.ndarray]:
+             vessel: SupplyVessel,
+             f_ext: np.ndarray,
+             f_ext_dt: float,
+             seed: int) -> tuple[np.ndarray, np.ndarray]:
     
     DOF = 6                     # degrees of freedom
     t = 0                       # initial simulation time
@@ -47,18 +56,9 @@ def simulate(N: int,
     nu = vessel.nu                              # velocity, defined by vehicle class
     u_actual = vessel.u_actual                  # actual inputs, defined by vehicle class
     
-    # Initialization of table used to store the simulation data
-    simData = np.empty( [0, 2*DOF + 9], float)
+    df = make_df(N)
 
-    # Debug data storage
-    # 3x3 controller gains. 3x estimated position, 3x e_int, 6x rpm actuators = 9+3+3+6 = 21
-    debugData = np.zeros([N+1, 21])
-
-    rng = np.random.default_rng()
-    lambda_ = 0.01 # Speed of noise
-    f_ext = random_mean + random_std * rng.standard_normal(3)
-    sqrt_dt = np.sqrt(sampleTime)
-
+    f_ext = resample_from_base(f_ext, f_ext_dt, sampleTime, N * sampleTime)
     # Main simulation loop
     for i in range(0,N+1):
         
@@ -67,49 +67,42 @@ def simulate(N: int,
             print(f"time: {t}s")
    
         u_control = vessel.DPcontrol(eta,nu,sampleTime)
-        # u_control = np.zeros(6)
 
-        # Sample random forcing from normal distribution
-        f_ext = f_ext - lambda_*(f_ext - random_mean) * sampleTime + random_std * sqrt_dt * rng.standard_normal(3)
-
-        # Store simulation data in simData
         tau_control = vessel.B @ (np.abs(u_control) * u_control)
         tau_actual = vessel.B @ (np.abs(u_actual) * u_actual)
-        signals = np.hstack([eta, nu, tau_control, tau_actual, f_ext])
-        simData = np.vstack( [simData, signals] )
+
+        update_df(df, i, t, eta, nu, tau_control, tau_actual, f_ext[i], vessel.gains, u_actual)
         
-        for j in range(3):
-            debugData[i, 3 * j : 3 * (j + 1)] = vessel.gains[j]
-            debugData[i, 9+j] = vessel.pos_est[j]
-        debugData[i, 12:15] = vessel.e_int
-        debugData[i, 15:21] = u_actual
-
-
         # Propagate vehicle and attitude dynamics
-        [nu, u_actual]  = vessel.dynamics(eta,nu,u_actual,u_control,sampleTime, f_external=f_ext)
+        [nu, u_actual]  = vessel.dynamics(eta,nu,u_actual,u_control,sampleTime, f_external=f_ext[i])
         eta = attitudeEuler(eta,nu,sampleTime)
 
         # if t == 120:
         #     vessel.thrusterFailure(5) # Thruster failure of main propeller
-
-    # Store simulation time vector
-    simTime = np.arange(start=0, stop=t+sampleTime, step=sampleTime)[:, None]
-
-    return(simTime,simData, debugData)
+    save_df_to_parquet(df, seed, sampleTime, (N+1) * sampleTime, path=Path(r"C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\data"))    
 
 def R2D(value):  # radians to degrees
     return value * 180 / np.pi
 
-
 if __name__ == "__main__":
     vehicle = SupplyVessel('DPcontrol')
+    runtime = 1000 # seconds
+    seeds = range(0, 11)
 
-    # Simulation parameters
-    sampleTime = 0.02                   # sample time [seconds]
-    N = 50000                        # number of samples
+    for seed in seeds:
+        rng = np.random.default_rng(seed)
+        
+        noise_dt = 0.01
+        external_forces = ou_generate_uniform(int(runtime // noise_dt), noise_dt, mu=np.array([75e3, 75e3, 100e3]), sigma=np.array([50e3, 50e3, 50e3]), rng=rng)
 
-    printInfo(vehicle, sampleTime, N)
-    [simTime, simData, debugData] = simulate(N, sampleTime, vehicle, np.array([100e3, 0, 0]), np.array([80e3, 0, 0]))
-    plotTimeSeries.displayPlot(simTime, simData)    
-    plotTimeSeries.debugPlot(simTime, simData, debugData, vehicle)
-    plt.show()
+        sampleTimes = [0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1]
+
+        for sampleTime in sampleTimes:
+
+            N = int(runtime // sampleTime)     # number of samples
+
+            start_time = time.time_ns()
+            printInfo(vehicle, sampleTime, N)
+            simulate(N, sampleTime, vehicle, f_ext=external_forces, f_ext_dt=noise_dt, seed=seed)
+            end_time = time.time_ns()
+            print(f"Time taken: {(end_time-start_time)/1e9:.3f}s")
