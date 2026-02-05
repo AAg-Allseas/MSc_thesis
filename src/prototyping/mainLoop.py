@@ -7,21 +7,14 @@ Author:     Thor I. Fossen
 """
 
 from concurrent import futures
-import os
 from pathlib import Path
 import time
-from typing import Generator, Optional
 import numpy as np
-import matplotlib.pyplot as plt
-from src.prototyping.visualisation import plotTimeSeries
 from src.prototyping.data_handling import ParquetMetadata, make_df, save_df_to_parquet, update_df
 from src.prototyping.model.ornstein_uhlenbeck import ou_generate_uniform, resample_from_base
 from src.prototyping.model.supply import SupplyVessel
 from src.prototyping.model.gnc import attitudeEuler
 
-import numpy as np
-import hashlib
-import struct
 
 MODEL="ToyDPModel"
 VERSION="1.0"
@@ -53,7 +46,6 @@ def simulate(N: int,
              meta: ParquetMetadata
             ) -> tuple[np.ndarray, np.ndarray]:
     
-    DOF = 6                     # degrees of freedom
     t = 0                       # initial simulation time
 
     # Initial state vectors

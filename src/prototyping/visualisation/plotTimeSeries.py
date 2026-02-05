@@ -12,12 +12,9 @@ Author:     Thor I. Fossen
 import math
 import matplotlib.pyplot as plt
 import numpy as np
-import matplotlib.pyplot as plt
 from src.prototyping.model.gnc import ssa
 import mpl_toolkits.mplot3d.axes3d as p3
 import matplotlib.animation as animation
-import matplotlib.patches as patches
-from matplotlib.transforms import Affine2D
 
 from src.prototyping.model.supply import SupplyVessel
 
@@ -47,37 +44,37 @@ def displayPlot(simTime: np.ndarray, simData: np.ndarray) -> None:
     #eta
     x = simData[:, 0]
     y = simData[:, 1]
-    z = simData[:, 2]
-    phi = R2D(ssa(simData[:, 3]))
-    theta = R2D(ssa(simData[:, 4]))
+    simData[:, 2]
+    R2D(ssa(simData[:, 3]))
+    R2D(ssa(simData[:, 4]))
     psi = R2D(ssa(simData[:, 5]))
 
     #nu
     u = simData[:, 6]
     v = simData[:, 7]
     w = simData[:, 8]
-    p = R2D(simData[:, 9])
-    q = R2D(simData[:, 10])
-    r = R2D(simData[:, 11])
+    R2D(simData[:, 9])
+    R2D(simData[:, 10])
+    R2D(simData[:, 11])
 
     # Actuator forces
-    u_x_control = simData[:, 12]
-    u_y_control = simData[:, 13]
-    u_r_control = simData[:, 14]
+    simData[:, 12]
+    simData[:, 13]
+    simData[:, 14]
     u_x_actual = simData[:, 15]
     u_y_actual = simData[:, 16]
-    u_r_actual = simData[:, 17]
+    simData[:, 17]
     f_ext_x = simData[:, 18]
     f_ext_y = simData[:, 19]
-    f_ext_r = simData[:, 20]
+    simData[:, 20]
 
 
     # Speed
-    U = np.sqrt(np.multiply(u, u) + np.multiply(v, v) + np.multiply(w, w))
+    np.sqrt(np.multiply(u, u) + np.multiply(v, v) + np.multiply(w, w))
 
-    beta_c  = R2D(ssa(np.arctan2(v,u)))   # crab angle, beta_c    
-    alpha_c = R2D(ssa(np.arctan2(w,u)))   # flight path angle
-    chi = R2D(ssa(simData[:, 5] + np.arctan2(v, u)))  # course angle, chi=psi+beta_c
+    R2D(ssa(np.arctan2(v,u)))   # crab angle, beta_c    
+    R2D(ssa(np.arctan2(w,u)))   # flight path angle
+    R2D(ssa(simData[:, 5] + np.arctan2(v, u)))  # course angle, chi=psi+beta_c
 
     # Plots
     
@@ -150,31 +147,31 @@ def debugPlot(simTime: np.ndarray, simData: np.ndarray, debugData: np.ndarray, v
     #eta
     x = simData[:, 0]
     y = simData[:, 1]
-    z = simData[:, 2]
-    phi = R2D(ssa(simData[:, 3]))
-    theta = R2D(ssa(simData[:, 4]))
+    simData[:, 2]
+    R2D(ssa(simData[:, 3]))
+    R2D(ssa(simData[:, 4]))
     psi = R2D(ssa(simData[:, 5]))
 
     pos = (x, y, psi)
 
     #nu
-    u = simData[:, 6]
-    v = simData[:, 7]
-    w = simData[:, 8]
-    p = R2D(simData[:, 9])
-    q = R2D(simData[:, 10])
-    r = R2D(simData[:, 11])
+    simData[:, 6]
+    simData[:, 7]
+    simData[:, 8]
+    R2D(simData[:, 9])
+    R2D(simData[:, 10])
+    R2D(simData[:, 11])
 
     # Actuator forces
-    u_x_control = simData[:, 12]
-    u_y_control = simData[:, 13]
-    u_r_control = simData[:, 14]
-    u_x_actual = simData[:, 15]
-    u_y_actual = simData[:, 16]
-    u_r_actual = simData[:, 17]
-    f_ext_x = simData[:, 18]
-    f_ext_y = simData[:, 19]
-    f_ext_r = simData[:, 20]
+    simData[:, 12]
+    simData[:, 13]
+    simData[:, 14]
+    simData[:, 15]
+    simData[:, 16]
+    simData[:, 17]
+    simData[:, 18]
+    simData[:, 19]
+    simData[:, 20]
 
     p_gains = debugData[:, :3]
     i_gains = debugData[:, 3:6]
@@ -272,9 +269,9 @@ def plot3D(simData,numDataPoints,FPS,filename,figNo):
     z = simData[:,2]
     
     # down-sampling the xyz data points
-    N = y[::len(x) // numDataPoints];
-    E = x[::len(x) // numDataPoints];
-    D = z[::len(x) // numDataPoints];
+    N = y[::len(x) // numDataPoints]
+    E = x[::len(x) // numDataPoints]
+    D = z[::len(x) // numDataPoints]
     
     # Animation function
     def anim_function(num, dataSet, line):

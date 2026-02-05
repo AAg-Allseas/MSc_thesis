@@ -126,9 +126,10 @@ def find_parquet_files(
             params = json.loads(meta[meta_key_bytes].decode("utf-8"))
 
             if filter_fn(params):
-                matches.append((path, params))
+                matches.append(path)
 
         except Exception:
             pass  # Handle corrupt files etc.
 
     return matches
+

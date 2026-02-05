@@ -107,7 +107,7 @@ def compare_timesteps() -> None:
 
             ax2 = twinaxs[idx]
             times = timestep_times[dt][0][:min_len]
-            stride = max(1, len(times) // 50)
+            max(1, len(times) // 50)
             ax2.plot(
                 times,
                 mean_series,

@@ -11,7 +11,6 @@ Author:     Thor I. Fossen
 """
 
 import numpy as np
-from src.prototyping.model.guidance import refModel3
 from src.prototyping.model.gnc import ssa, Rzyx
 
 

@@ -10,8 +10,6 @@ URL: www.fossen.biz/wiley
 Author:     Thor I. Fossen
 """
 
-import numpy as np
-import math
 
 # [x_d,v_d,a_d] = refModel3(x_d,v_d,a_d,r,wn_d,zeta_d,v_max,sampleTime) is a 3-order 
 # reference  model for generation of a smooth desired position x_d, velocity |v_d| < v_max, 
