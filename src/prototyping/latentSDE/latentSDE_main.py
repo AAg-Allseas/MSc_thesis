@@ -11,19 +11,19 @@ https://doi.org/10.48550/arXiv.2001.01328
 
 """
 
-import matplotlib.gridspec as gridspec
-import matplotlib.pyplot as plt
-import numpy as np
+from pathlib import Path
 import torch
 import tqdm
 from torch import nn, Tensor
 from torch import optim
 from torch.distributions import Normal
+from torch.utils.data import DataLoader
 
 import torchsde
-import logging
-import os
-from typing import Sequence
+from typing import Optional
+
+from src.prototyping.data_handling import find_parquet_files
+from src.prototyping.latentSDE.dataloader import ParquetDataset, prep_batch
 
 
 class LinearScheduler(object):
@@ -40,23 +40,43 @@ class LinearScheduler(object):
         return self._val
     
 class Encoder(nn.Module):
-    """GRU encoder to encode observation data into context for the posterior network"""
+    """LSTM encoder to encode observation data into context for the posterior network.
+    
+    Uses chunked processing to handle long sequences that exceed cuDNN's ~65k limit.
+    """
+    # cuDNN LSTM has a max sequence length of ~65k 
+    CUDNN_SEQ_LIMIT = 60000
+    
     def __init__(self, input_size: int, hidden_size: int, output_size: int) -> None:
         super(Encoder, self).__init__()
         self.gru = nn.GRU(input_size=input_size, hidden_size=hidden_size)
         self.lin = nn.Linear(hidden_size, output_size)
 
     def forward(self, inp: Tensor) -> Tensor:
-        out, _ = self.gru(inp)
-        out = self.lin(out)
-        return out
+        seq_len = inp.size(0)
+        
+        # For short sequences, process directly
+        if seq_len <= self.CUDNN_SEQ_LIMIT:
+            self.gru.flatten_parameters()
+            out, _ = self.gru(inp)
+        else:
+            # Process long sequences in chunks to avoid cuDNN limit
+            outputs = []
+            hidden = None
+            for start in range(0, seq_len, self.CUDNN_SEQ_LIMIT):
+                end = min(start + self.CUDNN_SEQ_LIMIT, seq_len)
+                chunk = inp[start:end]
+                self.gru.flatten_parameters()
+                out_chunk, hidden = self.gru(chunk, hidden)
+                outputs.append(out_chunk)
+            out = torch.cat(outputs, dim=0)
+        
+        return self.lin(out)
 
-class LatentSDE(nn.Module):
-    sde_type = "ito"
-    noise_type = "diagonal"
+class LatentSDE(torchsde.SDEStratonovich):
 
     def __init__(self, data_size, latent_size, context_size, hidden_size):
-        super(LatentSDE, self).__init__()
+        super(LatentSDE, self).__init__(noise_type="diagonal")
         # Encoder - used to encode observations to context for posterior
         self.encoder = Encoder(input_size=data_size, hidden_size=hidden_size, output_size=context_size)
         # Inital condition network - Generates a likely initial condition from context
@@ -101,7 +121,7 @@ class LatentSDE(nn.Module):
         self.pz0_logstd = nn.Parameter(torch.zeros(1, latent_size))
 
         # Data context
-        self._ctx = None
+        self._ctx: Optional[tuple[Tensor, Tensor]] = None
 
     def contextualize(self, ctx: Tensor) -> None:
         """Function to update context"""
@@ -124,7 +144,7 @@ class LatentSDE(nn.Module):
         out = [g_net_i(y_i) for (g_net_i, y_i) in zip(self.g_nets, y)]
         return torch.cat(out, dim=1)
 
-    def forward(self, xs: Tensor, ts: Tensor, noise_std: Tensor, method: str="euler") -> tuple[float, float]:
+    def forward(self, xs: Tensor, ts: Tensor, noise_std: Tensor, adaptive: bool=False, method: str="reversible_heun") -> tuple[float, float]:
         """ 
         Forward pass through Neural SDE.
         Steps:
@@ -135,7 +155,7 @@ class LatentSDE(nn.Module):
             Calculate the KL divergence loss of the inital condition
 
         Args:
-            xs: Measurement data
+            xs: Batch of measurement data. Dimensions: [Time, batches, state]
             ts: Timestamps corresponding to measurements
             noise_std: Measurement noise standard deviation
 
@@ -144,8 +164,9 @@ class LatentSDE(nn.Module):
             logqp0 + logqp_path: KL-divergence loss
         """
         # Contextualization is only needed for posterior inference.
-        ctx = self.encoder(torch.flip(xs, dims=(0,)))
-        ctx = torch.flip(ctx, dims=(0,))
+        # .contiguous() is required because torch.flip creates negative strides that cuDNN doesn't support
+        ctx = self.encoder(torch.flip(xs, dims=(0,)).contiguous())
+        ctx = torch.flip(ctx, dims=(0,)).contiguous()
         self.contextualize((ts, ctx))
 
         # Posterior initial condition
@@ -161,7 +182,7 @@ class LatentSDE(nn.Module):
         
         # Integrate SDE and adjoint
         zs, log_ratio = torchsde.sdeint_adjoint(
-            self, z0, ts, adjoint_params=adjoint_params, dt=1e-2, logqp=True, method=method)
+            self, z0, ts, adjoint_params=adjoint_params, dt=5e-2, logqp=True, method=method)
 
         # Likelihood loss
         _xs = self.projector(zs)
@@ -200,10 +221,29 @@ def train(
         noise_std=0.01,
         adjoint=False,
         train_dir='./dump/',
-        method="euler"
+        method="reversible_heun"
         ) -> None:
     
+    files = find_parquet_files(Path(r"C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\data"),
+                               lambda m: m["end_time"] == 10800 and m["timestep"] == 0.05)
+    
+    dataset = ParquetDataset(files, columns=['pos_eta_x', 
+                                             'pos_eta_y', 
+                                             'pos_eta_mz', 
+                                             'pos_nu_x', 
+                                             'pos_nu_y', 
+                                             'pos_nu_mz', 
+                                             'rpm_bow_fore', 
+                                             'rpm_bow_aft', 
+                                             'rpm_stern_fore', 
+                                             'rpm_stern_aft', 
+                                             'rpm_fixed_ps', 
+                                             'rpm_fixed_sb'])
+    
+    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True, pin_memory=True, num_workers=0)
+
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
     latent_sde = LatentSDE(
         data_size=12,
         latent_size=latent_size,
@@ -215,13 +255,23 @@ def train(
     scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer=optimizer, gamma=lr_gamma)  # Learning rate scheduler
     kl_scheduler = LinearScheduler(iters=kl_anneal_iters)  # KL annealing, start low
 
-    # for epoch in tqdm.trange(1, num_epochs + 1):
-    #     latent_sde.zero_grad()
+    for epoch in tqdm.trange(1, num_epochs + 1):
+        for batch in dataloader:
+            ts, xs = prep_batch(batch, device)
 
-    #     log_pxs, log_ratio = latent_sde(xs, ts, noise_std, adjoint, method)
-    #     loss = -log_pxs + log_ratio * kl_scheduler.val
+            latent_sde.zero_grad()
 
-    #     loss.backward()
-    #     optimizer.step()
-    #     scheduler.step()
-    #     kl_scheduler.step()
+            log_pxs, log_ratio = latent_sde(xs, ts, noise_std, method)
+            loss = -log_pxs + log_ratio * kl_scheduler.val
+
+            loss.backward()
+            optimizer.step()
+            scheduler.step()
+            kl_scheduler.step()
+        
+        if epoch % pause_every == 0:
+            lr_now = optimizer.param_groups[0]['lr']
+            print(f'Epoch {epoch:06d}, lr: {lr_now:.5f}, log_pxs: {log_pxs:.4f}, log_ratio: {log_ratio:.4f}, loss: {loss:.4f}')
+
+if __name__ == "__main__":
+    train(batch_size=2)
