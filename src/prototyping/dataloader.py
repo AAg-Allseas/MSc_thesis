@@ -1,16 +1,17 @@
-""" 
-Example usage 
-files = find_parquet_files(Path(filepath,
-                            lambda m: m["seed"] < 10)
+"""Parquet-backed dataset utilities.
 
-dataset = ParquetDataset(files)
-dataloader = DataLoader(dataset, batch_size=5, shuffle=True, pin_memory=True, num_workers=2)
+Example usage:
+    files = find_parquet_files(Path(filepath), lambda m: m["seed"] < 10)
+    dataset = ParquetDataset(files)
+    dataloader = DataLoader(dataset, batch_size=5, shuffle=True, pin_memory=True, num_workers=2)
 """
 
+import json
 from pathlib import Path
-from typing import Optional
+from typing import Any, Dict, Optional, Tuple
 import numpy as np
 import pandas as pd
+import pyarrow.parquet as pq
 import torch
 from torch.utils.data import Dataset, DataLoader
 from torch import Tensor
@@ -18,15 +19,31 @@ from torch import Tensor
 from src.prototyping.data_handling import find_parquet_files
 
 class ParquetDataset(Dataset):
-    """ Dataloader for reading in time series from parquet"""
-    def __init__(self, files: list[Path], 
-                 columns: Optional[list[str]]=None, 
-                 sample_length: Optional[int]=None,
-                 resample_every: Optional[int]=None,
-                 resample_dt: Optional[float]=None,
-                 scale_factors: Optional[np.ndarray] = None,
-                 meta_key: str="run_params",
-                 device: str="cpu"):
+    """Dataset for reading time series from parquet files."""
+
+    def __init__(
+        self,
+        files: list[Path],
+        columns: Optional[list[str]] = None,
+        sample_length: Optional[int] = None,
+        resample_every: Optional[int] = None,
+        resample_dt: Optional[float] = None,
+        scale_factors: Optional[np.ndarray] = None,
+        meta_key: str = "run_params",
+        device: str = "cpu",
+    ) -> None:
+        """Initialize the dataset and metadata cache.
+
+        Args:
+            files: List of parquet files to read.
+            columns: Columns to load; time is prepended if missing.
+            sample_length: Number of time steps per sample.
+            resample_every: Downsample by fixed step size.
+            resample_dt: Downsample by target timestep.
+            scale_factors: Per-feature scaling factors.
+            meta_key: Parquet metadata key with JSON payload.
+            device: Device hint for downstream usage.
+        """
         if len(files) == 0:
             raise AttributeError("File list must include at least one entry")
         
@@ -40,7 +57,6 @@ class ParquetDataset(Dataset):
             columns = ["time"] + columns
 
         self.columns = columns
-        self.meta_key = meta_key
         self.device = device
         if scale_factors is not None:
             self.scale_factors = scale_factors
@@ -55,15 +71,36 @@ class ParquetDataset(Dataset):
         
         self.n_per_series = int(np.floor(series_length / self.sample_length))
 
+        self.metas: list[Dict[str, Any]] = []
+        for file in self.files:
 
-    def __len__(self):
+            schema = pq.read_schema(file)
+            meta = schema.metadata or {}
+
+            meta_key_bytes = meta_key.encode("utf-8")
+            if meta_key_bytes not in meta:
+                continue
+            params = json.loads(meta[meta_key_bytes].decode("utf-8"))
+            self.metas.append[params]
+
+
+
+    def __len__(self) -> int:
+        """Return the number of samples across all files.
+
+        Returns:
+            Total number of samples in the dataset.
+        """
         return self.n_per_series * len(self.files)
     
-    def __getitem__(self, idx: int) -> tuple[Tensor, Tensor]:
-        """ 
-        __getitem__ method used by dataloader. 
-        Opens files based on the index and splits it into a sample. 
-        Scales the states and adjusts the time series to start from 0.
+    def __getitem__(self, idx: int) -> Tuple[Tensor, Tensor, Dict[str, Any]]:
+        """Load a sample window, resample if needed, and return time and states.
+
+        Args:
+            idx: Sample index into the virtual concatenated dataset.
+
+        Returns:
+            Tuple of time tensor, state tensor, and metadata dict.
         """
         states_time = pd.read_parquet(self.files[idx // self.n_per_series], columns=self.columns)
         states_time = np.ascontiguousarray(states_time.values, dtype=np.float32)
@@ -91,11 +128,19 @@ class ParquetDataset(Dataset):
         states = torch.from_numpy(states).to(dtype=torch.float32)
 
         time = torch.from_numpy(np.round(states_time[:, 0] - states_time[0, 0], 2)).to(dtype=torch.float32)
-        return time, states
+        return time, states, self.metas[idx // self.n_per_series]
 
-def prep_batch(batch: tuple[Tensor, Tensor], device: str="cpu") -> tuple[Tensor, Tensor]:
-    """ Function to move data to device as well as verifying the timestep and length"""
-    ts, xs = batch
+def prep_batch(batch: Tuple[Tensor, Tensor, Dict[str, Any]], device: str = "cpu") -> Tuple[Tensor, Tensor]:
+    """Move batch to device and validate aligned timesteps.
+
+    Args:
+        batch: Tuple of time, state, and metadata tensors.
+        device: Target device for tensors.
+
+    Returns:
+        Tuple of time and state tensors on the target device.
+    """
+    ts, xs, _ = batch
     t = ts[0, :]
     if not torch.allclose(ts, t, atol=0.005):
         raise ValueError("Timesteps between runs are different. Please ensure they are equal")
