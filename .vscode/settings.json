@@ -230,4 +230,6 @@
         "XXX",
     ],
     "todo-tree.highlights.useColourScheme": true,
+    "debugpy.debugJustMyCode": false,
+    "run-buttons.justMyCode": false,
 }
