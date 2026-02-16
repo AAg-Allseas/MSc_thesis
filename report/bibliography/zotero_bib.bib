@@ -364,7 +364,7 @@
 
 @article{chenNeuralNetworksNonlinear1992,
   title = {Neural Networks for Nonlinear Dynamic System Modelling and Identification},
-  author = {CHEN, S. and BILLINGS, S. A.},
+  author = {Chen, S. and Billings, S. A.},
   date = {1992-08-01},
   journaltitle = {International Journal of Control},
   volume = {56},
@@ -390,6 +390,23 @@
   abstract = {We introduce a new family of deep neural network models. Instead of specifying a discrete sequence of hidden layers, we parameterize the derivative of the hidden state using a neural network. The output of the network is computed using a blackbox differential equation solver. These continuous-depth models have constant memory cost, adapt their evaluation strategy to each input, and can explicitly trade numerical precision for speed. We demonstrate these properties in continuous-depth residual networks and continuous-time latent variable models. We also construct continuous normalizing flows, a generative model that can train by maximum likelihood, without partitioning or ordering the data dimensions. For training, we show how to scalably backpropagate through any ODE solver, without access to its internal operations. This allows end-to-end training of ODEs within larger models.},
   langid = {english},
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Chen et al. - Neural Ordinary Differential Equations.pdf}
+}
+
+@article{chenUniversalApproximationNonlinear1995,
+  title = {Universal Approximation to Nonlinear Operators by Neural Networks with Arbitrary Activation Functions and Its Application to Dynamical Systems},
+  author = {Chen, Tianping and Chen, Hong},
+  date = {1995-07},
+  journaltitle = {IEEE Transactions on Neural Networks},
+  volume = {6},
+  number = {4},
+  pages = {911--917},
+  issn = {1941-0093},
+  doi = {10.1109/72.392253},
+  url = {https://ieeexplore.ieee.org/document/392253/},
+  urldate = {2026-02-06},
+  abstract = {The purpose of this paper is to investigate neural network capability systematically. The main results are: 1) every Tauber-Wiener function is qualified as an activation function in the hidden layer of a three-layered neural network; 2) for a continuous function in S'(R/sup 1/) to be a Tauber-Wiener function, the necessary and sufficient condition is that it is not a polynomial; 3) the capability of approximating nonlinear functionals defined on some compact set of a Banach space and nonlinear operators has been shown; and 4) the possibility by neural computation to approximate the output as a whole (not at a fixed point) of a dynamical system, thus identifying the system.{$<>$}},
+  keywords = {Computer networks,H infinity control,Integral equations,Kernel,Mathematics,Neural networks,Nonlinear dynamical systems,Polynomials,Sufficient conditions,Sun},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Chen and Chen - 1995 - Universal approximation to nonlinear operators by neural networks with arbitrary activation function.pdf}
 }
 
 @article{crnjaric-zicKoopmanOperatorSpectrum2020,
@@ -633,6 +650,15 @@
   issn = {2835-8856},
   url = {https://openreview.net/forum?id=GEilvtsFNV},
   file = {C:\Users\AAg\Zotero\storage\Z7RBBBYE\El-Laham et al. - Variational Neural Stochastic Differential Equations with Change Points.pdf}
+}
+
+@online{FastProbabilisticPower,
+  title = {Fast {{Probabilistic Power Flow}} via {{DeepONet-GPR Surrogates}}},
+  url = {https://ieeexplore.ieee.org/document/11045021},
+  urldate = {2026-02-16},
+  abstract = {Modern power grids increasingly incorporate variable renewable energy sources (RES) such as wind and solar, introducing significant uncertainty into power flow studies. Traditional deterministic approaches cannot adequately capture these uncertainties, while Monte Carlo methods, though accurate, are computationally expensive. This paper proposes a novel operator-learning-based probabilistic power flow (PPF) framework that combines Deep Operator Networks (DeepONet) and Gaussian Process Regression (GPR) to achieve both speed and uncertainty quantification. DeepONet approximates the nonlinear power flow operator, swiftly mapping stochastic inputs (e.g., wind, solar, load uncertainties) to bus voltages and phase angles. GPR subsequently models the residual error to yield predictive intervals for robust uncertainty estimates. Numerical results on the IEEE 14-bus test system show that our approach achieves a 150×speed-up relative to brute-force Monte Carlo simulation, while maintaining high accuracy (voltage magnitude RMSE under 0.004 p.u.) and delivering well-calibrated confidence intervals (PICP ≈ 95\%). This synergy between operator learning and probabilistic regression offers a scalable, real-time compatible solution for datadriven, risk-aware power system operations.},
+  langid = {american},
+  file = {C:\Users\AAg\Zotero\storage\CWXH23KU\11045021.html}
 }
 
 @article{fengEarlyWarningIndicators2024,
@@ -999,6 +1025,40 @@
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Gneiting and Katzfuss - 2014 - Probabilistic Forecasting.pdf}
 }
 
+@article{gongPhysicsinformedGloballocalNeural2025,
+  title = {A Physics-Informed Global-Local Neural Operator for Parametric Stochastic Differential Equations},
+  author = {Gong, Yi and Cheung, Sai Hung},
+  date = {2025-11-08},
+  journaltitle = {Engineering Applications of Artificial Intelligence},
+  shortjournal = {Engineering Applications of Artificial Intelligence},
+  volume = {159},
+  pages = {111523},
+  issn = {0952-1976},
+  doi = {10.1016/j.engappai.2025.111523},
+  url = {https://www.sciencedirect.com/science/article/pii/S0952197625015258},
+  urldate = {2026-02-16},
+  abstract = {Deep operator network (DeepONet) learning the mapping between infinite-dimensional functions has provided a promising paradigm for learning parametric stochastic differential equations (PSDE). As an extension of DeepONet, Multi-input operator network (MIONet) allows handling multiple input functions effectively. In this study, inspired by MIONet, a physics-informed global-local neural operator (PIGLNO) is established for learning PSDE considering the uncertainties induced by multiple stochastic processes and uncertain parameters. Compared with the vanilla MIONet, our proposed PIGLNO considers both global functions evaluated at fixed grids and local functions evaluated at any discretized location simultaneously, enabling the proposed approach's efficient adaptability to varying-resolution inputs without re-training. Besides, our proposed PIGLNO does not require any conventional solver and is purely physics-informed at training time. Numerical studies demonstrate that our PIGLNO outperforms the physics-informed MIONet and achieves a strong gain in accuracy and efficiency for uncertainty quantification of PSDEs solutions. Our PIGLNO also provides useful information for rare event estimation of stochastic physical systems.},
+  keywords = {Multiple stochastic processes,Parametric stochastic differential equation,Physics-informed global-local neural operator,Uncertainty quantification},
+  file = {C\:\\Users\\AAg\\OneDrive - Allseas Engineering BV\\Documents\\Thesis\\Thesis-Literature - Documents\\Gong and Cheung - 2025 - A physics-informed global-local neural operator for parametric stochastic differential equations.pdf;C\:\\Users\\AAg\\Zotero\\storage\\2VBYLT7F\\S0952197625015258.html}
+}
+
+@article{goswamiNeuralOperatorsStochastic2025,
+  title = {Neural Operators for Stochastic Modeling of Nonlinear Structural System Response to Natural Hazards},
+  author = {Goswami, Somdatta and Giovanis, Dimitris G. and Li, Bowei and Spence, Seymour M. J. and Shields, Michael D.},
+  date = {2025-12-15},
+  journaltitle = {Engineering Structures},
+  shortjournal = {Engineering Structures},
+  volume = {345},
+  pages = {121284},
+  issn = {0141-0296},
+  doi = {10.1016/j.engstruct.2025.121284},
+  url = {https://www.sciencedirect.com/science/article/pii/S014102962501675X},
+  urldate = {2026-02-16},
+  abstract = {Traditionally, neural networks have been employed to learn the mapping between finite-dimensional Euclidean spaces. However, recent research has opened up new horizons, focusing on the utilization of deep neural networks to learn operators capable of mapping infinite-dimensional function spaces. In this work, we employ two state-of-the-art neural operators, the deep operator network (DeepONet) and the Fourier neural operator (FNO) for the prediction of the nonlinear time history response of structural systems exposed to natural hazards, such as earthquakes and windstorms. Specifically, we propose two architectures, a self-adaptive FNO and a fast Fourier transform-based DeepONet (DeepFNOnet), where we employ a FNO beyond the DeepONet to learn the discrepancy between the ground truth and the solution predicted by the DeepONet. To demonstrate the efficiency and applicability of the architectures, two problems are considered. In the first, we use the proposed model to predict the seismic nonlinear dynamic response of a six-story shear building subject to stochastic ground motions. In the second problem, we employ the operators to predict the wind-induced nonlinear dynamic response of a high-rise building while explicitly accounting for the stochastic nature of the wind excitation. In both cases, the trained metamodels achieve high accuracy while being orders of magnitude faster than their corresponding high-fidelity models.},
+  keywords = {DeepONet,FNO,Natural hazards,Nonlinear dynamic response metamodeling,ODE emulator},
+  file = {C\:\\Users\\AAg\\OneDrive - Allseas Engineering BV\\Documents\\Thesis\\Thesis-Literature - Documents\\Goswami et al. - 2025 - Neural operators for stochastic modeling of nonlinear structural system response to natural hazards.pdf;C\:\\Users\\AAg\\Zotero\\storage\\8XG6XEJG\\S014102962501675X.html}
+}
+
 @article{gravesPracticalVariationalInference,
   title = {Practical {{Variational Inference}} for {{Neural Networks}}},
   author = {Graves, Alex},
@@ -1216,6 +1276,24 @@
   langid = {english},
   keywords = {Computer Science - Machine Learning,Statistics - Machine Learning},
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Jia and Benson - 2020 - Neural Jump Stochastic Differential Equations.pdf}
+}
+
+@article{jinMIONetLearningMultipleInput2022,
+  title = {{{MIONet}}: {{Learning Multiple-Input Operators}} via {{Tensor Product}}},
+  shorttitle = {{{MIONet}}},
+  author = {Jin, Pengzhan and Meng, Shuai and Lu, Lu},
+  date = {2022-12},
+  journaltitle = {SIAM Journal on Scientific Computing},
+  shortjournal = {SIAM J. Sci. Comput.},
+  volume = {44},
+  number = {6},
+  pages = {A3490-A3514},
+  issn = {1064-8275, 1095-7197},
+  doi = {10.1137/22M1477751},
+  url = {https://epubs.siam.org/doi/10.1137/22M1477751},
+  urldate = {2026-02-16},
+  langid = {english},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Jin et al. - 2022 - MIONet Learning Multiple-Input Operators via Tensor Product.pdf}
 }
 
 @article{jospinHandsOnBayesianNeural2022,
@@ -1627,23 +1705,6 @@
 @article{luLearningNonlinearOperators2021,
   title = {Learning Nonlinear Operators via {{DeepONet}} Based on the Universal Approximation Theorem of Operators},
   author = {Lu, Lu and Jin, Pengzhan and Pang, Guofei and Zhang, Zhongqiang and Karniadakis, George Em},
-  date = {2021},
-  journaltitle = {Nature Machine Intelligence},
-  shortjournal = {Nat. Mach. Intell.},
-  volume = {3},
-  number = {3},
-  pages = {218--229},
-  publisher = {Nature Research},
-  issn = {2522-5839},
-  doi = {10.1038/s42256-021-00302-5},
-  abstract = {It is widely known that neural networks (NNs) are universal approximators of continuous functions. However, a less known but powerful result is that a NN with a single hidden layer can accurately approximate any nonlinear continuous operator. This universal approximation theorem of operators is suggestive of the structure and potential of deep neural networks (DNNs) in learning continuous operators or complex systems from streams of scattered data. Here, we thus extend this theorem to DNNs. We design a new network with small generalization error, the deep operator network (DeepONet), which consists of a DNN for encoding the discrete input function space (branch net) and another DNN for encoding the domain of the output functions (trunk net). We demonstrate that DeepONet can learn various explicit operators, such as integrals and fractional Laplacians, as well as implicit operators that represent deterministic and stochastic differential equations. We study different formulations of the input function space and its effect on the generalization error for 16 different diverse applications. © 2021, The Author(s), under exclusive licence to Springer Nature Limited.},
-  langid = {english},
-  file = {C\:\\Users\\AAg\\OneDrive - Allseas Engineering BV\\Documents\\Thesis\\Thesis-Literature - Documents\\Lu et al. - 2021 - Learning nonlinear operators via DeepONet based on the universal approximation theorem of operators.pdf;C\:\\Users\\AAg\\Zotero\\storage\\VMFNNWGT\\85102732693.html}
-}
-
-@article{luLearningNonlinearOperators2021a,
-  title = {Learning Nonlinear Operators via {{DeepONet}} Based on the Universal Approximation Theorem of Operators},
-  author = {Lu, Lu and Jin, Pengzhan and Pang, Guofei and Zhang, Zhongqiang and Karniadakis, George Em},
   date = {2021-03},
   journaltitle = {Nature Machine Intelligence},
   shortjournal = {Nat Mach Intell},
@@ -1854,6 +1915,23 @@
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Mezić - 2005 - Spectral Properties of Dynamical Systems, Model Reduction and Decompositions.pdf}
 }
 
+@online{MIONetLearningMultipleInput,
+  title = {{{MIONet}}: {{Learning Multiple-Input Operators}} via {{Tensor Product}} | {{SIAM Journal}} on {{Scientific Computing}}},
+  url = {https://epubs-siam-org.tudelft.idm.oclc.org/doi/10.1137/22M1477751},
+  urldate = {2026-02-16},
+  file = {C:\Users\AAg\Zotero\storage\3N2G8ASE\22M1477751.html}
+}
+
+@article{MIONetLearningMultipleInputa,
+  title = {{{MIONet}}: {{Learning Multiple-Input Operators}} via {{Tensor Product}}},
+  shorttitle = {{{MIONet}}},
+  doi = {10.1137/22M1477751},
+  url = {https://epubs.siam.org/doi/epdf/10.1137/22M1477751},
+  urldate = {2026-02-16},
+  langid = {english},
+  file = {C\:\\Users\\AAg\\OneDrive - Allseas Engineering BV\\Documents\\Thesis\\Thesis-Literature - Documents\\MIONet Learning Multiple-Input Operators via Tensor Product.pdf;C\:\\Users\\AAg\\Zotero\\storage\\XEMED7DC\\22M1477751.html}
+}
+
 @article{morrillNeuralRoughDifferential,
   title = {Neural {{Rough Differential Equations}} for {{Long Time Series}}},
   author = {Morrill, James and Salvi, Cristopher and Kidger, Patrick and Foster, James},
@@ -1887,6 +1965,42 @@
   isbn = {978-0-9992411-4-1},
   langid = {english},
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Morton et al. - 2019 - Deep Variational Koopman Models Inferring Koopman Observations for Uncertainty-Aware Dynamics Model.pdf}
+}
+
+@online{moyaDeepONetGridUQTrustworthyDeep2022,
+  title = {{{DeepONet-Grid-UQ}}: {{A Trustworthy Deep Operator Framework}} for {{Predicting}} the {{Power Grid}}'s {{Post-Fault Trajectories}}},
+  shorttitle = {{{DeepONet-Grid-UQ}}},
+  author = {Moya, Christian and Zhang, Shiqi and Yue, Meng and Lin, Guang},
+  date = {2022-02-15},
+  eprint = {2202.07176},
+  eprinttype = {arXiv},
+  eprintclass = {math},
+  doi = {10.48550/arXiv.2202.07176},
+  url = {http://arxiv.org/abs/2202.07176},
+  urldate = {2026-02-06},
+  abstract = {This paper proposes a new data-driven method for the reliable prediction of power system post-fault trajectories. The proposed method is based on the fundamentally new concept of Deep Operator Networks (DeepONets). Compared to traditional neural networks that learn to approximate functions, DeepONets are designed to approximate nonlinear operators. Under this operator framework, we design a DeepONet to (1) take as inputs the fault-on trajectories collected, for example, via simulation or phasor measurement units, and (2) provide as outputs the predicted post-fault trajectories. In addition, we endow our method with a much-needed ability to balance efficiency with reliable/trustworthy predictions via uncertainty quantification. To this end, we propose and compare two methods that enable quantifying the predictive uncertainty. First, we propose a Bayesian DeepONet (B-DeepONet) that uses stochastic gradient Hamiltonian Monte-Carlo to sample from the posterior distribution of the DeepONet parameters. Then, we propose a Probabilistic DeepONet (Prob-DeepONet) that uses a probabilistic training strategy to equip DeepONets with a form of automated uncertainty quantification, at virtually no extra computational cost. Finally, we validate the predictive power and uncertainty quantification capability of the proposed B-DeepONet and Prob-DeepONet using the IEEE 16-machine 68-bus system.},
+  langid = {english},
+  pubstate = {prepublished},
+  keywords = {Computer Science - Machine Learning,Mathematics - Numerical Analysis},
+  file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Moya et al. - 2022 - DeepONet-Grid-UQ A Trustworthy Deep Operator Framework for Predicting the Power Grid's Post-Fault T.pdf}
+}
+
+@article{moyaDeepONetgridUQTrustworthyDeep2023,
+  title = {{{DeepONet-grid-UQ}}: {{A}} Trustworthy Deep Operator Framework for Predicting the Power Grid’s Post-Fault Trajectories},
+  shorttitle = {{{DeepONet-grid-UQ}}},
+  author = {Moya, Christian and Zhang, Shiqi and Lin, Guang and Yue, Meng},
+  date = {2023-05-28},
+  journaltitle = {Neurocomputing},
+  shortjournal = {Neurocomputing},
+  volume = {535},
+  pages = {166--182},
+  issn = {0925-2312},
+  doi = {10.1016/j.neucom.2023.03.015},
+  url = {https://www.sciencedirect.com/science/article/pii/S0925231223002503},
+  urldate = {2026-02-16},
+  abstract = {This paper proposes a novel data-driven method for the reliable prediction of the power grid’s post-fault trajectories, i.e., the power grid’s dynamic response after a disturbance or fault. The proposed method is based on the recently proposed concept of Deep Operator Networks (DeepONets). Unlike traditional neural networks that learn to approximate functions, DeepONets are designed to approximate nonlinear operators, i.e., mappings between infinite-dimensional spaces. Under this operator framework, we design a novel and efficient DeepONet that (i) takes as inputs the trajectories collected before and during the fault and (ii) outputs the predicted post-fault trajectories. In addition, we endow our method with the much-needed ability to balance efficiency with reliable/trustworthy predictions via uncertainty quantification. To this end, we propose and compare two novel methods that enable quantifying the predictive uncertainty. First, we propose a Bayesian DeepONet (B-DeepONet) that uses stochastic gradient Hamiltonian Monte-Carlo to sample from the posterior distribution of the DeepONet trainable parameters. Then, we design a Probabilistic DeepONet (Prob-DeepONet) that uses a probabilistic training strategy to enable quantifying uncertainty at virtually no extra computational cost. Finally, we validate the proposed methods’ predictive power and uncertainty quantification capability using the New York-New England power grid model.},
+  keywords = {Bayesian neural networks,Deep operator network,Power grids,Probabilistic training,Transient response prediction},
+  file = {C\:\\Users\\AAg\\OneDrive - Allseas Engineering BV\\Documents\\Thesis\\Thesis-Literature - Documents\\Moya et al. - 2023 - DeepONet-grid-UQ A trustworthy deep operator framework for predicting the power grid’s post-fault t.pdf;C\:\\Users\\AAg\\Zotero\\storage\\JTQSEY8E\\S0925231223002503.html}
 }
 
 @online{MTMScGuidelinesMaster,
@@ -2975,6 +3089,22 @@
   langid = {english},
   pagetotal = {68},
   file = {C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\Thesis-Literature - Documents\Wit - 2009 - Optimal Thrust Allocation Methods for Dynamic Positioning of Ships.pdf}
+}
+
+@article{wuNeuralOperatorbasedStochastic2025,
+  title = {Neural Operator-Based Stochastic Forcing for Resolvent Prediction of Space–Time Turbulence Statistics in Channel Flows},
+  author = {Wu, Chutian and Zhang, Xin-Lei and He, Guowei},
+  date = {2025-12},
+  journaltitle = {Journal of Fluid Mechanics},
+  volume = {1024},
+  pages = {A1},
+  issn = {0022-1120, 1469-7645},
+  doi = {10.1017/jfm.2025.10847},
+  url = {https://www.cambridge.org/core/journals/journal-of-fluid-mechanics/article/neural-operatorbased-stochastic-forcing-for-resolvent-prediction-of-spacetime-turbulence-statistics-in-channel-flows/889389E956431661B118EC5F7CBE823F},
+  urldate = {2026-02-16},
+  abstract = {, In this work we propose a neural operator-based coloured-in-time forcing model to predict space–time characteristics of large-scale turbulent structures in channel flows. The resolvent-based method has emerged as a powerful tool to capture dominant dynamics and associated spatial structures of turbulent flows. However, the method faces the difficulty in modelling the coloured-in-time nonlinear forcing, which often leads to large predictive discrepancies in the frequency spectra of velocity fluctuations. Although the eddy viscosity has been introduced to enhance the resolvent-based method by partially accounting for the forcing colour, it is still not able to accurately capture the decay rate of the time-correlation function. Also, the uncertainty in the modelled eddy viscosity can significantly limit the predictive reliability of the method. In view of these difficulties, we propose using the neural operator based on the DeepONet architecture to model the stochastic forcing as a function of mean velocity and eddy viscosity. Specifically, the DeepONet-based model is constructed to map an arbitrary eddy-viscosity profile and corresponding mean velocity to stochastic forcing spectra based on the direct numerical simulation data at Reτ=180Re\_\textbackslash tau =180. Furthermore, the learned forcing model is integrated with the resolvent operator, which enables predicting the space–time flow statistics based on the eddy viscosity and mean velocity from the Reynolds-averaged Navier–Stokes (RANS) method. Our results show that the proposed forcing model can accurately predict the frequency spectra of velocity in channel flows at different characteristic scales. Moreover, the model remains robust across different RANS-provided eddy viscosities and generalises well to Reτ=550Re\_\textbackslash tau =550.},
+  langid = {english},
+  keywords = {channel flow,machine learning,turbulence modelling}
 }
 
 @online{wuVariationalApproachLearning2019,

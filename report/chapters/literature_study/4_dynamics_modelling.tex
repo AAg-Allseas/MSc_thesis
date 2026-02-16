@@ -223,6 +223,69 @@ an advantage for deep learning, as the gradients are easier to handle, making th
 
 By using \eqref{eq:VAMP_2} as a loss function for the two networks, these can be trained to learn \(\mathcal{X}_0 \text{ and } \mathcal{X}_1\).
 
+\subsection{DeepONet}
+DeepONet, proposed by \textcite{luLearningNonlinearOperators2021}, works based on the universal operator approximation
+theorum. The theorum states that a neural network with a single hidden layer can approximate any nonlinear continuous
+function or operator. 
+
+\textcite{luLearningNonlinearOperators2021} used this theorum to develop DeepONet, a network architecture designed to
+approximate nonlinear operators. Let \(u(x)\) be an input signal with \(G(u)\) is the corresponding output function.
+Then \(G(u)(y)\) is a real number. The network therefore takes two inputs, the function \(u(x)\) and the point at which
+to sample \(y\). 
+
+The universal approximation theorum for operator is as follows \parencite{chenUniversalApproximationNonlinear1995}. Let \(\sigma\) be a continous non-polynomial function.
+\(G\) is a nonlinear continuous operator. For any \(\epsilon > 0\) there exists a set of positive integers \(n,p,m\) and
+constants \(c_i^k, \zeta_{ij}^k, \theta_i^k, \zeta_k, \zeta_k\in\mathbb{R}, x_j\in\mathbb{R}, w_k\in\mathbb{R}, i = 1,
+\dots, n, k = 1,\dots,p, j = 1,\dots m \) such that:
+
+\begin{equation}
+    \left| G(u)(y) - \sum^p_{k = 1} \underbrace{ \sum^n_{i = 1} c_i^k\sigma\left(\sum^m_{j = 1}\zeta_{ij}^ku(x_j) + \theta^k_i\right)}_{\text{Branch network}} \, \underbrace{\sigma(w_k\cdot y + \zeta_k)}_{\text{Trunk network}}\right| < \epsilon
+\end{equation}
+
+\textcite{luLearningNonlinearOperators2021} adapts this formulation from using a single shallow network to two deep
+networks: a branch network and a trunk network. These are then combined to form the total operator. The branch net can
+consist of multiple networks and handels
+the input function whereas the trunk network handles the location to evaluate the operator at. The specific network
+architecture choices for the branch and trunk networks are arbitrary and depend on the problem at hand. 
+
+\begin{equation}
+    G(u)(y) \approx \sum^p_{k = 1}\underbrace{b_k(u(x_1), u(x_2), \dots, u(x_m))}_{\text{Branches}}\,\underbrace{t_k(y)}_{\text{Trunk}}
+\end{equation}
+
+In practice, \(p\) is often of at least order 10 \parencite{luLearningNonlinearOperators2021}. As such the branch
+networks are combined into a single network that outputs a vector \([b_1, b_2, \dots b_p]\). This difference, as well as
+the overall architecture is illustrated in \cref{fig:deeponet_architecture}. The architecture with a single network is
+referred to as \emph{unstacked} whereas the version with separate branch networks is referred to as \emph{stacked}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{report/images/literature_study/luLearningNonlinearOperators2021.png}
+    \caption{\textbf{a.} Stacked DeepONet with multiple branch networks. \textbf{b.} Unstacked DeepONet with single
+    branch network \parencite{luLearningNonlinearOperators2021}}
+    \label{fig:deeponet_architecture}
+\end{figure}
+
+Passing a continous input to a neural network is a challenge. Two approaches that can be used are either a spectral
+decomposition where the coefficients are passed into the network, or by sampling the function at fixed discrete points.
+These discrete samples should be consistent with eachother, as should the spectral method. 
+
+\textcite{yeDeepONetBasedUncertainty2023} used the DeepONet architecture to propegate stochastic loading through power
+systems.
+
+- Just used a time trace of the noise as input function \\
+- Branch and trunk are fully connected FFNNs \\
+- Used a constant inital state of the dynamic system \\
+
+\textcite{moyaDeepONetGridUQTrustworthyDeep2022} introduced bayesian DeepONet and probabilistic deepOnet also for power
+systems.
+
+\textcite{jinMIONetLearningMultipleInput2022} introduce MIONet, DeepONet with multiple input functions. 
+
+- Works by having multiple branch networks that output the same dimension
+- Concatenates them as elementwise products into the "Regular" branch output
+
+
+
 \section{Neural Stochastic Differential Equations}
 \TODO{Unify notation}
 Neural Ordinary Differential Equations are a powerful tool for modelling dynamics of systems. Neural stochastic
@@ -372,6 +435,9 @@ arise when standard solvers must be (approximately) inverted in reverse-time adj
 remains low—one function evaluation per step—while matching the strong convergence rates of classical midpoint/Heun schemes.
 
 \subsection{Training architectures}
+\TODO{Notes:
+Kidger in GAN mentions using tanh as final layer for both drift and diffusion to avoid unstable gradients}
+
 Literature discusses two main training paradigms for neural SDEs. These are the \emph{Latent SDE} method proposed by
 \textcite{liScalableGradientsStochastic2020} and the \emph{SDE-GAN} approach by
 \textcite{kidgerNeuralSDEsInfiniteDimensional2021}. 
