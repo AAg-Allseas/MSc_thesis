@@ -16,3 +16,4 @@ __pycache__/
 # ignore everything in latex_out (all levels)
 latex_out/**
 dump
+logs
