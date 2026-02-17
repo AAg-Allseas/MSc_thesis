@@ -10,7 +10,7 @@ import torchsde
 
 from src.prototyping.data_handling import find_parquet_files
 from src.prototyping.dataloader import ParquetDataset
-from src.prototyping.latentSDE.latentSDE_main import LatentSDE
+from src.prototyping.latentSDE.model_latentSDE import LatentSDE
 from src.prototyping.visualisation.plot_batch_timeseries import plot_timetraces
 
 
