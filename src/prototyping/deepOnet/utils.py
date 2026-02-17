@@ -33,6 +33,7 @@ def get_activation(identifier: str) -> nn.Module:
             "gelu": nn.GELU(),
             "silu": nn.SiLU(),
             "Mish": nn.Mish(),
+            "identity": nn.Identity(),
     }[identifier]
 
 @dataclass
@@ -46,6 +47,13 @@ class MLPConstructor:
     layer_sizes: list[int]
     activation: str
 
+
+@dataclass
+class BranchConstructor(MLPConstructor):
+    """Configuration for a named branch network."""
+    name: str
+
+
 class MLP(nn.Module):
     """Simple MLP assembled from a constructor configuration.
 
@@ -57,11 +65,11 @@ class MLP(nn.Module):
         super(MLP, self).__init__()
         self.net = nn.ModuleList()
 
-        for k in range(len(constructor.layer_size) - 2):
-            self.net.append(nn.Linear(constructor.layer_size[k], constructor.layer_size[k+1], bias=True))
+        for k in range(len(constructor.layer_sizes) - 2):
+            self.net.append(nn.Linear(constructor.layer_sizes[k], constructor.layer_sizes[k+1], bias=True))
             self.net.append(get_activation(constructor.activation))
 
-        self.net.append(nn.Linear(constructor.layer_size[-2], constructor.layer_size[-1], bias=True))
+        self.net.append(nn.Linear(constructor.layer_sizes[-2], constructor.layer_sizes[-1], bias=True))
         self.net.apply(self._init_weights)
     
     def _init_weights(self, m: Any) -> None:
@@ -76,4 +84,5 @@ class MLP(nn.Module):
         for k in range(len(self.net)):
             y = self.net[k](y)
         return y
+
 

@@ -8,19 +8,13 @@ Jin, P., Meng, S., & Lu, L. (2022).
  MIONet: Learning Multiple-Input Operators via Tensor Product. 
  SIAM Journal on Scientific Computing, 44(6), A3490-A3514. https://doi.org/10.1137/22M1477751
 """
-from dataclasses import dataclass
 from typing import Dict, List, Tuple
 
 from torch import nn
 import torch
 
-from src.prototyping.deepOnet.utils import MLP, MLPConstructor
 
-@dataclass
-class BranchConstructor(MLPConstructor):
-    """Configuration for a named branch network."""
-
-    name: str
+from src.prototyping.deepOnet.utils import MLP, BranchConstructor, MLPConstructor
 
 
 class MIONet(nn.Module):
@@ -30,6 +24,7 @@ class MIONet(nn.Module):
         self,
         branches: List[BranchConstructor],
         trunk: MLPConstructor,
+        output_dim: int,
         use_bias: bool = True,
     ) -> None:
         """Build the branch and trunk subnetworks.
@@ -42,45 +37,57 @@ class MIONet(nn.Module):
         super().__init__()
 
         for branch in branches:
-            if branch.layer_size[-1] != trunk.layer_size[-1]:
-                raise AttributeError("Branches and trunk networks must have same output dimension")
+            # Output dimension must match trunk's latent dimension (penultimate layer).
+            if branch.layer_sizes[-1] != trunk.layer_sizes[-1]:
+                raise AttributeError(
+                    f"All branches must output {trunk.layer_sizes[-1]} dimensions "
+                    f"(trunk's penultimate layer), got {branch.layer_sizes[-1]}"
+                )
             
             setattr(self, branch.name, MLP(branch))
         
         self.trunk = MLP(trunk)
+        self.output = MLP(MLPConstructor(layer_sizes=[trunk.layer_sizes[-1], output_dim], activation="identity"))
+
         self.use_bias = use_bias
 
         if use_bias:
-            self.tau = nn.Parameter(torch.rand(1), requires_grad=True)
+            self.tau = nn.Parameter(torch.rand(output_dim), requires_grad=True)
 
     def forward(self, x: Tuple[Dict[str, torch.Tensor], torch.Tensor]) -> torch.Tensor:
         """Compute the MIONet output for a batch.
 
         Args:
             x: Tuple of branch input dict and trunk input tensor.
+               Trunk input y can be (batch,), (batch, 1), or (batch, n_samples).
 
         Returns:
-            Predicted output tensor.
+            Predicted output tensor of shape (batch, output_dim) or (batch, n_samples, output_dim).
         """
         u, y = x
+        
+        # Ensure y has trailing dimension of 1 for the trunk input
+        if y.dim() == 1:
+            y = y.unsqueeze(-1)  # (batch,) -> (batch, 1)
+        elif y.dim() == 2 and y.size(-1) != 1:
+            y = y.unsqueeze(-1)  # (batch, n_samples) -> (batch, n_samples, 1)
+        
         bs: List[torch.Tensor] = []
         for key, value in u.items():
             bs.append(getattr(self, key)(value))
-        T = self.trunk(y)
-        B = torch.stack(bs)
+        
+        T = self.trunk(y)  # (batch, latent_dim) or (batch, n_samples, latent_dim)
+        B = torch.stack(bs)  # (n_branches, batch, latent_dim)
+
+        # If T has n_samples dimension, expand B to broadcast
+        if T.dim() == 3:
+            B = B.unsqueeze(2)  # (n_branches, batch, 1, latent_dim)
 
         # Combine branch outputs with trunk output using a tensor product.
         s = torch.prod(B * T.unsqueeze(0), dim=0)
-        s = torch.sum(s, dim=-1)
 
+        output = self.output(s)
         if self.use_bias:
-            s = s + self.tau
-        return s
+            output = output + self.tau
 
-if __name__ == "__main__":
-    branches = [BranchConstructor(name="inital_conditions",layer_size=[12, 100, 100], activation="gelu"),
-                BranchConstructor(name="measurements",layer_size=[1000, 250, 250, 100], activation="gelu")]
-    trunk = MLPConstructor(layer_size=[1000, 250, 250, 100], activation="gelu")
-        
-    mionet = MIONet(branches, trunk)
-
+        return output
