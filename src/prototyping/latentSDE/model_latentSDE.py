@@ -1,5 +1,6 @@
+import logging
 from src.prototyping.latentSDE.utils import ContextEncoder, LipSwish
-from src.prototyping.latentSDE.train_latentSDE import LOGGER
+
 
 
 import torch
@@ -10,6 +11,7 @@ from torch.distributions import Normal
 
 from typing import Optional, Tuple
 
+LOGGER = logging.getLogger(__name__)
 
 class LatentSDE(torchsde.SDEIto):
     """Latent SDE model with learned drift, diffusion, and decoder."""

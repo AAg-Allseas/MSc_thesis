@@ -33,7 +33,7 @@ def plotLatentSDE(likelihood: np.ndarray, kl_loss: np.ndarray, start: int=0, end
 
 
 if __name__ == "__main__":
-    likelihood_losses =  np.load(Path("dump/latentsde/likelihood_losses.npy"))[:, 0].reshape(-1, 1)
-    kl_losses = np.load(Path("dump/latentsde/kl_losses.npy"))[:, 0].reshape(-1, 1)
+    likelihood_losses =  np.load(Path("dump/latentsde/proof_of_concept/likelihood_losses.npy"))[:, 0].reshape(-1, 1)
+    kl_losses = np.load(Path("dump/latentsde/proof_of_concept/kl_losses.npy"))[:, 0].reshape(-1, 1)
     plotLatentSDE(likelihood_losses, kl_losses, end=491)
     plt.show()

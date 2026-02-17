@@ -2,6 +2,7 @@ import torch
 from torch import Tensor, nn
 
 
+
 class ContextEncoder(nn.Module):
     """GRU encoder to encode observation data into context for the posterior network.
 
@@ -59,3 +60,5 @@ class LipSwish(nn.Module):
 
     def forward(self, x: Tensor) -> Tensor:
         return x * torch.sigmoid(x) / 1.1
+
+

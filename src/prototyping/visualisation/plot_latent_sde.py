@@ -6,41 +6,12 @@ import pstats
 from matplotlib import pyplot as plt
 import numpy as np
 import torch
-import torchsde
 
 from src.prototyping.data_handling import find_parquet_files
 from src.prototyping.dataloader import ParquetDataset
-from src.prototyping.latentSDE.model_latentSDE import LatentSDE
+from src.prototyping.latentSDE.test_latentSDE import load_and_sample
 from src.prototyping.visualisation.plot_batch_timeseries import plot_timetraces
 
-
-def load_and_sample(path: Path, 
-                    batch_size: int, 
-                    data_size: int, 
-                    latent_size: int, 
-                    context_size: int, 
-                    hidden_size: int,
-                    timestep: float,
-                    start_time: float = 0,
-                    end_time: float = 10800) -> np.ndarray:
-    
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    
-    latent_sde = LatentSDE(
-        data_size=12,
-        latent_size=latent_size,
-        context_size=context_size,
-        hidden_size=hidden_size,
-        ).to(device)
-    
-    latent_sde.load_state_dict(torch.load(path))
-    latent_sde.eval()
-    
-    ts = np.arange(start_time, end_time, timestep)
-    ts = torch.from_numpy(ts).to(device)
-    
-    bm = torchsde.BrownianInterval(start_time, end_time, size=(batch_size, latent_size), dt=timestep, device=device)
-    return latent_sde.sample(batch_size=batch_size, ts=ts, bm=bm).to("cpu"), ts.to("cpu")
 
 def plot_latentsde(dataset: ParquetDataset, 
                    sample_data: tuple[torch.Tensor, torch.Tensor]) -> None:
