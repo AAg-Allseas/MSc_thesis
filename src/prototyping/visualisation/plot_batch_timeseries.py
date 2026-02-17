@@ -1,24 +1,31 @@
 
 from pathlib import Path
+from typing import Optional
 from matplotlib import pyplot as plt
 import numpy as np
-from torch import Tensor
 
 from src.prototyping.data_handling import find_parquet_files
 from src.prototyping.dataloader import ParquetDataset
 
 
-def plot_timetraces(series: np.ndarray | Tensor, timesteps: np.ndarray | Tensor) -> None:
+def plot_timetraces(dataset: ParquetDataset, 
+                    color: Optional[str]=None) -> None:
+    samples = []
+    for i in range(len(dataset)):
+        times, sample, _ = dataset[i]
+        samples.append(sample)
+    samples = np.array(samples).swapaxes(0, 1)
+
 
     fig, ax = plt.subplots()
 
     # Surge
-    ax.plot(timesteps, series[..., 0], alpha=0.1)
+    ax.plot(times, samples[..., 0], alpha=0.1, color=color)
     ax.set_xlabel("Time [s]")
     ax.set_ylabel("Displacement [m]")
     ax.set_title("Surge position")
-    
-    plt.show()
+
+    return fig, ax
 
 
 if __name__ == "__main__":
@@ -42,9 +49,5 @@ if __name__ == "__main__":
                             columns=feats,
                             scale_factors=np.array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]))
 
-    samples = []
-    for i in range(len(dataset)):
-        times, sample = dataset[i]
-        samples.append(sample)
-    samples = np.array(samples).swapaxes(0, 1)
-    plot_timetraces(samples, times)
+
+    plot_timetraces(dataset)
