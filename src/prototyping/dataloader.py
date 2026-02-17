@@ -81,7 +81,7 @@ class ParquetDataset(Dataset):
             if meta_key_bytes not in meta:
                 continue
             params = json.loads(meta[meta_key_bytes].decode("utf-8"))
-            self.metas.append[params]
+            self.metas.append(params)
 
 
 
@@ -102,7 +102,8 @@ class ParquetDataset(Dataset):
         Returns:
             Tuple of time tensor, state tensor, and metadata dict.
         """
-        states_time = pd.read_parquet(self.files[idx // self.n_per_series], columns=self.columns)
+        file_idx = idx // self.n_per_series
+        states_time = pd.read_parquet(self.files[file_idx], columns=self.columns)
         states_time = np.ascontiguousarray(states_time.values, dtype=np.float32)
         states_time = states_time[(idx % self.n_per_series) * self.sample_length: (idx % self.n_per_series + 1) * self.sample_length, ...]
 
@@ -128,7 +129,9 @@ class ParquetDataset(Dataset):
         states = torch.from_numpy(states).to(dtype=torch.float32)
 
         time = torch.from_numpy(np.round(states_time[:, 0] - states_time[0, 0], 2)).to(dtype=torch.float32)
-        return time, states, self.metas[idx // self.n_per_series]
+        meta = self.metas[file_idx].copy()
+        meta["idx"] = idx  # Add file index
+        return time, states, meta
 
 def prep_batch(batch: Tuple[Tensor, Tensor, Dict[str, Any]], device: str = "cpu") -> Tuple[Tensor, Tensor]:
     """Move batch to device and validate aligned timesteps.
