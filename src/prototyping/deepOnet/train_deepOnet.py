@@ -1,13 +1,45 @@
 from pathlib import Path
+from typing import Any, Dict
 import numpy as np
 import torch
-from torch import nn
+from torch import Tensor, nn
 from torch.utils.data import DataLoader
 
 from src.prototyping.data_handling import find_parquet_files
 from src.prototyping.dataloader import ParquetDataset
 from src.prototyping.deepOnet.model_deepOnet import MIONet
 from src.prototyping.deepOnet.utils import BranchConstructor, MLPConstructor
+
+def prepare_batch(batch: tuple[Tensor, Tensor, Dict[str, Any]], 
+                  sample_dataset: ParquetDataset,
+                  device: torch.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+                  ) -> tuple[Dict[str, Tensor], Tensor, Tensor]:
+        _, sensors, metas = batch
+        sensors = sensors.to(device)
+
+        initial_conditions = torch.vstack(metas["inital_pos"]).T.to(device, dtype=torch.float32)
+
+        # Extract file index from batch indices (available via DataLoader's sampler)
+        idxs = metas["idx"]
+
+        ts, samples = ([], [])
+        for idx in idxs:
+            t, sample, _ = dataset_samples[idx]
+            ts.append(t)
+            samples.append(sample)
+        
+        ts = torch.stack(ts)
+        samples = torch.stack(samples)
+
+        idx = torch.randperm(ts.size(1))[:n_samples] 
+        ts = ts[:, idx].to(device)
+        samples = samples[:, idx].to(device)
+
+        x = ({"initial_conditions": initial_conditions,
+              "surge_force": sensors[..., 0],
+              "sway_force": sensors[..., 1],
+              "yaw_moment": sensors[..., 2]}, 
+              ts)
 
 
 if __name__ == "__main__":
@@ -95,33 +127,10 @@ if __name__ == "__main__":
 
     rng = torch.Generator()
 
+    optimiser = 
+
     for batch in dataloader:
-        _, sensors, metas = batch
-        sensors = sensors.to(device)
-
-        initial_conditions = torch.vstack(metas["inital_pos"]).T.to(device, dtype=torch.float32)
-
-        # Extract file index from batch indices (available via DataLoader's sampler)
-        idxs = metas["idx"]
-
-        ts, samples = ([], [])
-        for idx in idxs:
-            t, sample, _ = dataset_samples[idx]
-            ts.append(t)
-            samples.append(sample)
-        
-        ts = torch.stack(ts)
-        samples = torch.stack(samples)
-
-        idx = torch.randperm(ts.size(1))[:n_samples] 
-        ts = ts[:, idx].to(device)
-        samples = samples[:, idx].to(device)
-
-        x = ({"initial_conditions": initial_conditions,
-              "surge_force": sensors[..., 0],
-              "sway_force": sensors[..., 1],
-              "yaw_moment": sensors[..., 2]}, 
-              ts)
+       
         pred = mionet(x)
         loss_fn = nn.MSELoss()
         loss = loss_fn(pred, samples)
