@@ -9,6 +9,7 @@ Example:
         python -m src.prototyping.deepOnet.train_deepOnet
 """
 from pathlib import Path
+from typing import Optional
 import numpy as np
 from src.logging import LossTracker, create_run_folder, get_logger, save_checkpoint
 import torch
@@ -33,6 +34,7 @@ def train(
     max_errors: int,
     logger,
     tracker: LossTracker,
+    lr_scheduler: torch.optim.lr_scheduler.LRScheduler
 ) -> None:
     """Run one training epoch.
 
@@ -75,6 +77,10 @@ def train(
         optimiser.step()
 
         tracker.log_batch(loss.item())
+        logger.batch(f"Batch loss: {loss.item():.4f}")
+
+        if not isinstance(scheduler, torch.optim.lr_scheduler.ReduceLROnPlateau):
+            scheduler.step()
 
 
 def test(
@@ -197,9 +203,9 @@ if __name__ == "__main__":
         
     mionet = MIONet(branches, trunk, output_dim).to(device)
 
-    mionet.load_state_dict(torch.load(r"runs\prototypes\deepOnet\testing\starting_models\2026-02-17_17-22-31_epoch_1700.pth")["model_state_dict"])
-    mionet.eval()
-    logger.epoch("Loaded model from saved file")
+    # mionet.load_state_dict(torch.load(r"runs\prototypes\deepOnet\testing\starting_models\2026-02-17_17-22-31_epoch_1700.pth")["model_state_dict"])
+    # mionet.eval()
+    # logger.epoch("Loaded model from saved file")
 
     logger.epoch("Initialised model")
     logger.debug(str(mionet))
@@ -251,9 +257,18 @@ if __name__ == "__main__":
     
     rng = torch.Generator()
 
-    last_lr = 0.005
+    last_lr = 0.01
+    warmup_epochs = 100
+    warmup_steps = warmup_epochs * len(dataloader_training)
+
     optimiser = torch.optim.Adam(params=mionet.parameters(), lr=last_lr)
-    scheduler= torch.optim.lr_scheduler.ReduceLROnPlateau(optimiser, factor=0.5, min_lr=1e-6)
+
+    linear_warmup_schedule = torch.optim.lr_scheduler.LinearLR(optimiser, start_factor=1e-4, end_factor=1.0, total_iters=warmup_steps)
+
+    plateau_scheduler= torch.optim.lr_scheduler.ReduceLROnPlateau(optimiser, factor=0.5, min_lr=1e-6)
+
+    scheduler = linear_warmup_schedule
+
     loss_fn = nn.MSELoss()
 
     logger.epoch(f"Starting training\n Training parameters: \n - {n_samples} samples \n - {batch_size} batch size \n - {n_epochs} epochs")
@@ -262,16 +277,22 @@ if __name__ == "__main__":
             logger.epoch(f"Epoch {epoch}")
             logger.epoch("-" * 25)
             
-            train(mionet, dataloader_training, dataset_training_samples, optimiser, loss_fn, device, n_samples, max_errors, logger, loss_tracker)
+            train(mionet, dataloader_training, dataset_training_samples, optimiser, loss_fn, device, n_samples, max_errors, logger, loss_tracker, scheduler)
             test(mionet, dataloader_testing, dataset_testing_samples, loss_fn, device, n_samples, logger, loss_tracker)
             
             mean_training_loss, mean_testing_loss = loss_tracker.end_epoch(epoch)
-            scheduler.step(mean_training_loss)  # Step scheduler once per epoch with mean loss
+
+            if epoch == warmup_epochs:
+                scheduler = plateau_scheduler # Step scheduler once per epoch with mean loss
+            
+            if isinstance(scheduler, torch.optim.lr_scheduler.ReduceLROnPlateau):
+                scheduler.step(mean_training_loss.item())
+            
             lr = optimiser.param_groups[0]['lr']
 
             logger.epoch(f"Epoch {epoch} complete | Mean loss (training): {mean_training_loss:.4f} | Mean loss (testing): {mean_testing_loss:.4f}")
             if lr != last_lr:
-                 logger.epoch(f"Learning rate reduced. \n Old LR: {last_lr} | New LR: {lr}")
+                 logger.epoch(f"Learning rate reduced. \n Old LR: {last_lr:.5f} | New LR: {lr:.5f}")
             
             save_checkpoint(mionet, run_path, epoch, optimiser, scheduler)
             logger.epoch("Model saved")
