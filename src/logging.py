@@ -45,7 +45,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any, Literal, Optional
 
 import torch
 from torch import nn
@@ -147,7 +147,7 @@ def create_run_folder(base: str = "runs", sub: Optional[str] = None) -> Path:
 
     Args:
         base: Base directory for all runs.
-        sub: Unused placeholder for future subfolders.
+        sub: Optional subdirectory path appended to base (e.g., "experiment/v1").
 
     Returns:
         Path to the newly created run folder.
@@ -304,6 +304,7 @@ def save_checkpoint(
     optimizer: Optional[torch.optim.Optimizer] = None,
     scheduler: Optional[Any] = None,
     extra: Optional[dict[str, Any]] = None,
+    keep: int = 10
 ) -> Path:
     """Save model checkpoint to the run folder.
 
@@ -317,6 +318,7 @@ def save_checkpoint(
         optimizer: Optional optimizer to save state from.
         scheduler: Optional scheduler to save state from.
         extra: Optional dict of additional items to include.
+        keep: Number of recent checkpoints to retain; older ones are deleted.
 
     Returns:
         Path to the saved checkpoint file.
@@ -334,6 +336,11 @@ def save_checkpoint(
 
     path = checkpoint_dir / f"checkpoint_epoch_{epoch}.pth"
     torch.save(checkpoint, path)
+    if keep is not None and epoch > keep:
+        threshold = epoch - keep
+        for pth in checkpoint_dir.iterdir():
+            if int(pth.stem.split("_")[-1]) < threshold:
+                pth.unlink()
     return path
 
 
@@ -345,8 +352,9 @@ class LossTracker:
 
     Attributes:
         run_path: Root directory of the training run.
-        batch_losses: List of batch losses for the current epoch.
-        epoch_history: List of dicts with 'epoch', 'mean_loss', and 'batch_losses'.
+        train_batch_losses: List of training batch losses for the current epoch.
+        test_batch_losses: List of test batch losses for the current epoch.
+        epoch_history: List of dicts with epoch metrics and batch losses.
     """
 
     def __init__(self, run_path: Path) -> None:
@@ -356,37 +364,54 @@ class LossTracker:
             run_path: Root directory of the training run.
         """
         self.run_path = run_path
-        self.batch_losses: list[float] = []
+        self.train_batch_losses: list[float] = []
+        self.test_batch_losses: list[float] = []
         self.epoch_history: list[dict[str, Any]] = []
         self._losses_file = run_path / "logs" / "losses.json"
         self._losses_file.parent.mkdir(parents=True, exist_ok=True)
 
-    def log_batch(self, loss: float) -> None:
+    def log_batch(self, loss: float, mode: Literal["train", "test"] = "train") -> None:
         """Record a single batch loss.
 
         Args:
             loss: The loss value for this batch.
-        """
-        self.batch_losses.append(loss)
+            mode: Whether this is a "train" or "test" batch loss.
 
-    def end_epoch(self, epoch: int) -> float:
+        Raises:
+            ValueError: If mode is not "train" or "test".
+        """
+        match mode:
+            case "train":
+                self.train_batch_losses.append(loss)
+            case "test":
+                self.test_batch_losses.append(loss)
+            case _:
+                raise ValueError(f"Incorrect logging mode: {mode}. Must be one of ['train', 'test']")
+    
+
+
+    def end_epoch(self, epoch: int) -> tuple[float, float]:
         """Finalize the current epoch, compute mean, and save to disk.
 
         Args:
             epoch: The epoch number that just completed.
 
         Returns:
-            Mean loss for the epoch.
+            Tuple of (mean_train_loss, mean_test_loss) for the epoch.
         """
-        mean_loss = sum(self.batch_losses) / len(self.batch_losses) if self.batch_losses else 0.0
+        mean_train_loss = sum(self.train_batch_losses) / len(self.train_batch_losses) if self.train_batch_losses else 0.0
+        mean_test_loss = sum(self.test_batch_losses) / len(self.test_batch_losses) if self.test_batch_losses else 0.0
         self.epoch_history.append({
             "epoch": epoch,
-            "mean_loss": mean_loss,
-            "batch_losses": self.batch_losses.copy(),
+            "mean_train_loss": mean_train_loss,
+            "mean_test_loss": mean_test_loss,
+            "batch_train_losses": self.train_batch_losses.copy(),
+            "batch_test_losses": self.test_batch_losses.copy(),
         })
         self._save()
-        self.batch_losses.clear()
-        return mean_loss
+        self.train_batch_losses.clear()
+        self.test_batch_losses.clear()
+        return mean_train_loss, mean_test_loss
 
     def _save(self) -> None:
         """Write epoch history to JSON file."""
