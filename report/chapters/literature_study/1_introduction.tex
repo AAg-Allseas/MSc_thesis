@@ -62,9 +62,39 @@ when estimating the ultimimate capability of a ship, they are unable to say anyt
 system. In many operations, such as crane operations, pipelay, drilling or crew transfers
 \parencites{tannuriUtilizationNumericalSimulation2011}{serrarisDPStationkeepingAccuracy2017}{theilenNumericalSimulationShip2024},
 the maximum excursion can be a limiting factor much before the total power consumption. In 2025, the International
-Marine Contractors Association (IMCA) updated their reccomended practices for evaluating DP behaviour
+Marine Contractors Association (IMCA) updated their recommended practices for evaluating DP behaviour
 \parencite{RecommendedPracticeSpecification2025}. In the revised version, dynamic simulations are recommended for cases
 where the footprint is critical, reinforcing the statement from \textcite{serrarisDPStationkeepingAccuracy2017}. 
+
+By using time-domain simulations rather than a quasi-static force balance, more information can be used to determine the
+operational limits. These could be defined as the maximum excursion over three hours
+\parencite{AssessmentStationKeeping2021} or the probability of exceding power limits. These post processing steps are
+performed after the series is simulated. When performing these dynamic simulations with surrogate models, two approaches can be considered. The first is to
+directly predict output statistics of the system—such as the 3-hour most probable maximum footprint or peak thruster
+power—using regression models that map environmental and system parameters to these quantities. The second approach is to
+forecast the full time series, then calculate statistics through post-processing. 
+
+While the direct regression approach is attractive due to its low-dimensional output space and computational efficiency,
+experience from nonlinear oscillator and power system surrogate modeling has shown that extreme statistics such as
+maxima are highly nonlinear functionals of the time series. Polynomial chaos expansions constructed directly for
+maximal responses exhibit large errors, whereas NARX-based surrogates that reproduce the full time history, and only
+then derive maxima, achieve accurate predictions of both instantaneous statistics and extremes
+\parencites{maiSurrogateModellingStochastic2016}{ebadollahiTimedependentUncertaintyQuantification2025}{yeDeepONetBasedUncertainty2023}.
+A direct regression on output statistics therefore compresses the complex, non-linear and time-dependent DP dynamics—including
+control behavior, thruster interactions and wave-drift induced low-frequency motions—into a single mapping, likely
+resulting in reduced fidelity, particularly in the distribution tails relevant for footprint and power margins.
+
+In contrast, a time-series surrogate preserves the dynamic structure of the DP system, consistent with current
+industrial practice where dynamic capability and operability analyses are performed in the time domain specifically to
+capture low-frequency excursions, transient behavior after failures, and coupled criteria such as watch circle, riser
+tension and dynamic power load \parencites{smogeliDynCapFullScale}{tannuriUtilizationNumericalSimulation2011}. Such a
+surrogate can be reused across operations with different governing limits: for crane operations, acceptance is typically
+based on footprint and relative motions, whereas for pipelay or drilling the limiting factor may be thruster
+utilisation or generator loading
+\parencites{fruzzettiProbabilisticOperabilityGreenhouse2024}{mauroProbabilisticApproachDynamic2022}. Incorporating
+transient events such as thruster loss or DP controller re-tuning is also straightforward at the trajectory level, but
+would require ad-hoc modifications to a statistic-only regression model.
+
 
 \subsection{Probabilistic predictions}
 \label{subsec:probabilistic_predictions}
@@ -120,13 +150,14 @@ power grids. Particularly power grids are of interest. A power grid is a highly 
 external loading. Power distribution is regulated by controllers, aimed at minimising total power consumption
 \parencite{sadamotoDynamicModelingStability2019}. Such a system has a lot of parallels to a dynamic positioning system;
 a DP system aims to counter external loading while minimising power consumption. As probabilistic forecasting has seen
-use in predicting power consumption in electrical grids, it is likely to be suitable for predicting DP behaviour.
+use in predicting power consumption in electrical grids, it is likely to be suitable for predicting DP behaviour. Most
+of these approaches use some form of surrogate model to more efficiently calculate the dynamic responses of a system.
 
 \subsection{Uncertainty quantification}
 Uncertainty quantification is a field of mathematics that focusess on propegating input uncertainty through a
 mathematical system to quantify the uncertainty of the output
 \parencite{ebadollahiTimedependentUncertaintyQuantification2025}. Typically this is done with Monte-Carlo simulations,
-but as discussed in \cref{subsec:probabilistic_predictions}, this would be too computationally expensive for use with
+but as discussed in \cref{subsec:probabilistic_predictions}, this would be too computationally expensive to blindly use with
 dynamic DP analyses. Alternative methods for uncertainty quantification exist. These often consist of some form of
 surrogate model to inexpensively model the system's dynamics, which can then be combined with an uncertainty model to
 propegate uncertainty from input to output
@@ -136,7 +167,7 @@ Surrogate models can take many forms; for high diminsional non-linear systems ma
 \parencite{salinasDeepARProbabilisticForecasting2020}. The use of machine learning models in uncertainty quantification
 can lead to significantly faster model evaluations while maintaining decent accuracy
 \parencite{willardIntegratingPhysicsBasedModelling2022}. Prior physics knowledge can also be included to further improve
-accuracy.
+accuracy. 
 
 \section{Research question}
 
