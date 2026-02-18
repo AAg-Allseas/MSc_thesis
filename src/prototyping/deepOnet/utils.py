@@ -66,6 +66,51 @@ class BranchConstructor(MLPConstructor):
     name: str
 
 
+@dataclass
+class CNN1DBranchConstructor:
+    """Configuration for a 1D CNN branch network.
+
+    Attributes:
+        name: Unique identifier for this branch.
+        in_channels: Number of input channels (1 for univariate series).
+        channels: List of output channels per conv layer.
+        kernel_sizes: List of kernel sizes per conv layer.
+        output_dim: Final output dimension (latent dim).
+        activation: Activation name used between layers.
+    """
+    name: str
+    in_channels: int
+    channels: list[int]
+    kernel_sizes: list[int]
+    output_dim: int
+    activation: str = "gelu"
+
+
+class CNN1D(nn.Module):
+    """1D CNN that maps a time series to a fixed-size latent vector."""
+
+    def __init__(self, constructor: CNN1DBranchConstructor) -> None:
+        super().__init__()
+        layers = []
+        in_ch = constructor.in_channels
+        for out_ch, ks in zip(constructor.channels, constructor.kernel_sizes):
+            layers.append(nn.Conv1d(in_ch, out_ch, kernel_size=ks, padding=ks // 2))
+            layers.append(get_activation(constructor.activation))
+            layers.append(nn.MaxPool1d(kernel_size=2))
+            in_ch = out_ch
+        self.conv = nn.Sequential(*layers)
+        self.pool = nn.AdaptiveAvgPool1d(1)
+        self.fc = nn.Linear(in_ch, constructor.output_dim)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        # x: (batch, seq_len) -> (batch, 1, seq_len)
+        if x.dim() == 2:
+            x = x.unsqueeze(1)
+        x = self.conv(x)
+        x = self.pool(x).squeeze(-1)  # (batch, channels[-1])
+        return self.fc(x)
+
+
 class MLP(nn.Module):
     """Simple multi-layer perceptron assembled from a constructor configuration.
 
@@ -88,14 +133,7 @@ class MLP(nn.Module):
             self.net.append(get_activation(constructor.activation))
 
         self.net.append(nn.Linear(constructor.layer_sizes[-2], constructor.layer_sizes[-1], bias=True))
-        self.net.apply(self._init_weights)
-    
-    def _init_weights(self, m: Any) -> None:
-        """Initialize linear layers with Xavier normal weights."""
-        if isinstance(m, nn.Linear):
-            nn.init.xavier_normal_(m.weight)
-            m.bias.data.zero_()
-            
+
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Run a forward pass through the MLP.
 
@@ -139,9 +177,6 @@ def prepare_batch(
     _, sensors, metas = batch
     sensors = sensors.to(device)
 
-    pos = metas["inital_pos"]
-    initial_conditions = torch.vstack(pos if isinstance(pos[0], Tensor) else [torch.tensor(pos)]).T.to(device, dtype=torch.float32)
-
     # Extract file index from batch indices (available via DataLoader's sampler)
     idxs = metas["idx"]
     if isinstance(idxs, int):
@@ -156,6 +191,10 @@ def prepare_batch(
 
         ts = torch.stack(ts)
         samples = torch.stack(samples)
+
+    # Initial conditions from the first timestep of each sample (first 3 features = positions)
+    initial_conditions = samples[:, 0, :].to(device, dtype=torch.float32)
+
     if n_samples == -1:
         n_samples = ts.shape[-1]
 
@@ -166,6 +205,11 @@ def prepare_batch(
         idx = torch.randperm(ts.size(1))[:n_samples]
         ts = ts[:, idx].to(device)
         samples = samples[:, idx].to(device)
+
+    # Normalize time to [0, 1] so the trunk MLP operates in a reasonable range
+    t_max = ts.max()
+    if t_max > 0:
+        ts = ts / t_max
 
     x = ({"initial_conditions": initial_conditions,
           "surge_force": sensors[..., 0],

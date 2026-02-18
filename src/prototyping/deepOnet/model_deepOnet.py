@@ -14,7 +14,7 @@ from torch import nn
 import torch
 
 
-from src.prototyping.deepOnet.utils import MLP, BranchConstructor, MLPConstructor
+from src.prototyping.deepOnet.utils import CNN1D, CNN1DBranchConstructor, MLP, BranchConstructor, MLPConstructor
 
 
 class MIONet(nn.Module):
@@ -22,7 +22,7 @@ class MIONet(nn.Module):
 
     def __init__(
         self,
-        branches: List[BranchConstructor],
+        branches: list,
         trunk: MLPConstructor,
         output_dim: int,
         use_bias: bool = True,
@@ -30,29 +30,37 @@ class MIONet(nn.Module):
         """Build the branch and trunk subnetworks.
 
         Args:
-            branches: Branch constructors, one per input stream.
+            branches: Branch constructors (BranchConstructor or CNN1DBranchConstructor).
             trunk: Trunk constructor for the shared input.
             use_bias: Whether to include a learned scalar bias.
         """
         super().__init__()
+        latent_dim = trunk.layer_sizes[-1]
+        self.branch_names = []
 
         for branch in branches:
-            # Output dimension must match trunk's latent dimension (penultimate layer).
-            if branch.layer_sizes[-1] != trunk.layer_sizes[-1]:
-                raise AttributeError(
-                    f"All branches must output {trunk.layer_sizes[-1]} dimensions "
-                    f"(trunk's penultimate layer), got {branch.layer_sizes[-1]}"
-                )
-            
-            setattr(self, branch.name, MLP(branch))
+            if isinstance(branch, CNN1DBranchConstructor):
+                if branch.output_dim != latent_dim:
+                    raise AttributeError(
+                        f"CNN branch '{branch.name}' output_dim={branch.output_dim} "
+                        f"must match trunk latent dim={latent_dim}"
+                    )
+                setattr(self, branch.name, CNN1D(branch))
+            else:
+                if branch.layer_sizes[-1] != latent_dim:
+                    raise AttributeError(
+                        f"All branches must output {latent_dim} dimensions "
+                        f"(trunk's penultimate layer), got {branch.layer_sizes[-1]}"
+                    )
+                setattr(self, branch.name, MLP(branch))
+            self.branch_names.append(branch.name)
         
         self.trunk = MLP(trunk)
-        self.output = MLP(MLPConstructor(layer_sizes=[trunk.layer_sizes[-1], output_dim], activation="identity"))
-
-        self.use_bias = use_bias
-
-        if use_bias:
-            self.tau = nn.Parameter(torch.rand(output_dim), requires_grad=True)
+        # Output MLP takes concatenated branch + trunk representations
+        self.output = MLP(MLPConstructor(
+            layer_sizes=[latent_dim * 2, latent_dim, output_dim],
+            activation="gelu"
+        ))
 
     def forward(self, x: Tuple[Dict[str, torch.Tensor], torch.Tensor]) -> torch.Tensor:
         """Compute the MIONet output for a batch.
@@ -73,8 +81,8 @@ class MIONet(nn.Module):
             y = y.unsqueeze(-1)  # (batch, n_samples) -> (batch, n_samples, 1)
         
         bs: List[torch.Tensor] = []
-        for key, value in u.items():
-            bs.append(getattr(self, key)(value))
+        for name in self.branch_names:
+            bs.append(getattr(self, name)(u[name]))
         
         T = self.trunk(y)  # (batch, latent_dim) or (batch, n_samples, latent_dim)
         B = torch.stack(bs)  # (n_branches, batch, latent_dim)
@@ -83,11 +91,8 @@ class MIONet(nn.Module):
         if T.dim() == 3:
             B = B.unsqueeze(2)  # (n_branches, batch, 1, latent_dim)
 
-        # Combine branch outputs with trunk output using a tensor product.
-        s = torch.prod(B * T.unsqueeze(0), dim=0)
+        # Sum branch outputs, then concatenate with trunk
+        B_combined = torch.sum(B, dim=0)  # (batch, [n_samples,] latent_dim)
+        s = torch.cat([B_combined.expand_as(T), T], dim=-1)  # (batch, [n_samples,] 2*latent_dim)
 
-        output = self.output(s)
-        if self.use_bias:
-            output = output + self.tau
-
-        return output
+        return self.output(s)

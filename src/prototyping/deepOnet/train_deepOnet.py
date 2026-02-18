@@ -20,7 +20,7 @@ import tqdm
 from src.prototyping.data_handling import find_parquet_files
 from src.prototyping.dataloader import ParquetDataset
 from src.prototyping.deepOnet.model_deepOnet import MIONet
-from src.prototyping.deepOnet.utils import BranchConstructor, MLPConstructor, prepare_batch
+from src.prototyping.deepOnet.utils import BranchConstructor, CNN1DBranchConstructor, MLPConstructor, prepare_batch
 
 
 def train(
@@ -109,7 +109,7 @@ def test(
     
     with torch.no_grad():
         for batch in dataloader:
-            x, samples, _ = prepare_batch(batch, dataset_samples, n_samples=n_samples, ordered=True, device=device)
+            x, samples, _ = prepare_batch(batch, dataset_samples, n_samples=n_samples, device=device)
             loss = loss_fn(model(x), samples)
             
             if not torch.isfinite(loss):
@@ -169,7 +169,7 @@ if __name__ == "__main__":
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     logger.epoch(f"Running on {device}")
     # Latent dimension (shared by all branch outputs).
-    latent_dim = 64
+    latent_dim = 250
     # Number of features to predict.
     output_dim = 12
 
@@ -177,33 +177,42 @@ if __name__ == "__main__":
     branches = [
         BranchConstructor(
             name="initial_conditions",
-            layer_sizes=[3, 100, latent_dim],
+            layer_sizes=[12, 100, latent_dim],
             activation="gelu"
         ),
-        BranchConstructor(
+        CNN1DBranchConstructor(
             name="surge_force",
-            layer_sizes=[1000, 250, 250, latent_dim],
+            in_channels=1,
+            channels=[32, 64, 128],
+            kernel_sizes=[7, 5, 3],
+            output_dim=latent_dim,
             activation="gelu"
         ),
-        BranchConstructor(
+        CNN1DBranchConstructor(
             name="sway_force",
-            layer_sizes=[1000, 250, 250, latent_dim],
+            in_channels=1,
+            channels=[32, 64, 128],
+            kernel_sizes=[7, 5, 3],
+            output_dim=latent_dim,
             activation="gelu"
         ),
-        BranchConstructor(
+        CNN1DBranchConstructor(
             name="yaw_moment",
-            layer_sizes=[1000, 250, 250, latent_dim],
+            in_channels=1,
+            channels=[32, 64, 128],
+            kernel_sizes=[7, 5, 3],
+            output_dim=latent_dim,
             activation="gelu"
         ),
     ]
     trunk = MLPConstructor(
-        layer_sizes=[1, 250, 250, latent_dim],
+        layer_sizes=[1, 125, 250, 250, latent_dim],
         activation="gelu"
     )
         
     mionet = MIONet(branches, trunk, output_dim).to(device)
 
-    # mionet.load_state_dict(torch.load(r"runs\prototypes\deepOnet\testing\starting_models\2026-02-17_17-22-31_epoch_1700.pth")["model_state_dict"])
+    # mionet.load_state_dict(torch.load(r"runs\prototypes\deepOnet\testing\2026-02-18_11-57-56\checkpoints\checkpoint_epoch_99.pth")["model_state_dict"])
     # mionet.eval()
     # logger.epoch("Loaded model from saved file")
 
@@ -248,7 +257,7 @@ if __name__ == "__main__":
     scales_samples = np.array([1, 1, 1, 1, 1, 1, 1/250, 1/250, 1/250, 1/250, 1/160, 1/160])
 
     n_samples = 2048
-    batch_size = 64
+    batch_size = 4
     n_epochs = 10000
     max_errors = 3
     
@@ -257,11 +266,12 @@ if __name__ == "__main__":
     
     rng = torch.Generator()
 
-    last_lr = 0.01
+    last_lr = 1e-3
     warmup_epochs = 100
     warmup_steps = warmup_epochs * len(dataloader_training)
 
     optimiser = torch.optim.Adam(params=mionet.parameters(), lr=last_lr)
+    # optimiser.load_state_dict(torch.load(r"runs\prototypes\deepOnet\testing\2026-02-18_11-57-56\checkpoints\checkpoint_epoch_99.pth")["optimizer_state_dict"])
 
     linear_warmup_schedule = torch.optim.lr_scheduler.LinearLR(optimiser, start_factor=1e-4, end_factor=1.0, total_iters=warmup_steps)
 
@@ -273,7 +283,7 @@ if __name__ == "__main__":
 
     logger.epoch(f"Starting training\n Training parameters: \n - {n_samples} samples \n - {batch_size} batch size \n - {n_epochs} epochs")
     try:
-        for epoch in tqdm.trange(n_epochs):
+        for epoch in tqdm.tqdm(range(n_epochs)):
             logger.epoch(f"Epoch {epoch}")
             logger.epoch("-" * 25)
             
@@ -286,7 +296,7 @@ if __name__ == "__main__":
                 scheduler = plateau_scheduler # Step scheduler once per epoch with mean loss
             
             if isinstance(scheduler, torch.optim.lr_scheduler.ReduceLROnPlateau):
-                scheduler.step(mean_training_loss.item())
+                scheduler.step(mean_training_loss)
             
             lr = optimiser.param_groups[0]['lr']
 
