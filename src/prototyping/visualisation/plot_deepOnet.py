@@ -126,7 +126,7 @@ def plot_prediction(
 
 if __name__ == "__main__":
     # Example usage
-    checkpoint = r"runs\prototypes\deepOnet\testing\2026-02-18_15-50-00\checkpoints\checkpoint_epoch_54.pth"
+    checkpoint = r"runs\prototypes\deepOnet\testing\2026-02-18_16-30-21\checkpoints\checkpoint_epoch_1923.pth"
     model = model_cnn_1()
     fig = plot_prediction(checkpoint, model)
     plt.show()

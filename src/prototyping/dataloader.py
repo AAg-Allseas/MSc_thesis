@@ -28,7 +28,8 @@ class ParquetDataset(Dataset):
         sample_length: Optional[int] = None,
         resample_every: Optional[int] = None,
         resample_dt: Optional[float] = None,
-        scale_factors: Optional[np.ndarray] = None,
+        standardise: bool = True,
+        standardise_dict: Optional[Dict[str, np.ndarray]] = None,
         meta_key: str = "run_params",
         device: str = "cpu",
     ) -> None:
@@ -40,7 +41,9 @@ class ParquetDataset(Dataset):
             sample_length: Number of time steps per sample.
             resample_every: Downsample by fixed step size.
             resample_dt: Downsample by target timestep.
-            scale_factors: Per-feature scaling factors.
+            scale_factors: Per-feature scaling factors (simple multiplication).
+            standardize: Dict with 'mean' and 'std' arrays for (x - mean) / std
+                normalization. Takes precedence over scale_factors.
             meta_key: Parquet metadata key with JSON payload.
             device: Device hint for downstream usage.
         """
@@ -58,8 +61,14 @@ class ParquetDataset(Dataset):
 
         self.columns = columns
         self.device = device
-        if scale_factors is not None:
-            self.scale_factors = scale_factors
+        if standardise:
+            if standardise_dict is not None:
+                self.standardise = standardise_dict
+            else:
+                self.standardise = self.compute_statistics()
+        else:
+            n_feats = len(self.columns) - 1 if self.columns else 0
+            self.standardise = {"mean": np.zeros(n_feats, dtype=np.float32), "std": np.ones(n_feats, dtype=np.float32)}
 
         series_length = len(pd.read_parquet(self.files[0]))
         self.sample_length = sample_length if sample_length else series_length
@@ -124,14 +133,55 @@ class ParquetDataset(Dataset):
             states_time = states_time[::step]
         
         states = states_time[:, 1:]
-        if self.scale_factors is not None:
-            states = states * self.scale_factors
+
+        states = (states - self.standardise["mean"]) / self.standardise["std"]
+
         states = torch.from_numpy(states).to(dtype=torch.float32)
 
         time = torch.from_numpy(np.round(states_time[:, 0] - states_time[0, 0], 2)).to(dtype=torch.float32)
         meta = self.metas[file_idx].copy()
         meta["idx"] = idx  # Add file index
         return time, states, meta
+
+    def compute_statistics(self) -> None:
+        """Compute per-feature mean and std from a list of parquet files.
+
+        Args:
+
+        Returns:
+            Dict with 'mean' and 'std' arrays of shape (n_features,).
+        """
+        n = 0
+        mean = np.zeros(len(self.columns) - 1, dtype=np.float64)
+        m2 = np.zeros_like(mean)
+
+        for f in self.files:
+            data = pd.read_parquet(f, columns=self.columns).values.astype(np.float64)
+            values = data[:, 1:]
+            for row in values:
+                n += 1
+                delta = row - mean
+                mean += delta / n
+                delta2 = row - mean
+                m2 += delta * delta2
+
+        std = np.sqrt(m2 / n).astype(np.float32)
+        std[std < 1e-8] = 1.0  # avoid division by zero for constant features
+        return {"mean": mean.astype(np.float32), "std": std}
+
+    def inverse_scale(self, states: Tensor) -> Tensor:
+        """Reverse the scaling applied in __getitem__ to recover original values.
+
+        Args:
+            states: Scaled tensor of shape (..., n_features).
+
+        Returns:
+            Tensor in original (unscaled) space.
+        """
+        mean = torch.as_tensor(self.standardise["mean"], dtype=states.dtype, device=states.device)
+        std = torch.as_tensor(self.standardise["std"], dtype=states.dtype, device=states.device)
+        return states * std + mean
+
 
 def prep_batch(batch: Tuple[Tensor, Tensor, Dict[str, Any]], device: str = "cpu") -> Tuple[Tensor, Tensor]:
     """Move batch to device and validate aligned timesteps.

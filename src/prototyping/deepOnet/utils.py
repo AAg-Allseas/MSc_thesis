@@ -48,22 +48,27 @@ class MLPConstructor:
     Attributes:
         layer_sizes: List of layer sizes, including input and output.
         activation: Activation name used between linear layers.
+        dropout: Dropout probability applied after each hidden activation (0.0 = no dropout).
     """
     layer_sizes: list[int]
     activation: str
+    dropout: float = 0.0
 
 
 @dataclass
-class BranchConstructor(MLPConstructor):
+class BranchConstructor:
     """Configuration for a named branch network in MIONet.
 
     Attributes:
+        name: Unique identifier for this branch (used as model attribute name).
         layer_sizes: List of layer sizes, including input and output.
         activation: Activation name used between linear layers.
-        name: Unique identifier for this branch (used as model attribute name).
+        dropout: Dropout probability applied after each hidden activation (0.0 = no dropout).
     """
-
     name: str
+    layer_sizes: list[int]
+    activation: str
+    dropout: float = 0.0
 
 
 @dataclass
@@ -77,6 +82,7 @@ class CNN1DBranchConstructor:
         kernel_sizes: List of kernel sizes per conv layer.
         output_dim: Final output dimension (latent dim).
         activation: Activation name used between layers.
+        dropout: Dropout probability applied after each activation (0.0 = no dropout).
     """
     name: str
     in_channels: int
@@ -84,6 +90,7 @@ class CNN1DBranchConstructor:
     kernel_sizes: list[int]
     output_dim: int
     activation: str = "gelu"
+    dropout: float = 0.0
 
 
 class CNN1D(nn.Module):
@@ -96,6 +103,8 @@ class CNN1D(nn.Module):
         for out_ch, ks in zip(constructor.channels, constructor.kernel_sizes):
             layers.append(nn.Conv1d(in_ch, out_ch, kernel_size=ks, padding=ks // 2))
             layers.append(get_activation(constructor.activation))
+            if constructor.dropout > 0:
+                layers.append(nn.Dropout(constructor.dropout))
             layers.append(nn.MaxPool1d(kernel_size=2))
             in_ch = out_ch
         self.conv = nn.Sequential(*layers)
@@ -131,6 +140,8 @@ class MLP(nn.Module):
         for k in range(len(constructor.layer_sizes) - 2):
             self.net.append(nn.Linear(constructor.layer_sizes[k], constructor.layer_sizes[k+1], bias=True))
             self.net.append(get_activation(constructor.activation))
+            if constructor.dropout > 0:
+                self.net.append(nn.Dropout(constructor.dropout))
 
         self.net.append(nn.Linear(constructor.layer_sizes[-2], constructor.layer_sizes[-1], bias=True))
 
@@ -195,19 +206,23 @@ def prepare_batch(
     # Initial conditions from the first timestep of each sample (first 3 features = positions)
     initial_conditions = samples[:, 0, :].to(device, dtype=torch.float32)
 
+    # Compute fixed t_max from the full time vector before subsampling
+    t_max = ts.max()
+
     if n_samples == -1:
         n_samples = ts.shape[-1]
 
     if ordered:
-        ts = ts[..., :n_samples].to(device)
-        samples = samples[:, :n_samples, :].to(device)
+        idx_0 = torch.randint(0, ts.shape[-1] - n_samples + 1, size=(1,)).item()
+        ts = ts[..., idx_0 : idx_0 + n_samples].to(device)
+        samples = samples[:, idx_0 : idx_0 + n_samples, :].to(device)
+        
     else:
         idx = torch.randperm(ts.size(1))[:n_samples]
         ts = ts[:, idx].to(device)
         samples = samples[:, idx].to(device)
 
-    # Normalize time to [0, 1] so the trunk MLP operates in a reasonable range
-    t_max = ts.max()
+    # Normalize time to [0, 1]
     if t_max > 0:
         ts = ts / t_max
 

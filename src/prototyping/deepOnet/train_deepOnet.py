@@ -124,10 +124,10 @@ def load_samples_sensors(
     files: list[Path],
     sample_length: int,
     feats_sensors: list[str],
-    scales_sensors: np.ndarray,
     feats_samples: list[str],
-    scales_samples: np.ndarray,
     batch_size: int,
+    sample_dt: float=1.0, 
+    scale: bool = True,
     shuffel: bool = True,
 ) -> tuple[ParquetDataset, DataLoader]:
     """Load sensor and sample datasets and create a DataLoader.
@@ -148,12 +148,12 @@ def load_samples_sensors(
     dataset_sensors = ParquetDataset(files, 
                         columns=feats_sensors,
                         sample_length=sample_length,
-                        scale_factors=scales_sensors,
-                        resample_dt=1)
+                        standardise=scale,
+                        resample_dt=sample_dt)
     dataset_samples = ParquetDataset(files, 
                              columns=feats_samples,
                              sample_length=sample_length,
-                             scale_factors=scales_samples,
+                             standardise=scale,
                              )
 
     dataloader = DataLoader(dataset_sensors, batch_size=batch_size, shuffle=shuffel, pin_memory=True)
@@ -169,7 +169,7 @@ if __name__ == "__main__":
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     logger.epoch(f"Running on {device}")
     # Latent dimension (shared by all branch outputs).
-    latent_dim = 250
+    latent_dim = 128
     # Number of features to predict.
     output_dim = 12
 
@@ -178,7 +178,8 @@ if __name__ == "__main__":
         BranchConstructor(
             name="initial_conditions",
             layer_sizes=[12, 100, latent_dim],
-            activation="gelu"
+            activation="gelu",
+            dropout=0.1
         ),
         CNN1DBranchConstructor(
             name="surge_force",
@@ -186,7 +187,8 @@ if __name__ == "__main__":
             channels=[32, 64, 128],
             kernel_sizes=[7, 5, 3],
             output_dim=latent_dim,
-            activation="gelu"
+            activation="gelu",
+            dropout=0.1
         ),
         CNN1DBranchConstructor(
             name="sway_force",
@@ -194,7 +196,8 @@ if __name__ == "__main__":
             channels=[32, 64, 128],
             kernel_sizes=[7, 5, 3],
             output_dim=latent_dim,
-            activation="gelu"
+            activation="gelu",
+            dropout=0.1
         ),
         CNN1DBranchConstructor(
             name="yaw_moment",
@@ -202,12 +205,14 @@ if __name__ == "__main__":
             channels=[32, 64, 128],
             kernel_sizes=[7, 5, 3],
             output_dim=latent_dim,
-            activation="gelu"
+            activation="gelu",
+            dropout=0.1
         ),
     ]
     trunk = MLPConstructor(
         layer_sizes=[1, 125, 250, 250, latent_dim],
-        activation="gelu"
+        activation="gelu",
+        dropout=0.1
     )
         
     mionet = MIONet(branches, trunk, output_dim).to(device)
@@ -224,7 +229,7 @@ if __name__ == "__main__":
     files_testing = find_parquet_files(Path(r"C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\data"),
                                lambda m: m["end_time"] == 10800 and m["timestep"] == 0.05 and m["seed"] > 40)
     
-    sample_length = 20000
+    sample_length = 10000
     logger.epoch(f"Using {len(files_training)} with sample length {sample_length} for training")
     logger.debug(files_training)
 
@@ -237,8 +242,6 @@ if __name__ == "__main__":
         'tau_ext_y',
         'tau_ext_mz'
     ]
-    scales_sensors = np.array([1/75e3, 1/75e3, 1/100e3])
-
     # State samples at original resolution
     feats_samples = [
         'pos_eta_x',
@@ -254,15 +257,14 @@ if __name__ == "__main__":
         'rpm_fixed_ps',
         'rpm_fixed_sb',]
 
-    scales_samples = np.array([1, 1, 1, 1, 1, 1, 1/250, 1/250, 1/250, 1/250, 1/160, 1/160])
 
     n_samples = 2048
-    batch_size = 4
+    batch_size = 16
     n_epochs = 10000
     max_errors = 3
     
-    dataset_training_samples, dataloader_training = load_samples_sensors(files_training, sample_length, feats_sensors, scales_sensors, feats_samples, scales_samples, batch_size)
-    dataset_testing_samples, dataloader_testing = load_samples_sensors(files_testing, sample_length, feats_sensors, scales_sensors, feats_samples, scales_samples, batch_size)
+    dataset_training_samples, dataloader_training = load_samples_sensors(files_training, sample_length, feats_sensors, feats_samples, batch_size, sample_dt=0.5)
+    dataset_testing_samples, dataloader_testing = load_samples_sensors(files_testing, sample_length, feats_sensors, feats_samples, batch_size, sample_dt=0.5)
     
     rng = torch.Generator()
 
