@@ -11,7 +11,7 @@ from torch.utils.data import DataLoader
 from src.prototyping.data_handling import find_parquet_files
 from src.prototyping.dataloader import ParquetDataset
 from src.prototyping.deepOnet.model_deepOnet import MIONet
-from src.prototyping.deepOnet.models import model_2, model_cnn_1
+from src.prototyping.deepOnet.models import model_2, model_cnn_1, model_cnn_2
 from src.prototyping.deepOnet.utils import BranchConstructor, MLPConstructor, prepare_batch
 
 
@@ -54,7 +54,7 @@ def plot_prediction(
         lambda m: m["end_time"] == 10800 and m["timestep"] == 0.05 and m["seed"] > 40
     )
     
-    sample_length = 20000
+    sample_length = 10000
     feats_sensors = ['tau_ext_x', 'tau_ext_y', 'tau_ext_mz']
     scales_sensors = np.array([1/75e3, 1/75e3, 1/100e3])
     feats_samples = [
@@ -67,11 +67,11 @@ def plot_prediction(
 
     dataset_sensors = ParquetDataset(
         files, columns=feats_sensors, sample_length=sample_length,
-        scale_factors=scales_sensors, resample_dt=1
+        standardise=True, resample_dt=0.5
     )
     dataset_samples = ParquetDataset(
         files, columns=feats_samples, sample_length=sample_length,
-        scale_factors=scales_samples
+        standardise=True,
     )
 
     # Get single sample
@@ -126,7 +126,7 @@ def plot_prediction(
 
 if __name__ == "__main__":
     # Example usage
-    checkpoint = r"runs\prototypes\deepOnet\testing\2026-02-18_16-30-21\checkpoints\checkpoint_epoch_1923.pth"
-    model = model_cnn_1()
+    checkpoint = r"runs\prototypes\deepOnet\testing\2026-02-19_09-41-18\checkpoints\checkpoint_epoch_20.pth"
+    model = model_cnn_2()
     fig = plot_prediction(checkpoint, model)
     plt.show()

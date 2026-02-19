@@ -128,3 +128,52 @@ def model_cnn_1() -> MIONet:
     )
     
     return MIONet(branches, trunk, output_dim)
+
+def model_cnn_2() -> MIONet:
+    latent_dim = 128
+    # Number of features to predict.
+    output_dim = 12
+
+
+    branches = [
+        BranchConstructor(
+            name="initial_conditions",
+            layer_sizes=[12, 100, latent_dim],
+            activation="gelu",
+            dropout=0.1
+        ),
+        CNN1DBranchConstructor(
+            name="surge_force",
+            in_channels=1,
+            channels=[32, 64, 128],
+            kernel_sizes=[7, 5, 3],
+            output_dim=latent_dim,
+            activation="gelu",
+            dropout=0.1
+        ),
+        CNN1DBranchConstructor(
+            name="sway_force",
+            in_channels=1,
+            channels=[32, 64, 128],
+            kernel_sizes=[7, 5, 3],
+            output_dim=latent_dim,
+            activation="gelu",
+            dropout=0.1
+        ),
+        CNN1DBranchConstructor(
+            name="yaw_moment",
+            in_channels=1,
+            channels=[32, 64, 128],
+            kernel_sizes=[7, 5, 3],
+            output_dim=latent_dim,
+            activation="gelu",
+            dropout=0.1
+        ),
+    ]
+    trunk = MLPConstructor(
+        layer_sizes=[1, 125, 250, 250, latent_dim],
+        activation="gelu",
+        dropout=0.1
+    )
+        
+    return MIONet(branches, trunk, output_dim)
