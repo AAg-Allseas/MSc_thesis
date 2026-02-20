@@ -9,8 +9,6 @@ Example:
         python -m src.prototyping.deepOnet.train_deepOnet
 """
 import logging
-import os
-import tempfile
 from pathlib import Path
 from typing import Optional
 import mlflow
@@ -25,6 +23,7 @@ from src.prototyping.data_handling import find_parquet_files
 from src.prototyping.dataloader import ParquetDataset
 from src.prototyping.deepOnet.model_deepOnet import MIONet
 from src.prototyping.deepOnet.utils import BranchConstructor, CNN1DBranchConstructor, MLPConstructor, prepare_batch
+from src.utils import save_checkpoint_artifact
 
 logger = logging.getLogger(__name__)
 
@@ -132,32 +131,6 @@ def test(
 
     mean_test_loss = sum(test_losses) / len(test_losses) if test_losses else 0.0
     return global_step, mean_test_loss
-
-
-def save_checkpoint_artifact(
-    model: nn.Module,
-    epoch: int,
-    optimizer: Optional[torch.optim.Optimizer] = None,
-    scheduler: Optional[object] = None,
-) -> None:
-    """Save a model checkpoint as an MLflow artifact.
-
-    Args:
-        model: The model to save.
-        epoch: Current epoch number (used in filename).
-        optimizer: Optional optimizer to save state from.
-        scheduler: Optional scheduler to save state from.
-    """
-    checkpoint = {"epoch": epoch, "model_state_dict": model.state_dict()}
-    if optimizer is not None:
-        checkpoint["optimizer_state_dict"] = optimizer.state_dict()
-    if scheduler is not None:
-        checkpoint["scheduler_state_dict"] = scheduler.state_dict()
-
-    with tempfile.TemporaryDirectory() as tmp:
-        path = os.path.join(tmp, f"checkpoint_epoch_{epoch}.pth")
-        torch.save(checkpoint, path)
-        mlflow.log_artifact(path, artifact_path="checkpoints")
 
 
 def load_samples_sensors(
