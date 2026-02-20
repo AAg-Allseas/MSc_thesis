@@ -231,11 +231,7 @@ def prepare_batch(
     input_dict = {"initial_conditions": initial_conditions}
     for feat, idx in input_features.items():
         input_dict[feat] = sensors[..., idx]
-    x = ({"initial_conditions": initial_conditions,
-          "surge_force": sensors[..., 0],
-          "sway_force": sensors[..., 1],
-          "yaw_moment": sensors[..., 2]},
-          ts)
+    x = (input_dict, ts)
 
     return x, samples, ts
 
