@@ -15,9 +15,19 @@ A discrete time system can analogously be considered in the following form:
 
 As this only depends on the state at the current time, these processes can be considerd as markov processes.
 
-\section{Operator learning}
+In this chapter three approaches to modelling dynamics of nonlinear systems are considered. 
 
-\subsection{Koopman operator theory - 3p}
+\section{State-space models}
+\textcite{guEfficientlyModelingLong2022}, \textcite{guMambaLinearTimeSequence2024}
+
+Not inherintly as suited as the other approaches for nonlinear systems with stochastic loading
+
+\section{Operator learning}
+An approach to modelling dynamics is operator learning. With operator learning, one aims to learn an operator that maps
+one function into another. Two main approaches are covered in this section. First Koopman operators will be discussed
+followed by more general operator learning with DeepONets. 
+
+\subsection{Koopman operator theory}
 Koopman operator theory states that it is possible to represent a nonlinear dynamical system in terms of an
 infinite-dimensioned linear operator acting on a Hilbert space of measurement functions of the state of the system
 \parencite{bruntonDatadrivenScienceEngineering2019}. This was demonstrated by
@@ -267,22 +277,19 @@ referred to as \emph{unstacked} whereas the version with separate branch network
 
 Passing a continous input to a neural network is a challenge. Two approaches that can be used are either a spectral
 decomposition where the coefficients are passed into the network, or by sampling the function at fixed discrete points.
-These discrete samples should be consistent with eachother, as should the spectral method. 
+These discrete samples should be consistent with each other, as should the spectral method. 
 
 \textcite{yeDeepONetBasedUncertainty2023} used the DeepONet architecture to propegate stochastic loading through power
-systems.
-
-- Just used a time trace of the noise as input function \\
-- Branch and trunk are fully connected FFNNs \\
-- Used a constant inital state of the dynamic system \\
+systems. The aim was to learn a surrogate operator to quantify uncertainty on rotor angle trajectories while subject to
+stochastic loads. They used a time trace of an Ornstein-Uhlenbeck process as the input function, with fully connected
+FFNNs for the branch and trunk networks.
 
 \textcite{moyaDeepONetGridUQTrustworthyDeep2022} introduced bayesian DeepONet and probabilistic deepOnet also for power
 systems.
 
-\textcite{jinMIONetLearningMultipleInput2022} introduce MIONet, DeepONet with multiple input functions. 
-
-- Works by having multiple branch networks that output the same dimension
-- Concatenates them as elementwise products into the "Regular" branch output
+\textcite{jinMIONetLearningMultipleInput2022} introduce MIONet, DeepONet with multiple input functions. It works by
+using multiple branch networks that output the same dimension, then concatenating them as elementwise products into the
+regular branch output. 
 
 
 
@@ -454,6 +461,7 @@ hidden dynamics that depend only on the current latent state, rather than on the
 efficient forecasting and simulation without storing past states.
 
 \subsubsection{Latent SDE}
+\label{subsubsec:latentsde}
 The latent SDE method was developed by \textcite{liScalableGradientsStochastic2020} to train neural SDEs. The key
 problem it aims to avoid is the fact that directly fitting an SDE to observed data by maximising the likelyhood often
 causes the learned diffusion to tend to zero. This causes the model to overfit the data. It overcomes this issue by
