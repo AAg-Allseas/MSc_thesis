@@ -3,7 +3,7 @@ name = "msc_thesis_awn_aperghis"
 version = "1.0.0"
 description = "template repository to include overleaf report"
 authors = [{ name = "Albert Aperghis", email = "a.w.n.aperghis@student.tudelft.nl" }]
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.14"
 readme = "README.md"
 classifiers = [
     "Programming Language :: Python :: 3",
@@ -17,9 +17,10 @@ package-mode = false
 dependencies = [
     "diffrax>=0.7.0",
     "matplotlib>=3.10.8",
+    "mlflow>=2.19",
     "numpy>=2.2.6",
     "pandas>=2.3.3",
-    "pyarrow>=23.0.0",
+    "pyarrow>=4.0.0",
     "ruff>=0.15.0",
     "scikit-learn>=1.7.2",
     "snakeviz>=2.2.2",
