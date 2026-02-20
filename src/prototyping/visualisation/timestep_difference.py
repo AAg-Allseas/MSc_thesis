@@ -175,5 +175,101 @@ def compare_timesteps() -> None:
 
         
 
+def plot_cumulative_error_summary() -> None:
+    """Plot final cumulative error vs timestep for pos_eta (mean) and rpm_fixed (mean)."""
+    path = Path(r"C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\data\timestep_convergence")
+    save_path = Path("plots")
+    save_path.mkdir(exist_ok=True)
+    files = list(path.glob("*.parquet"))
+
+    pos_eta_cols = ["pos_eta_x", "pos_eta_y"]
+    rpm_fixed_cols = ["rpm_fixed_ps", "rpm_fixed_sb"]
+    all_cols = pos_eta_cols + rpm_fixed_cols
+
+    # Group files by seed and timestep
+    file_info = {}
+    for file in files:
+        parts = file.stem.split("_")
+        seed = int(parts[-1])
+        timestep = float(parts[-2])
+        if seed not in file_info:
+            file_info[seed] = {}
+        file_info[seed][timestep] = file
+
+    baseline_dt = 0.01
+
+    # Collect final cumulative errors per timestep per column per seed
+    # {timestep: {col: [final_cumulative_error_per_seed]}}
+    final_errors: dict[float, dict[str, list[float]]] = {}
+
+    for seed, seed_files in file_info.items():
+        if baseline_dt not in seed_files:
+            continue
+
+        baseline = pd.read_parquet(seed_files[baseline_dt], columns=["time"] + all_cols)
+
+        for dt, file in seed_files.items():
+            if dt == baseline_dt:
+                continue
+
+            df = pd.read_parquet(file, columns=["time"] + all_cols)
+            merged = pd.merge(baseline, df, on="time", suffixes=("_baseline", "_df"))
+
+            if dt not in final_errors:
+                final_errors[dt] = {col: [] for col in all_cols}
+
+            for col in all_cols:
+                col_b, col_d = f"{col}_baseline", f"{col}_df"
+                if col_b in merged.columns and col_d in merged.columns:
+                    error = np.abs(merged[col_d] - merged[col_b])
+                    cumulative = (error * merged["time"].diff().fillna(0)).cumsum()
+                    final_errors[dt][col].append(cumulative.iloc[-1])
+
+    sorted_timesteps = sorted(final_errors.keys())
+
+    # --- Figure 1: pos_eta mean ---
+    fig1, ax1 = plt.subplots(figsize=(6, 4))
+    means, stds = [], []
+    for dt in sorted_timesteps:
+        col_means = [np.mean(final_errors[dt][col]) for col in pos_eta_cols]
+        col_stds = [np.std(final_errors[dt][col]) for col in pos_eta_cols]
+        means.append(np.mean(col_means))
+        stds.append(np.mean(col_stds))
+    means, stds = np.array(means), np.array(stds)
+    ax1.plot(sorted_timesteps, means, marker='o', linewidth=2)
+    ax1.fill_between(sorted_timesteps, means - stds, means + stds, alpha=0.2)
+    ax1.set_xlabel("Timestep (s)")
+    ax1.set_ylabel("Final Cumulative Error")
+    ax1.set_title(r"$\eta$ (Position)")
+    ax1.set_xscale('log')
+    ax1.set_yscale('log')
+    ax1.grid(True, alpha=0.3)
+    fig1.tight_layout()
+    fig1.savefig(save_path / "cumulative_error_pos_eta.png", dpi=300)
+
+    # --- Figure 2: rpm_fixed mean ---
+    fig2, ax2 = plt.subplots(figsize=(6, 4))
+    means, stds = [], []
+    for dt in sorted_timesteps:
+        col_means = [np.mean(final_errors[dt][col]) for col in rpm_fixed_cols]
+        col_stds = [np.std(final_errors[dt][col]) for col in rpm_fixed_cols]
+        means.append(np.mean(col_means))
+        stds.append(np.mean(col_stds))
+    means, stds = np.array(means), np.array(stds)
+    ax2.plot(sorted_timesteps, means, marker='o', linewidth=2)
+    ax2.fill_between(sorted_timesteps, means - stds, means + stds, alpha=0.2)
+    ax2.set_xlabel("Timestep (s)")
+    ax2.set_ylabel("Final Cumulative Error")
+    ax2.set_title("RPM of Fixed thrusters")
+    ax2.set_xscale('log')
+    ax2.set_yscale('log')
+    ax2.grid(True, alpha=0.3)
+    fig2.tight_layout()
+    fig2.savefig(save_path / "cumulative_error_rpm_fixed.png", dpi=300)
+
+    plt.show()
+
+
 if __name__ == "__main__":
     compare_timesteps()
+    plot_cumulative_error_summary()

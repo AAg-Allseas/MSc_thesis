@@ -180,3 +180,4 @@ class LatentSDE(torchsde.SDEIto):
         # Most of the times in ML, we don't sample the observation noise for visualization purposes.
         _xs = self.projector(zs)
         return _xs
+    

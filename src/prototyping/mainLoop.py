@@ -78,7 +78,7 @@ def simulate(N: int,
         #     vessel.thrusterFailure(5) # Thruster failure of main propeller
     save_df_to_parquet(df, 
                        metadata=meta,
-                       path=Path(r"C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\data"))    
+                       path=Path(r"C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\data\1_dof"))    
 
 def R2D(value):  # radians to degrees
     return value * 180 / np.pi
@@ -100,7 +100,9 @@ def run_sim(seed: int,
 
     # Initial condition
     x_0, y_0 = rng.uniform(low=-3, high=3, size=2)
-    psi_0 = rng.uniform(low=-0.15, high=0.15)
+    y_0 = 0
+    # psi_0 = rng.uniform(low=-0.15, high=0.15)
+    psi_0=0
     pos_0 = (x_0, y_0, psi_0)
     vessel.eta[0] = x_0
     vessel.eta[1] = y_0
@@ -133,12 +135,13 @@ if __name__ == "__main__":
     sampleTime = 0.05 # Seconds [s]
 
     # Number of runs and seeds
-    seeds = range(0, 50)
+    seeds = range(0, 100)
 
     # External forces
-    mu_f = np.array([75e3, 75e3, 100e3])  # Mean
-    sigma_f = np.array([50e3, 50e3, 50e3])  # Variance
+    mu_f = np.array([75e3, 0, 0])  # Mean
+    sigma_f = np.array([50e3, 0, 0])  # Variance
 
+    start_time = time.time_ns()
     with futures.ProcessPoolExecutor() as pool:
         fs = []
         for seed in seeds:
@@ -157,3 +160,5 @@ if __name__ == "__main__":
                 future.result()
             except Exception as e:
                 print(f"Error in worker: {e}")
+    
+    print(f"Total time taken: {(time.time_ns()-start_time)/1e9:.3f}s")

@@ -18,26 +18,26 @@ def resample_from_base(x_base: np.ndarray,
 
 def ou_generate_uniform(N: int,
                         dt: float,
-                        kappa: float=0.01,
+                        theta: float=0.01,
                         mu: np.ndarray=np.zeros(3),
                         sigma: np.ndarray=np.zeros(3),
                         x0: Optional[np.ndarray]=None,
                         rng: Optional[np.random.Generator]=None) -> np.ndarray:
     """
     Exact OU discretization on a uniform grid.
-    SDE: dX = kappa*(mu - X) dt + sigma dW
+    SDE: dX = theta*(mu - X) dt + sigma dW
     Returns array of length N+1 (including initial value at t=0).
     """
     if rng is None:
         rng = np.random.default_rng()
     if x0 is None:
         # draw from stationary distribution for warm start
-        x0 = mu + rng.normal(scale=sigma / np.sqrt(2.0 * kappa), size=3)
+        x0 = mu + rng.normal(scale=sigma / np.sqrt(2.0 * theta), size=3)
     x = np.empty([N + 2, 3], dtype=float)
     x[0, :] = x0
 
-    phi = np.exp(-kappa * dt)                 # AR coefficient
-    q = sigma * np.sqrt((1.0 - phi**2) / (2.0 * kappa))  # noise std
+    phi = np.exp(-theta * dt)                 # AR coefficient
+    q = sigma * np.sqrt((1.0 - phi**2) / (2.0 * theta))  # noise std
 
     z = rng.normal(size=N+1)
     for n in range(N + 1):
