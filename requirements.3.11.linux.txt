@@ -291,9 +291,7 @@ python-dotenv==1.2.1
 pytz==2025.2
     # via pandas
 pywin32==306
-    # via
-    #   msc-thesis-awn-aperghis (pyproject.toml)
-    #   docker
+    # via docker
 pyyaml==6.0.3
     # via mlflow-skinny
 pyzmq==27.1.0
