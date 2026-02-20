@@ -180,4 +180,18 @@ The second approach tested was the DeepONet. For these tests the multiple input 
 \textcite{moyaDeepONetgridUQTrustworthyDeep2023} in their work on uncertainty quantification with DeepONets.
 
 \subsection{Architecture}
+\TODO{Update with regards to 1 or 3DOF, depending on what works}
+The MIONet approach uses a separate branch network per input function. The inputs used are the external stochastic force
+and an initial position. The branch nets consist of two types. The initial condition is encoded using two linear layers,
+whereas the force traces are encoded using 1 dimensional convolutional layers. \Cref{fig:mionet_architecture} gives a
+graphical representation as well as the dimensions of each layer.
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{report/images/diagrams/3dof_mionet.pdf}
+    \caption{MIONet architecture used}
+    \label{fig:mionet_architecture}
+\end{figure}
+
+Each convolutional layer in \cref{fig:mionet_architecture} consists of a convolution, a dropout layer and a max pool
+layer with a kernal size of 2. All the layers used the GeLu activation function. 
