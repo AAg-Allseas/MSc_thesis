@@ -30,6 +30,7 @@ dependencies = [
     "torchsde>=0.2.6",
     "torchvision>=0.25.0",
     "tqdm>=4.67.3",
+    'pywin32==306; platform_system == "Windows"',
 ]
 
 [tool.uv]
