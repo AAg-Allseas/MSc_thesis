@@ -32,7 +32,6 @@ dependencies = [
     "tqdm>=4.67.3",
     'pywin32==306; platform_system == "Windows"',
 ]
-
 [tool.uv]
 package = false
 
