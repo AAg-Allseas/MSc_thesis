@@ -32,6 +32,7 @@ def train(
     model: nn.Module,
     dataloader: DataLoader,
     dataset_samples: ParquetDataset,
+    input_features: dict[str, int],
     optimiser: torch.optim.Optimizer,
     loss_fn: nn.Module,
     device: torch.device,
@@ -62,10 +63,13 @@ def train(
     """
     model.train()
     error_count = 0
-    for batch in dataloader:
+    n_batches = len(dataloader)
+    log_interval = n_batches // 3
+
+    for i, batch in enumerate(dataloader):
         optimiser.zero_grad()
                 
-        x, samples, _ = prepare_batch(batch, dataset_samples, n_samples=n_samples, device=device)
+        x, samples, _ = prepare_batch(batch, dataset_samples, input_features,  n_samples=n_samples, device=device)
         loss = loss_fn(model(x), samples)
 
         # Early detection of numerical instability
@@ -80,8 +84,9 @@ def train(
         torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
 
         optimiser.step()
+        if i % log_interval == 0:
+            mlflow.log_metric("batch_train_loss", loss.item(), step=global_step)
 
-        mlflow.log_metric("batch_train_loss", loss.item(), step=global_step)
         global_step += 1
 
         if not isinstance(lr_scheduler, torch.optim.lr_scheduler.ReduceLROnPlateau):
@@ -94,6 +99,7 @@ def test(
     model: nn.Module,
     dataloader: DataLoader,
     dataset_samples: ParquetDataset,
+    input_features: dict[str, int], 
     loss_fn: nn.Module,
     device: torch.device,
     n_samples: int,
@@ -115,10 +121,12 @@ def test(
     """
     model.eval()
     test_losses: list[float] = []
-    
+    n_batches = len(dataloader)
+    log_interval = n_batches // 3
+
     with torch.no_grad():
-        for batch in dataloader:
-            x, samples, _ = prepare_batch(batch, dataset_samples, n_samples=n_samples, device=device)
+        for i, batch in enumerate(dataloader):
+            x, samples, _ = prepare_batch(batch, dataset_samples, input_features, n_samples=n_samples, device=device)
             loss = loss_fn(model(x), samples)
             
             if not torch.isfinite(loss):
@@ -126,7 +134,9 @@ def test(
                 continue
             
             test_losses.append(loss.item())
-            mlflow.log_metric("batch_test_loss", loss.item(), step=global_step)
+            if i % log_interval == 0:
+                mlflow.log_metric("batch_test_loss", loss.item(), step=global_step)
+
             global_step += 1
 
     mean_test_loss = sum(test_losses) / len(test_losses) if test_losses else 0.0
@@ -254,12 +264,18 @@ if __name__ == "__main__":
         'rpm_stern_aft',
         'rpm_fixed_ps',
         'rpm_fixed_sb',]
+    
+    input_features = {"surge_force": 0,
+                      "surge_force": 1,
+                      "yaw_moment": 2}
 
     n_samples = 2048
     batch_size = 16
     n_epochs = 10000
     max_errors = 3
     
+
+
     dataset_training_samples, dataloader_training = load_samples_sensors(files_training, sample_length, feats_sensors, feats_samples, batch_size, sample_dt=0.5)
     dataset_testing_samples, dataloader_testing = load_samples_sensors(files_testing, sample_length, feats_sensors, feats_samples, batch_size, sample_dt=0.5)
 
@@ -300,8 +316,8 @@ if __name__ == "__main__":
 
         try:
             for epoch in tqdm.tqdm(range(n_epochs)):
-                global_train_step = train(mionet, dataloader_training, dataset_training_samples, optimiser, loss_fn, device, n_samples, max_errors, scheduler, global_step=global_train_step)
-                global_test_step, mean_test_loss = test(mionet, dataloader_testing, dataset_testing_samples, loss_fn, device, n_samples, global_step=global_test_step)
+                global_train_step = train(mionet, dataloader_training, dataset_training_samples, input_features, optimiser, loss_fn, device, n_samples, max_errors, scheduler, global_step=global_train_step)
+                global_test_step, mean_test_loss = test(mionet, dataloader_testing, dataset_testing_samples, input_features, loss_fn, device, n_samples, global_step=global_test_step)
 
                 if epoch == warmup_epochs:
                     scheduler = plateau_scheduler

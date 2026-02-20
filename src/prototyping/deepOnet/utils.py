@@ -163,6 +163,7 @@ class MLP(nn.Module):
 def prepare_batch(
     batch: tuple[Tensor, Tensor, Dict[str, Any]],
     sample_dataset: ParquetDataset,
+    input_features: dict[str, int],
     n_samples: int = -1,
     ordered: bool = False,
     device: torch.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu'),
@@ -175,6 +176,8 @@ def prepare_batch(
     Args:
         batch: Tuple of (unused, sensors, metadata) from the DataLoader.
         sample_dataset: Dataset providing target samples at full resolution.
+        input_features: dictionary of strings defining the names of the input features and their corresponding index in the state vector. 
+                        Initial conditions are added automatically.
         n_samples: Number of time samples to use (-1 for all).
         ordered: If True, take first n_samples; if False, randomly permute.
         device: Torch device to move tensors to.
@@ -225,7 +228,9 @@ def prepare_batch(
     # Normalize time to [0, 1]
     if t_max > 0:
         ts = ts / t_max
-
+    input_dict = {"initial_conditions": initial_conditions}
+    for feat, idx in input_features.items():
+        input_dict[feat] = sensors[..., idx]
     x = ({"initial_conditions": initial_conditions,
           "surge_force": sensors[..., 0],
           "sway_force": sensors[..., 1],
