@@ -11,7 +11,7 @@ from torch.utils.data import DataLoader
 from src.prototyping.data_handling import find_parquet_files
 from src.prototyping.dataloader import ParquetDataset
 from src.prototyping.deepOnet.model_deepOnet import MIONet
-from src.prototyping.deepOnet.models import model_2, model_cnn_1, model_cnn_2
+from src.prototyping.deepOnet.models import model_1dof, model_2, model_cnn_1, model_cnn_2
 from src.prototyping.deepOnet.utils import BranchConstructor, MLPConstructor, prepare_batch
 
 
@@ -22,6 +22,7 @@ def plot_prediction(
     data_path: Optional[str | Path] = None,
     sample_idx: int = 0,
     device: Optional[torch.device] = None,
+    max_plot_points: int = 2000,
 ) -> plt.Figure:
     """Plot model prediction vs ground truth for all features.
 
@@ -30,6 +31,7 @@ def plot_prediction(
         data_path: Path to data directory. Defaults to standard location.
         sample_idx: Index of sample in the dataset to plot.
         device: Torch device. Defaults to CUDA if available.
+        max_plot_points: Maximum number of points to plot (downsamples if needed).
 
     Returns:
         Matplotlib figure with prediction and ground truth for all features.
@@ -55,15 +57,11 @@ def plot_prediction(
     )
     
     sample_length = 10000
-    feats_sensors = ['tau_ext_x', 'tau_ext_y', 'tau_ext_mz']
-    scales_sensors = np.array([1/75e3, 1/75e3, 1/100e3])
+    feats_sensors = ['tau_ext_x']
     feats_samples = [
-        'pos_eta_x', 'pos_eta_y', 'pos_eta_mz',
-        'pos_nu_x', 'pos_nu_y', 'pos_nu_mz',
-        'rpm_bow_fore', 'rpm_bow_aft', 'rpm_stern_fore', 'rpm_stern_aft',
-        'rpm_fixed_ps', 'rpm_fixed_sb',
+        'pos_eta_x'
     ]
-    scales_samples = np.array([1, 1, 1, 1, 1, 1, 1/250, 1/250, 1/250, 1/250, 1/160, 1/160])
+
 
     dataset_sensors = ParquetDataset(
         files, columns=feats_sensors, sample_length=sample_length,
@@ -83,7 +81,7 @@ def plot_prediction(
         
         with torch.no_grad():
             x, samples, ts = prepare_batch(
-                batch, dataset_samples, n_samples=-1, ordered=True, device=device
+                batch, dataset_samples, n_samples=-1, ordered=True, device=device, input_features = {"surge_force": 0}
             )
             predictions = model(x)
         
@@ -91,6 +89,20 @@ def plot_prediction(
         ts_np = ts.squeeze().cpu().numpy()
         pred_np = predictions.squeeze().cpu().numpy()
         true_np = samples.squeeze().cpu().numpy()
+        
+        # Downsample if necessary to avoid memory issues
+        n_points = len(ts_np)
+        if n_points > max_plot_points:
+            step = n_points // max_plot_points
+            ts_np = ts_np[::step]
+            pred_np = pred_np[::step]
+            true_np = true_np[::step]
+        
+        # Ensure arrays are 2D (add feature dimension if needed)
+        if pred_np.ndim == 1:
+            pred_np = pred_np[:, np.newaxis]
+        if true_np.ndim == 1:
+            true_np = true_np[:, np.newaxis]
         
         # Create subplot grid for all features
         n_features = pred_np.shape[-1]
@@ -125,8 +137,18 @@ def plot_prediction(
 
 
 if __name__ == "__main__":
+    # Use non-interactive backend to avoid tkinter memory issues
+    import matplotlib
+    matplotlib.use('Agg')  # Use non-interactive backend
+    
     # Example usage
-    checkpoint = r"runs\prototypes\deepOnet\testing\2026-02-19_10-11-51\checkpoints\checkpoint_epoch_300.pth"
-    model = model_cnn_2()
+    checkpoint = r"C:/Soft_dev/MSc_thesis/mlruns/2/ddca770c0b4543b9b18767153482c299/artifacts/checkpoints/checkpoint_epoch_4900.pth"
+    model = model_1dof()
     fig = plot_prediction(checkpoint, model, sample_idx=10)
-    plt.show()
+    
+    # Save to file instead of showing interactively
+    output_path = Path(r"C:/Soft_dev/MSc_thesis/plots/deeponet_prediction.png")
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(output_path, dpi=100, bbox_inches='tight')
+    print(f"Plot saved to {output_path}")
+    plt.close(fig)

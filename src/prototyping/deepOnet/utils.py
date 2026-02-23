@@ -37,9 +37,19 @@ def get_activation(identifier: str) -> nn.Module:
             "Rrelu": nn.RReLU(),
             "gelu": nn.GELU(),
             "silu": nn.SiLU(),
+            "sin": sin_act(),
             "Mish": nn.Mish(),
             "identity": nn.Identity(),
     }[identifier]
+
+# sin activation function
+class sin_act(nn.Module):
+    def __init__(self):
+        super(sin_act, self).__init__()
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return torch.sin(x)
+
 
 @dataclass
 class MLPConstructor:
@@ -105,7 +115,6 @@ class CNN1D(nn.Module):
             layers.append(get_activation(constructor.activation))
             if constructor.dropout > 0:
                 layers.append(nn.Dropout(constructor.dropout))
-            layers.append(nn.MaxPool1d(kernel_size=2))
             in_ch = out_ch
         self.conv = nn.Sequential(*layers)
         self.pool = nn.AdaptiveAvgPool1d(1)
