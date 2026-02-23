@@ -3,24 +3,24 @@ Based on the literature, neural SDEs and DeepONet appear to be promising methods
 system. Their ability to capture the stochastic dynamics are evaluated with a toy DP model. 
 
 Both experiments in this chapter were conducted on a local Windows machine equipped with an Intel Core i7-13850HX (13th
-generation) CPU featuring 20 physical cores and 28 logical processors at a base frequency of 2.10-GHz. The system
+generation) CPU featuring 20 physical cores and 28 logical processors at a base frequency of 2.10 GHz. The system
 included 64 GB of RAM and a NVIDIA RTX 3500 Ada Generation Laptop GPU with 12 GB of dedicated VRAM. Model training was
 performed using PyTorch 2.1.0 with CUDA 12.8.
 
-\section{Toy model}
+\section{Toy Model}
 The toy model used is based on the Python Vehicle Simulator developed by \textcite{FossenPythonVehicleSimulator2021}.
 The vessel used is a supply vessel based on the M/V Far Scandia
-\textcite{fossenIdentificationDynamicallyPositioned1996}. This model was used to generate training data for the neural
-SDE and DeepONet tests. The vessel is a 76.2m long supply vessel. It features two bow tunnel thrusters, two stern tunnel
-thrusters and two fixed main propellers. 
+\parencite{fossenIdentificationDynamicallyPositioned1996}. This model was used to generate training data for the neural
+SDE and DeepONet tests. The vessel is a 76.2 m long supply vessel. It features two bow tunnel thrusters, two stern tunnel
+thrusters, and two fixed main propellers. 
 
-The dynamics model used is a linear version of \eqref{eq:general_eq_motion}. 
+The dynamics model used is a linear version of \eqref{eq:general_eq_motion}.
 
 \begin{equation}
     (M + M_A) \dot{\nu} + D \nu = \tau
 \end{equation}
 
-The control force is given by a PID controller with a low pass filter over the setpoint to avoid agressive control
+The control force is given by a PID controller with a low pass filter over the setpoint to avoid aggressive control
 actions.  The PID gains are determined using a pole placement method \parencite{fossenHandbookMarineCraft2014}. These
 are determined as follows:
 
@@ -32,11 +32,11 @@ are determined as follows:
     \end{aligned}
 \end{equation}
 
-Where \(M\), \(D\) are the mass and linear damping matrices respecively, and \(\zeta\) and \(\omega_n\) are design
+Where \(M\), \(D\) are the mass and linear damping matrices respectively, and \(\zeta\) and \(\omega_n\) are design
 parameters corresponding to the desired response of the ship. 
 
 The control force is allocated through a Moore-Penrose pseudoinverse to the thrusters, after which saturation
-and rate limitations are applied. Saturation is modelled as a cap on the thruster revolutions and the rate limitations
+and rate limitations are applied. Saturation is modelled as a cap on the thruster revolutions, and the rate limitations
 are linear. A delay in response is not considered. 
 
 Environmental forcing has been added to the model using an Ornstein-Uhlenbeck (OU) process. This can be characterised by a
@@ -46,9 +46,9 @@ stochastic differential equation of the following form:
     dX_t = \theta (\mu - X_t)dt + \sigma dW_t
 \end{equation}
 
-Where \(\mu\) is the long term mean of the process, \(\theta\) is the mean reversion rate and \(\sigma\) is the
-diffusion coefficent. \(dW_t\) is an increment of the Wiener process,  which is sampled from a gaussian distribution
-\(dW_t \sim (0, dt)\). Trajectories from the process can be obtained by sampling a series brownian increments and
+Where \(\mu\) is the long-term mean of the process, \(\theta\) is the mean reversion rate, and \(\sigma\) is the
+diffusion coefficient. \(dW_t\) is an increment of the Wiener process, which is sampled from a Gaussian distribution
+\(dW_t \sim (0, dt)\). Trajectories from the process can be obtained by sampling a series of Brownian increments and
 integrating through time with an Euler-Maruyama scheme. 
 
 \begin{figure}[H]
@@ -66,14 +66,14 @@ integrating through time with an Euler-Maruyama scheme.
     \label{fig:timestep_difference}
 \end{figure}
 
-Time integration is done with a forward Euler scheme. The sensitivity of the model to timestep difference was
-investigated. As a metric the cumulative error between a benchmark timestep of \(0.01s\) was taken. Runs of \(1000 
-s\) were used with 10 realisations of the stochastic forcing. Between timesteps the forcing was kept the same. As shown
+Time integration is done with a forward Euler scheme. The sensitivity of the model to timestep differences was
+investigated. As a metric, the cumulative error between a benchmark timestep of \(0.01 s\) was taken. Runs of \(1000 s\) 
+were used with 10 realisations of the stochastic forcing. Between timesteps, the forcing was kept the same. As shown
 in \cref{fig:timestep_difference}, the position error is not sensitive to the timestep, whereas the thruster RPMs are
-much more sensitive. For clarity, only the fixed thrusters are shown but the bow thrusters follow the same trend. A
+much more sensitive. For clarity, only the fixed thrusters are shown, but the bow thrusters follow the same trend. A
 timestep of \(0.05 s\) is chosen to generate the training data.
 
-To generate the training data, 50 realisations of brownian motion were generated. The parameters used to generate the
+To generate the training data, 50 realisations of Brownian motion were generated. The parameters used to generate the
 external forces with the OU process are shown in \cref{tab:ou-params_pilot_test}.
 
 \begin{table}[htbp]
@@ -91,58 +91,58 @@ external forces with the OU process are shown in \cref{tab:ou-params_pilot_test}
     \label{tab:ou-params_pilot_test}
 \end{table}
 
-The initial position of the vessel is determined through a uniform sampling between \(\pm 3m\) for surge and sway and
+The initial position of the vessel is determined through uniform sampling between \(\pm 3 m\) for surge and sway and
 \(\pm 0.15 rad\) for the yaw angle. The initial actuator actions are the result of the controller and thrust allocation
-for the corresponding starting position. 
+for the corresponding starting position.
 
-The simulations were run for 3 simulated hours, corresponding to 216000 timesteps. The process took 281.9 seconds, or
-4.68 minutes. The runs were parallised on the computer's CPU with 28 processes. 
+The simulations were run for 3 simulated hours, corresponding to 216,000 timesteps. The process took 281.9 seconds, or
+4.68 minutes. The runs were parallelised on the computer's CPU with 28 processes. 
 
 \section{LatentSDE}
-The first approach tested were neural SDEs. The LatentSDE method for training was chosen as this is simpler to train
+The first approach tested was neural SDEs. The LatentSDE method for training was chosen, as this is simpler to train
 than the SDE-GAN approach \parencite{kidgerNeuralDifferentialEquations2022}. The TorchSDE package was used for these
 initial tests. 
 
 \subsection{Architecture}
-The latent SDE consists of 5 neural networks: A prior drift network, a posterior drift network, a shared diffusion
-network, an encoder for the measurements and a decoder from the latent space to measurement space. 
+The latent SDE consists of 5 neural networks: a prior drift network, a posterior drift network, a shared diffusion
+network, an encoder for the measurements, and a decoder from the latent space to measurement space. 
 
 The prior and posterior drift networks both consist of 3 linear layers, mapping a latent vector of dimension 4 into a
 hidden dimension of 128. The activation function used between the linear layers is LipSwish
-\parencite{kidgerNeuralDifferentialEquations2022}, a Lipschitz continuous version of Swish or SiLU. A final hyperbolic
+\parencite{kidgerNeuralDifferentialEquations2022}, a Lipschitz-continuous version of Swish or SiLU. A final hyperbolic
 tangent activation was used to prevent the latent space from exploding during training
-\parencite{kidgerNeuralSDEsInfiniteDimensional2021}. The posterior differs to the prior in that its input is
+\parencite{kidgerNeuralSDEsInfiniteDimensional2021}. The posterior differs from the prior in that its input is
 concatentated with a context vector of 64 that encodes the measurements.
 
-The drift nework is shared between the prior and posterior. As per the example provided in the TorchSDE, this is
+The diffusion network is shared between the prior and posterior. As per the example provided in the TorchSDE, this is
 implemented as a set of neural networks that result in a diagonal additive noise. Between the layers LipSwish is used
-and a sigmoid function is used on the output. 
+and a sigmoid function is used on the output.
 
 The measurements are encoded using the encoder network. This consists of a gated recurrent unit (GRU) that takes the
 entire time series of measured states and outputs a vector of 128 at every timestep. This is then passed through
 a linear layer to make a context vector of 64 at each timestep.
 
 The decoder is a single fully connected layer taking the latent vector of dimension 4 and mapping it to the state. The
-state used is 12 dimensional. The values considered are \(\eta\), \(\nu\) and the thruster RPMs. 
+state used is 12 dimensional. The values considered are \(\eta\), \(\nu\), and the thruster RPMs.
 
 The initial state and observation noise distribution are also set as learnable parameters.
 
-\subsection{Training}
+{{\subsection{Training}
 The training is performed using the latentSDE approach developed by \textcite{liScalableGradientsStochastic2020} and
 explained in \cref{subsubsec:latentsde}. During the forward pass of the network, an initial state is sampled. The
-observation series is encoded. The posterior and prior networks are then integrated over time with an SDE solver and
+observation series is encoded. The posterior and prior networks are then integrated over time with an SDE solver, and
 their adjoints are solved. The KL-divergence loss between the prior and posterior is calculated by augmenting the latent
 state.
 
-The SDE integration results in a generated series of latent vectors. These are passed through the decoder nework. A
+The SDE integration results in a generated series of latent vectors. These are passed through the decoder network. A
 likelihood loss is then calculated between the generated series and the measured series. An additional KL-divergence
 loss is calculated between the model's initial state and the data's initial state. The data's initial state is mapped
 to a distribution in the latent space.
 
 Training is done with the Adam optimiser. An exponential learning rate schedule was used with an initial rate of 0.005
 and a decay ratio of 0.997. A linear KL schedule was used to ramp up the effect of the KL loss from 0 to full over 1000
-epochs. Training was set to run over a period of 5000 epochs. A timestep of 0.05 was used for the SDE integration and a
-period of 250 seconds was used, equating to series of length 5000. A single file was used, resulting in a training set
+epochs. Training was set to run over 5000 epochs. A timestep of 0.05 was used for the SDE integration, and a
+period of 250 seconds was used, equating to a series of length 5000. A single file was used, resulting in a training set
 of 40 time traces.
 
 \subsection{Evaluation}
@@ -162,28 +162,28 @@ this integration period. Some of the traces exhibit expected behavior of a DP sy
 
 There are several caveats. The reconstructed traces are generated from the prior network. The model training was stopped
 after 492 epochs, meaning the contribution of the KL loss was not fully included yet. As the KL loss is the primary loss
-driving the training of the prior, the prior has not been trained to the extent of the posterior. The second is that the
-training took a very long time for the size of the training set and the lenght of the timeseries. 
+driving the training of the prior, the prior has not been trained to the same extent as the posterior. Second, the
+training took a very long time for the size of the training set and the length of the time series.
 
 Inference of the model also took a significant amount of time. For the five traces shown in
 \cref{fig:pilot_latentsde_generation}, TorchSDE took 937 seconds. A manual test was performed to investigate the cause.
-An Euler-Maruyama integration loop was setup and the model's prior diffusion network and drift network were sampled
-directly. The test was run for the same size and length as the toy model training data: 50 batches for 10800 seconds
-with a timestep of 0.05s. The result was the model taking 161 seconds to complete the run. This was performed with a
-single CPU core with the models running parallel on the GPU. As such the time increase with respect to an increased
-batch size does not increase linearly. The cause of the speed difference between torchSDE and the manual approach is
-unknown at the time of writing. Overall, the manual test showed a speed increase of 1.75x with regards to the toy model.
+An Euler-Maruyama integration loop was set up, and the model's prior diffusion network and drift network were sampled
+directly. The test was run for the same size and length as the toy model training data: 50 batches for 10,800 seconds
+with a timestep of 0.05 s. The result was the model taking 161 seconds to complete the run. This was performed with a
+single CPU core, with the models running in parallel on the GPU. As such, the time increase with respect to an increased
+batch size does not increase linearly. The cause of the speed difference between TorchSDE and the manual approach is
+unknown at the time of writing. Overall, the manual test showed a speed increase of 1.75x with respect to the toy model.
 
 \section{DeepONet}
-The second approach tested was the DeepONet. For these tests the multiple input operator network described in
+The second approach tested was DeepONet. For these tests, the multiple input operator network described in
 \textcite{jinMIONetLearningMultipleInput2022} is used. The networks are built upon the PyTorch implementation used by
 \textcite{moyaDeepONetgridUQTrustworthyDeep2023} in their work on uncertainty quantification with DeepONets.
 
 \subsection{Architecture}
-\TODO{Update with regards to 1 or 3DOF, depending on what works}
+\TODO{Update with regards to 1 or 3 DOF, depending on what works}
 The MIONet approach uses a separate branch network per input function. The inputs used are the external stochastic force
-and an initial position. The branch nets consist of two types. The initial condition is encoded using two linear layers,
-whereas the force traces are encoded using 1 dimensional convolutional layers. \Cref{fig:mionet_architecture} gives a
+and an initial position. The branch nets consist of two types: the initial condition is encoded using two linear layers,
+whereas the force traces are encoded using 1-dimensional convolutional layers. \Cref{fig:mionet_architecture} gives a
 graphical representation as well as the dimensions of each layer.
 
 \begin{figure}[H]
@@ -193,5 +193,5 @@ graphical representation as well as the dimensions of each layer.
     \label{fig:mionet_architecture}
 \end{figure}
 
-Each convolutional layer in \cref{fig:mionet_architecture} consists of a convolution, a dropout layer and a max pool
-layer with a kernal size of 2. All the layers used the GeLu activation function. 
+Each convolutional layer in \cref{fig:mionet_architecture} consists of a convolution, a dropout layer, and a max pool
+layer with a kernel size of 2. All the layers used the GELU activation function.

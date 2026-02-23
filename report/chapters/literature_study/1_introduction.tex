@@ -12,7 +12,7 @@ between environmental loads and thruster forces, neglecting any dynamics of the 
 
 When making decisions on board, dynamic positioning operators (DPOs) make use of activity specific operating guidelines
 (ASOGs) \parencites{ASOGDecisionSupport2022}{baillyguimaeraesCAMOASOGNaval2023}. These ASOGs contain requirements for
-hen to cease operations, based on power consumption limits. These limits are calculated using a quasi-static approach
+when to cease operations, based on power consumption limits. These limits are calculated using a quasi-static approach
 and do not consider behaviour such as transients in the case of a thruster failing.
 
 Recently, more attention has started going to the use of time-domain simulations to predict dynamic positioning
@@ -56,9 +56,9 @@ difference of \qty{10}{\%} between the experimental data and their simulations. 
 increased accuracy of the time domain approach as opposed to the quasi-static approach, \qty{10}{\%} is still a large
 margin for operational decision making.
 
-Researchers from the Maritime Research Institite Netherlands (MARIN) also developed a time domain DP simulator
+Researchers from the Maritime Research Institute Netherlands (MARIN) also developed a time domain DP simulator
 \parencite{serrarisDPStationkeepingAccuracy2017}. In their paper they highlight that while static DP solvers are useful
-when estimating the ultimimate capability of a ship, they are unable to say anything about the accuracy of the DP
+when estimating the ultimate capability of a ship, they are unable to say anything about the accuracy of the DP
 system. In many operations, such as crane operations, pipelay, drilling or crew transfers
 \parencites{tannuriUtilizationNumericalSimulation2011}{serrarisDPStationkeepingAccuracy2017}{theilenNumericalSimulationShip2024},
 the maximum excursion can be a limiting factor much before the total power consumption. In 2025, the International
@@ -68,26 +68,27 @@ where the footprint is critical, reinforcing the statement from \textcite{serrar
 
 By using time-domain simulations rather than a quasi-static force balance, more information can be used to determine the
 operational limits. These could be defined as the maximum excursion over three hours
-\parencite{AssessmentStationKeeping2021} or the probability of exceding power limits. These post processing steps are
-performed after the series is simulated. When performing these dynamic simulations with surrogate models, two approaches can be considered. The first is to
+\parencite{AssessmentStationKeeping2021} or the probability of exceeding power limits.
+
+When performing post-processing after simulations, two main approaches can be considered. The first is to
 directly predict output statistics of the system—such as the 3-hour most probable maximum footprint or peak thruster
 power—using regression models that map environmental and system parameters to these quantities. The second approach is to
 forecast the full time series, then calculate statistics through post-processing. 
 
-While the direct regression approach is attractive due to its low-dimensional output space and computational efficiency,
-experience from nonlinear oscillator and power system surrogate modeling has shown that extreme statistics such as
+Whilst the direct regression approach is attractive due to its low-dimensional output space and computational efficiency,
+experience from nonlinear oscillator and power system surrogate modelling has shown that extreme statistics such as
 maxima are highly nonlinear functionals of the time series. Polynomial chaos expansions constructed directly for
 maximal responses exhibit large errors, whereas NARX-based surrogates that reproduce the full time history, and only
 then derive maxima, achieve accurate predictions of both instantaneous statistics and extremes
 \parencites{maiSurrogateModellingStochastic2016}{ebadollahiTimedependentUncertaintyQuantification2025}{yeDeepONetBasedUncertainty2023}.
 A direct regression on output statistics therefore compresses the complex, non-linear and time-dependent DP dynamics—including
-control behavior, thruster interactions and wave-drift induced low-frequency motions—into a single mapping, likely
+control behaviour, thruster interactions and wave-drift induced low-frequency motions—into a single mapping, likely
 resulting in reduced fidelity, particularly in the distribution tails relevant for footprint and power margins.
 
-In contrast, a time-series surrogate preserves the dynamic structure of the DP system, consistent with current
+In contrast, a time-series surrogate preserves the dynamic structure of the DP system, which is consistent with current
 industrial practice where dynamic capability and operability analyses are performed in the time domain specifically to
-capture low-frequency excursions, transient behavior after failures, and coupled criteria such as watch circle, riser
-tension and dynamic power load \parencites{smogeliDynCapFullScale}{tannuriUtilizationNumericalSimulation2011}. Such a
+capture low-frequency excursions, transient behaviour after failures, and coupled criteria such as watch circle, riser
+tension, and dynamic power load \parencites{smogeliDynCapFullScale}{tannuriUtilizationNumericalSimulation2011}. Such a
 surrogate can be reused across operations with different governing limits: for crane operations, acceptance is typically
 based on footprint and relative motions, whereas for pipelay or drilling the limiting factor may be thruster
 utilisation or generator loading
@@ -107,11 +108,11 @@ to their stochastic nature \parencite{vanessenRequiredTestDurations2023}.
 So far, most quantifications of ship DP behavior use deterministic approaches. These generally use 3-hour simulations 
 \parencites{serrarisDPStationkeepingAccuracy2017}{RecommendedPracticeSpecification2025}{AssessmentStationKeeping2021} 
 to generate a point forecast with a single set of parameters, which is then post-processed. In these simulations,
-uncertainty in the simulation parameters is not considered. 
+uncertainty in the simulation parameters is not considered.
 
 Probabilistic forecasting treats uncertain inputs and model parameters as random variables and propagates that
 uncertainty through a model to produce a predictive distribution for quantities of interest. Instead of a single point
-forecast from one 3-hour run, probabilistic outputs give ranges with associated probabilities making the risk in
+forecast from one 3-hour run, probabilistic outputs give ranges with associated probabilities, making the risk in
 operational decisions explicit \parencite{nowotarskiRecentAdvancesElectricity2018}. 
 
 Quasi-static capability calculations has seen some use of probabilistic forecasting in a study performed by
@@ -131,7 +132,7 @@ study considered wind speeds up to a set maximum, whereas the reference IMCA con
 
 This approach required the use of a very large number of samples to converge. \Cref{fig:convergence_history_mauro} shows
 the convergence history of their approach in red, with classic monte-carlo runs overlaid. In both cases, thousands of
-runs were needed for the final value to converge. This approach is likely to be prohibitavely expensive for use with a
+runs were needed for the final value to converge. This approach is likely to be prohibitively expensive for use with a
 time-domain approach. \textcite{serrarisDPStationkeepingAccuracy2017} mentioned that a single time domain simulation
 using the MARIN framework would take approximately 10 minutes; to blindly use monte-carlo simulations would render the
 approach useless for use in offshore decision making.
@@ -144,7 +145,7 @@ approach useless for use in offshore decision making.
     \label{fig:convergence_history_mauro}
 \end{figure}
 
-Uncertainty modelling and probabilistic forecasting is a well estabilished field
+Uncertainty modelling and probabilistic forecasting is a well established field
 \parencite{gneitingProbabilisticForecasting2014}. It is widely used for applications such as meteorology, economics and
 power grids. Particularly power grids are of interest. A power grid is a highly non-linear dynamic system, subject to
 external loading. Power distribution is regulated by controllers, aimed at minimising total power consumption
@@ -154,16 +155,16 @@ use in predicting power consumption in electrical grids, it is likely to be suit
 of these approaches use some form of surrogate model to more efficiently calculate the dynamic responses of a system.
 
 \subsection{Uncertainty quantification}
-Uncertainty quantification is a field of mathematics that focusess on propegating input uncertainty through a
+Uncertainty quantification is a field of mathematics that focuses on propagating input uncertainty through a
 mathematical system to quantify the uncertainty of the output
 \parencite{ebadollahiTimedependentUncertaintyQuantification2025}. Typically this is done with Monte-Carlo simulations,
 but as discussed in \cref{subsec:probabilistic_predictions}, this would be too computationally expensive to blindly use with
 dynamic DP analyses. Alternative methods for uncertainty quantification exist. These often consist of some form of
 surrogate model to inexpensively model the system's dynamics, which can then be combined with an uncertainty model to
-propegate uncertainty from input to output
+propagate uncertainty from input to output
 \parencites{maiSurrogateModellingStochastic2016}{heuvelineHybridGeneralizedPolynomial2014}{nowotarskiRecentAdvancesElectricity2018}. 
 
-Surrogate models can take many forms; for high diminsional non-linear systems machine learning is a promising candidate
+Surrogate models can take many forms; for high dimensional non-linear systems machine learning is a promising candidate
 \parencite{salinasDeepARProbabilisticForecasting2020}. The use of machine learning models in uncertainty quantification
 can lead to significantly faster model evaluations while maintaining decent accuracy
 \parencite{willardIntegratingPhysicsBasedModelling2022}. Prior physics knowledge can also be included to further improve
@@ -180,9 +181,9 @@ and shows promise for use with dynamic positioning systems.
 
 Based on this research gap, the following research question is defined:
 
-\textit{How can a pipelay ship's short term dynamic positioning behaviour efficiently be forecast while considering environmental and system uncertainty?} 
+\textit{How can a pipelay ship's short-term dynamic positioning behaviour efficiently be forecast while considering environmental and system uncertainty?} 
 
-To answer this question, a series of research goals will be persued:
+To answer this question, a series of research goals will be pursued:
 
 \begin{enumerate}
     \item Identify existing methods for simulating stochastic dynamical systems under uncertainty that are applicable to marine dynamic positioning problems.
@@ -191,15 +192,15 @@ To answer this question, a series of research goals will be persued:
     \item Quantitatively compare the proposed probabilistic approach with deterministic and Monte-Carlo-based DP simulations in terms of accuracy, uncertainty representation, and computational efficiency.
 \end{enumerate}
 
-\section{Report structure}
-In this section the general structure of this literature review will be outlined. 
+\section{Report Structure}
+In this section, the general structure of this literature review will be outlined. 
 
 First, a general overview of the
 dynamic positioning system and existing efforts to simulate it will be given in \cref{chapter:DP_simulation}. This
-includes an overview of of the system components, mathematical descriptions of the system and an overview of existing
+includes an overview of the system components, mathematical descriptions of the system, and an overview of existing
 simulation tools.
 
-Next, uncertainty quantification will be exlained in \cref{chapter:uncertainty_quantification}. This will start with a
+Next, uncertainty quantification will be explained in \cref{chapter:uncertainty_quantification}. This will start with a
 general overview of the concepts behind uncertainty quantification and will then cover commonly used methods.
 
 \Cref{chapter:dynamic_modelling} will discuss various methods to handle the simulation of dynamical systems. Two main

@@ -1,6 +1,6 @@
 \chapter{Dynamics Modelling}
 \label{chapter:dynamic_modelling}
-A continuous time dynamical system can at its simplist be considered in the following form:
+A continuous time dynamical system can be considered in the following form:
 
 \begin{equation}
     \diff{\mathbf{x}(t)}{t} = \mathbf{f}\left(\mathbf{x}(t), t; \boldsymbol{\beta}\right)
@@ -13,14 +13,14 @@ A discrete time system can analogously be considered in the following form:
     \label{eq:discrete_dynamical_system}
 \end{equation}
 
-As this only depends on the state at the current time, these processes can be considerd as markov processes.
+As this only depends on the state at the current time, these processes can be considered as Markov processes.
 
-In this chapter three approaches to modelling dynamics of nonlinear systems are considered. 
+In this chapter, three approaches to modelling the dynamics of nonlinear systems are considered. 
 
 \section{State-space models}
 \textcite{guEfficientlyModelingLong2022}, \textcite{guMambaLinearTimeSequence2024}
 
-Not inherintly as suited as the other approaches for nonlinear systems with stochastic loading
+State-space models are less inherently suited to nonlinear systems with stochastic loading compared to other approaches.
 
 \section{Operator learning}
 An approach to modelling dynamics is operator learning. With operator learning, one aims to learn an operator that maps
@@ -29,7 +29,7 @@ followed by more general operator learning with DeepONets.
 
 \subsection{Koopman operator theory}
 Koopman operator theory states that it is possible to represent a nonlinear dynamical system in terms of an
-infinite-dimensioned linear operator acting on a Hilbert space of measurement functions of the state of the system
+infinite-dimensional linear operator acting on a Hilbert space of measurement functions of the state of the system
 \parencite{bruntonDatadrivenScienceEngineering2019}. This was demonstrated by
 \citeauthor{koopmanHamiltonianSystemsTransformation1931} in \citeyear{koopmanHamiltonianSystemsTransformation1931}. This
 operator is linear, making analysis of the system much easier. It is however infinite, so must be truncated for real
@@ -47,7 +47,7 @@ For a discrete system as described in \eqref{eq:discrete_dynamical_system}, this
     \mathcal{K} g(\mathbf{x}_k) = g(\mathbf{x}_{k + 1})
 \end{align}
 
-This means the Koopman Operator is a linear operator that advances the observation of a state forward in time. This is
+This means the Koopman operator is a linear operator that advances the observation of a state forward in time. This is
 true for any observable function \( g\) and any state \( \mathbf{x}_k \). \Cref{fig:koopman_visualisation} visualises
 the transformation performed by the Koopman operator and the measurement functions.
 
@@ -60,9 +60,9 @@ the transformation performed by the Koopman operator and the measurement functio
     \label{fig:koopman_visualisation}
 \end{figure}
 
-The operator is however infinite in dimension. This provides a significant challange for computing. Instead of capturing
+The operator is, however, infinite in dimension. This provides a significant challenge for computing. Instead of capturing
 the development of all the measurement functions, one can identify key measurement functions that evolve linearly over time.
-\parencite{bruntonDatadrivenScienceEngineering2019}. This can be done by determining the eigenfunctions of the koopman
+\parencite{bruntonDatadrivenScienceEngineering2019}. This can be done by determining the eigenfunctions of the Koopman
 operator \( (\varphi(\mathbf{x}_k)) \). 
 
 \begin{equation}
@@ -74,15 +74,15 @@ eigenfunctions can be used to generate more eigenfunctions. The product of two e
 
 \begin{align}
     \mathcal{K}(\varphi_1(\mathbf{x})\varphi_2(\mathbf{x})) &= \varphi_1(\mathbf{F}(\mathbf{x}))\varphi_2(\mathbf{F}(\mathbf{x})) \\
-    &=\,\lambda_1\lambda_2\varphi_1(\mathbf{x})\varphi_2(\mathbf{x})
+    &= \,\lambda_1\lambda_2\varphi_1(\mathbf{x})\varphi_2(\mathbf{x})
 \end{align}
 
-This means there may be a finite set of eigenfunctions that can be used to construct all infinite eigenfunction needed
+This means there may be a finite set of eigenfunctions that can be used to construct all the eigenfunction needed
 to fully represent the nonlinear system. 
 
-\subsubsection{Finite dimensional models}
+\subsubsection{Finite Dimensional Models}
 
-As the eigenfunctions form a basis for the measurement space, each measurement function can be formualated as an
+As the eigenfunctions form a basis for the measurement space, each measurement function can be formulated as an
 infinite weighted sum of eigenfunctions.
 
 \begin{equation}
@@ -102,18 +102,18 @@ If we consider a measurement vector \(\mathbf{g}(\mathbf{x}) = [g_1(\mathbf{x}),
     \end{bmatrix}
     = \sum_{j = 1}^{\infty} \varphi_j(\mathbf{x}) \mathbf{v}_j
 \end{equation}
-Where \(\mathbf{v}_j\) is the $\mathit{j}$-th Koopman mode associated with $\varphi_j$. For practical applications, this
+Where \(\mathbf{v}_j\) is the \(j\)-th Koopman mode associated with \(\varphi_j\). For practical applications, this
 sum is truncated to make an approximation of the measurement space. The challenge of using the Koopman operator has now
 shifted to selecting the best finite set of eigenfunctions to capture the systems dynamics.
 
 \subsubsection{Data-driven Koopman analysis}
-Analytically Determining the Koopman eigenfunctions and their weights for a complex non-linear dynamical system is not
-practically feasible. As such data-driven techniques are the method of choice for real world systems. 
+Analytically determining the Koopman eigenfunctions and their weights for a complex non-linear dynamical system is not
+practically feasible. As such data-driven techniques are the method of choice for real world systems.
 
-DMD is a data driven technique used to identify modes that represent spatial patterns that evolve linearly in time. DMD
+DMD is a data-driven technique used to identify modes that represent spatial patterns that evolve linearly in time. DMD
 approximates the Koopman operator while restricted to a set of direct measurements of the state. It is based purely on
 data, and requires no prior knowledge of the system's governing equations. Its simple and efficient numerical
-implementation has made it popular in recent years \parencite{bruntonDataDrivenDynamicalSystems2019}. 
+implementation has made it popular in recent years \parencite{bruntonDataDrivenDynamicalSystems2019}.
 
 The governing principle is as follows: Snapshots of the dynamical system are arranged into two data matrices. These
 matrices are then used to solve for a linear operator that maps one data matrix onto the other. 
@@ -151,7 +151,7 @@ essential.
 \subsubsection{Neural networks for Koopman theory}
 Even for relatively simple dynamical systems, the Koopman eigenfunctions can be arbitrarily complex
 \parencite{bruntonDataDrivenDynamicalSystems2019}. Creating a suitable library for use with eDMD can be challenging.
-Deep learning could provide an alternative approach \textcite{luschDeepLearningUniversal2018}
+Deep learning could provide an alternative approach \parencite{luschDeepLearningUniversal2018}
 
 The goal of determining an invertable function \(\varphi\) and Koopman operator \(\mathcal{K}\) such that \( y_{k} =
 \varphi(x_k) \) and \( y_{k + 1} = \mathcal{K}y_k \). This problem fits well with a deep auto-encoder based approach. An
@@ -176,13 +176,13 @@ This approach is not without its challenges. While there is no more need to sele
 has to decide on the number of latent nodes needed, as well as other hyperparameters. This approach also has a larger
 upfront computational cost to train the system as well as needing a large amount of data.
 
-\subsubsection{Koopman theory for stochastic systems}
+\subsubsection{Koopman Theory for Stochastic Systems}
 The above sections discuss the Koopman operator for deterministic systems. If a stochastic dynamical system is to be
 considered however, the formulation can be adjusted. This is given by \textcite{crnjaric-zicKoopmanOperatorSpectrum2020}
 in the following form: 
 
 \begin{equation}
-    \mathcal{K}g(\mathbf{x}) = \mathbb{E}[g(\mathbf{F}(\mathbf{x}))]
+    \mathcal{K}(\mathbf{x}) = \mathbb{E}[g(\mathbf{F}(\mathbf{x}))]
 \end{equation}
 
 The eigenvalue formulation can then analogously be formulated:
@@ -195,15 +195,14 @@ where $\varphi$ are the eigenfunctions of the stochastic Koopman Operator and $\
 eigenvalues. The stochastic Koopman operator tracks how the expected state of the stochastic dynamical system develops
 in measurement space. It does not however track the variance of the the state. 
 
-\subsection{Variational approach for Markov processes}
+\subsection{Variational Approach for Markov Processes}
 \textcite{wuVariationalApproachLearning2019} developed a method to approximate the Koopman operator from data of
-stochastic systems. Their approach is based off stochastic koopman theory coupled with canonical covariance analysis. This
-approach was extend by \textcite{mardtVAMPnetsDeepLearning2018} to use deep learning. 
+stochastic systems. Their approach is based on stochastic Koopman theory coupled with canonical covariance analysis. This
+approach was extended by \textcite{mardtVAMPnetsDeepLearning2018} to use deep learning. 
 
 The method uses two neural encoders to estimate the measurement function at any given timestep. These are indicated as
-\(\mathcal{X}_0 \text{ and } \mathcal{X}_1\) respectively. By passing two states through these networks time lagged by
-by time \(\tau\), 
-the covariance can be calculated.
+\(\mathcal{X}_0 \text{ and } \mathcal{X}_1\) respectively. By passing two states through these networks time-lagged by
+time \(\tau\), the covariance can be calculated.
 
 \begin{equation}
     \begin{aligned}
@@ -213,15 +212,15 @@ the covariance can be calculated.
     \end{aligned}
 \end{equation}
 
-The optimal koopman operator can then be found by minimising the least square error between
+The optimal Koopman operator can then be found by minimising the least-square error between
 \(\mathcal{X}_1(\mathbf{x}_{t + \tau})\) and \(\mathcal{X}_0(\mathbf{x}_t)\). This becomes:
 
 \begin{equation}
     \mathcal{K} = C_{00}^{-1} C_{01}
 \end{equation}
 
-Directly solving this would result in a trivial answer. To avoid that issue,
-\textcites{wuVariationalApproachLearning2019}{mardtVAMPnetsDeepLearning2018} use the VAMP-2 score. This additionally has
+Directly solving this would result in a trivial answer. To avoid this issue,
+\parencites{wuVariationalApproachLearning2019}{mardtVAMPnetsDeepLearning2018} use the VAMP-2 score. This additionally has
 an advantage for deep learning, as the gradients are easier to handle, making the approach simpler for time series data.
 
 \begin{equation}
@@ -233,7 +232,7 @@ By using \eqref{eq:VAMP_2} as a loss function for the two networks, these can be
 
 \subsection{DeepONet}
 DeepONet, proposed by \textcite{luLearningNonlinearOperators2021}, works based on the universal operator approximation
-theorum. The theorum states that a neural network with a single hidden layer can approximate any nonlinear continuous
+theorem. The theorem states that a neural network with a single hidden layer can approximate any nonlinear continuous
 function or operator. 
 
 \textcite{luLearningNonlinearOperators2021} used this theorum to develop DeepONet, a network architecture designed to
@@ -241,7 +240,7 @@ approximate nonlinear operators. Let \(u(x)\) be an input signal with \(G(u)\) i
 Then \(G(u)(y)\) is a real number. The network therefore takes two inputs, the function \(u(x)\) and the point at which
 to sample \(y\). 
 
-The universal approximation theorum for operator is as follows \parencite{chenUniversalApproximationNonlinear1995}. Let \(\sigma\) be a continous non-polynomial function.
+The universal approximation theorem for operators is as follows \parencite{chenUniversalApproximationNonlinear1995}. Let \(\sigma\) be a continuous non-polynomial function.
 \(G\) is a nonlinear continuous operator. For any \(\epsilon > 0\) there exists a set of positive integers \(n,p,m\) and
 constants \(c_i^k, \zeta_{ij}^k, \theta_i^k, \zeta_k, \zeta_k\in\mathbb{R}, x_j\in\mathbb{R}, w_k\in\mathbb{R}, i = 1,
 \dots, n, k = 1,\dots,p, j = 1,\dots m \) such that:
@@ -260,9 +259,9 @@ architecture choices for the branch and trunk networks are arbitrary and depend 
     G(u)(y) \approx \sum^p_{k = 1}\underbrace{b_k(u(x_1), u(x_2), \dots, u(x_m))}_{\text{Branches}}\,\underbrace{t_k(y)}_{\text{Trunk}}
 \end{equation}
 
-In practice, \(p\) is often of at least order 10 \parencite{luLearningNonlinearOperators2021}. As such the branch
+In practice, \(p\) is often of at least order 10 \parencite{luLearningNonlinearOperators2021}. As such, the branch
 networks are combined into a single network that outputs a vector \([b_1, b_2, \dots b_p]\). This difference, as well as
-the overall architecture is illustrated in \cref{fig:deeponet_architecture}. The architecture with a single network is
+the overall architecture, is illustrated in \cref{fig:deeponet_architecture}. The architecture with a single network is
 referred to as \emph{unstacked} whereas the version with separate branch networks is referred to as \emph{stacked}.
 
 \begin{figure}[H]
@@ -277,16 +276,16 @@ Passing a continous input to a neural network is a challenge. Two approaches tha
 decomposition where the coefficients are passed into the network, or by sampling the function at fixed discrete points.
 These discrete samples should be consistent with each other, as should the spectral method. 
 
-The results obtainined by \textcite{luLearningNonlinearOperators2021} demonstrate a remarkably low generalisation error
+The results obtained by \textcite{luLearningNonlinearOperators2021} demonstrate a remarkably low generalisation error
 with DeepONet compared to more traditional neural network approaches. The theoretical reasoning behind this low error is
 unknown to the authors. The approach works for a diverse set of problems; the paper reports tests of PDEs, ODEs and
-SDEs. In all the test cases DeepoONet showed a remarkable performance. The training cost of the network is higher than
+Among the test cases DeepONet showed a remarkable performance. The training cost of the network is higher than
 with regular neural networks, as the per epoch cost is the product of the number of training runs and the samples per
-run. The trade-off is that relatively small training sets are needed. 
+run. The trade-off is that relatively small training sets are needed.
 
 \textcite{yeDeepONetBasedUncertainty2023} present a DeepONet-based framework for uncertainty quantification in power
 system dynamics under stochastic loads. The system is modeled as a set of stochastic differential-algebraic equations
-(SDAEs), where load fluctuations follow an Ornstein=Uhlenbeck process. The authors argue that conventional methods—such
+(SDAEs), where load fluctuations follow an Ornstein-Uhlenbeck process. The authors argue that conventional methods—such
 as Monte Carlo simulation or Gaussian Process surrogates—are either computationally prohibitive or fail to capture
 temporal correlations, especially because they require separate models at each time step. DeepONet is employed to learn
 the solution operator mapping entire stochastic load trajectories to full dynamic system responses. Simple MLPs were
