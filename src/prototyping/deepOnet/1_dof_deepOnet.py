@@ -80,14 +80,14 @@ def main():
 
     input_features = {"surge_force": 0}
 
-    last_lr = 1e-3
-    warmup_epochs = 100
+    last_lr = 1e-2
+    warmup_epochs = 0
     warmup_steps = warmup_epochs * len(dataloader_training)
 
     optimiser = torch.optim.Adam(params=mionet.parameters(), lr=last_lr)
 
     linear_warmup_schedule = torch.optim.lr_scheduler.LinearLR(
-        optimiser, start_factor=1e-4, end_factor=1.0, total_iters=warmup_steps)
+        optimiser, start_factor=1.0, end_factor=1.0, total_iters=warmup_steps)
     plateau_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimiser, factor=0.5, min_lr=1e-6)
     scheduler = linear_warmup_schedule
 
