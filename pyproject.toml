@@ -26,9 +26,9 @@ dependencies = [
     "ruff>=0.15.0",
     "scikit-learn>=1.7.2",
     "snakeviz>=2.2.2",
-    "torch>=2.10.0",
+    "torch>=2.10.0; sys_platform == 'win32'",
     "torchsde>=0.2.6",
-    "torchvision>=0.25.0",
+    "torchvision>=0.25.0; sys_platform == 'win32'",
     "tqdm>=4.67.3",
 ]
 

@@ -1674,10 +1674,7 @@ torch==2.10.0 ; sys_platform != 'win32' \
     --hash=sha256:b7bd80f3477b830dd166c707c5b0b82a898e7b16f59a7d9d42778dd058272e8b \
     --hash=sha256:cdf2a523d699b70d613243211ecaac14fe9c5df8a0b0a9c02add60fb2a413e0f \
     --hash=sha256:e521c9f030a3774ed770a9c011751fb47c4d12029a3d6522116e48431f2ff89e
-    # via
-    #   msc-thesis-awn-aperghis
-    #   torchsde
-    #   torchvision
+    # via torchsde
 torch==2.10.0+cu128 ; sys_platform == 'win32' \
     --hash=sha256:01b216e097b17a5277cfb47c383cdcacf06abeadcb0daca0c76b59e72854c3b6 \
     --hash=sha256:14d2831b9292c3a9b0d80116451315a08ffe8db745d403d06000bc47165b1f9e \
@@ -1691,23 +1688,6 @@ torch==2.10.0+cu128 ; sys_platform == 'win32' \
 torchsde==0.2.6 \
     --hash=sha256:19bf7ff02eec7e8e46ba1cdb4aa0f9db1c51d492524a16975234b467f7fc463b \
     --hash=sha256:81d074d3504f9d190f1694fb526395afbe4608ee43a88adb1262a639e5b4778b
-    # via msc-thesis-awn-aperghis
-torchvision==0.25.0 ; sys_platform != 'win32' \
-    --hash=sha256:0d9a3f925a081dd2ebb0b791249b687c2ef2c2717d027946654607494b9b64b6 \
-    --hash=sha256:146d02c9876858420adf41f3189fe90e3d6a409cbfa65454c09f25fb33bf7266 \
-    --hash=sha256:153c0d2cbc34b7cf2da19d73450f24ba36d2b75ec9211b9962b5022fb9e4ecee \
-    --hash=sha256:24e11199e4d84ba9c5ee7825ebdf1cd37ce8deec225117f10243cae984ced3ec \
-    --hash=sha256:5f271136d2d2c0b7a24c5671795c6e4fd8da4e0ea98aeb1041f62bc04c4370ef \
-    --hash=sha256:855c0dc6d37f462482da7531c6788518baedca1e0847f3df42a911713acdfe52 \
-    --hash=sha256:a8f8061284395ce31bcd460f2169013382ccf411148ceb2ee38e718e9860f5a7 \
-    --hash=sha256:a95c47abb817d4e90ea1a8e57bd0d728e3e6b533b3495ae77d84d883c4d11f56 \
-    --hash=sha256:acc339aba4a858192998c2b91f635827e40d9c469d9cf1455bafdda6e4c28ea4 \
-    --hash=sha256:b75deafa2dfea3e2c2a525559b04783515e3463f6e830cb71de0fb7ea36fe233 \
-    --hash=sha256:c2abe430c90b1d5e552680037d68da4eb80a5852ebb1c811b2b89d299b10573b \
-    --hash=sha256:c4d395cb2c4a2712f6eb93a34476cdf7aae74bb6ea2ea1917f858e96344b00aa \
-    --hash=sha256:db74a551946b75d19f9996c419a799ffdf6a223ecf17c656f90da011f1d75b20 \
-    --hash=sha256:f25aa9e380865b11ea6e9d99d84df86b9cc959f1a007cd966fc6f1ab2ed0e248 \
-    --hash=sha256:f49964f96644dbac2506dffe1a0a7ec0f2bf8cf7a588c3319fed26e6329ffdf3
     # via msc-thesis-awn-aperghis
 torchvision==0.25.0+cu128 ; sys_platform == 'win32' \
     --hash=sha256:068e519838b4a8b32a09521244b170edd8c2ac9eeb6538b7bf492cd70e57ebf5 \
