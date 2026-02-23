@@ -1,24 +1,95 @@
-
-
-
-
 % Define groups and their names
 \renewcommand\nomgroup[1]{%
   \item[\bfseries
   \ifstrequal{#1}{A}{Acronyms}{%
-  \ifstrequal{#1}{M}{Mathematical Symbols}{}}%
+  \ifstrequal{#1}{M}{Mathematical Symbols}{%
+  \ifstrequal{#1}{O}{Operators and Functions}{}}}%
 ]}
 
 % Define number of columns for the nomenclature
 \nomencols{1}
 
 % Nomenclature format: \nomenclature[Group]{Abbreviation}{Definition}
+\nomenclature[A]{ASOG}{Activity Specific Operating Guideline}
+\nomenclature[A]{BNN}{Bayesian Neural Network}
+\nomenclature[A]{CPU}{Central Processing Unit}
+\nomenclature[A]{DMD}{Dynamic Mode Decomposition}
 \nomenclature[A]{DP}{Dynamic Positioning}
+\nomenclature[A]{DPO}{Dynamic Positioning Operator}
+\nomenclature[A]{eDMD}{Extended Dynamic Mode Decomposition}
+\nomenclature[A]{GELU}{Gaussian Error Linear Unit}
+\nomenclature[A]{gPC}{Generalized Polynomial Chaos}
+\nomenclature[A]{GPU}{Graphics Processing Unit}
+\nomenclature[A]{GRU}{Gated Recurrent Unit}
 \nomenclature[A]{IMCA}{International Marine Contractors Association}
+\nomenclature[A]{KL}{Kullback--Leibler}
 \nomenclature[A]{MARIN}{Maritime Research Institute Netherlands}
+\nomenclature[A]{MC}{Monte Carlo}
+\nomenclature[A]{MCMC}{Markov Chain Monte Carlo}
+\nomenclature[A]{MIONet}{Multiple-Input Operator Network}
+\nomenclature[A]{NARX}{Nonlinear Auto-Regressive with eXogenous input}
+\nomenclature[A]{NED}{North-East-Down}
+\nomenclature[A]{OU}{Ornstein--Uhlenbeck}
+\nomenclature[A]{PCE}{Polynomial Chaos Expansion}
+\nomenclature[A]{PID}{Proportional-Integral-Derivative}
+\nomenclature[A]{RAM}{Random Access Memory}
+\nomenclature[A]{SDE}{Stochastic Differential Equation}
+\nomenclature[A]{SDE-GAN}{Stochastic Differential Equation Generative Adversarial Network}
+\nomenclature[A]{TD-gPC}{Time-Dependent Generalized Polynomial Chaos}
+\nomenclature[A]{UQ}{Uncertainty Quantification}
+\nomenclature[A]{VI}{Variational Inference}
+\nomenclature[A]{VAMP}{Variational Approach for Markov Processes}
+\nomenclature[A]{VRAM}{Video Random Access Memory}
 
 
-% \nomenclature[M]{$Acc$}{test factor}
+\nomenclature[M]{$\eta$}{Position vector in NED frame}
+\nomenclature[M]{$\nu$}{Body-fixed velocity vector}
+\nomenclature[M]{$J(\eta)$}{Rotation matrix from body-fixed to NED frame}
+\nomenclature[M]{$\tau$}{Generalized external force vector}
+\nomenclature[M]{$M_{RB}$}{Rigid-body mass matrix}
+\nomenclature[M]{$M_A$}{Hydrodynamic added-mass matrix}
+\nomenclature[M]{$C_{RB}(\nu)$}{Rigid-body Coriolis-centripetal matrix}
+\nomenclature[M]{$C_A(\nu)$}{Added-mass Coriolis-centripetal matrix}
+\nomenclature[M]{$D$}{Linear damping matrix}
+\nomenclature[M]{$D_n(\nu)$}{Nonlinear damping matrix}
+\nomenclature[M]{$G$}{Restoring matrix}
+\nomenclature[M]{$H_s$}{Significant wave height}
+\nomenclature[M]{$T_p$}{Peak wave period}
+\nomenclature[M]{$V_w$}{Wind speed}
+\nomenclature[M]{$\mathbf{x}(t)$}{State vector at time $t$}
+\nomenclature[M]{$\mathbf{f}(\cdot)$}{Continuous-time dynamics function}
+\nomenclature[M]{$\mathbf{F}(\cdot)$}{Discrete-time dynamics map}
+\nomenclature[M]{$\boldsymbol{\beta}$}{Model parameter vector}
+\nomenclature[M]{$x$}{Model input variable}
+\nomenclature[M]{$y$}{Model output variable}
+\nomenclature[M]{$f(\cdot)$}{Model mapping inputs to outputs}
+\nomenclature[M]{$X$}{Random variable}
+\nomenclature[M]{$\omega$}{Elementary event in $\Omega$}
+\nomenclature[M]{$\Omega$}{Sample space}
+\nomenclature[M]{$\mathcal{F}$}{Sigma-algebra}
+\nomenclature[M]{$\mathbb{P}$}{Probability measure}
+\nomenclature[M]{$\boldsymbol{\xi}$}{Vector of random variables}
+\nomenclature[M]{$\boldsymbol{\Psi}_i$}{Orthogonal polynomial basis function}
+\nomenclature[M]{$c_i$}{Polynomial chaos coefficient}
+\nomenclature[M]{$M$}{Truncation order in polynomial chaos expansion}
+\nomenclature[M]{$L$}{Stochastic dimension}
+\nomenclature[M]{$P$}{Maximum polynomial order}
+\nomenclature[M]{$\overbar{X}(t)$}{Mean of $X(t)$}
+\nomenclature[M]{$K_p, K_i, K_d$}{PID gains}
+\nomenclature[M]{$\omega_n$}{Natural frequency}
+\nomenclature[M]{$\zeta$}{Damping ratio}
+\nomenclature[M]{$\mu$}{OU process mean}
+\nomenclature[M]{$\theta$}{OU process mean reversion rate}
+\nomenclature[M]{$\sigma$}{OU process diffusion coefficient}
+\nomenclature[M]{$W_t$}{Wiener process}
+\nomenclature[M]{$dW_t$}{Wiener process increment}
+
+\nomenclature[O]{$\mathcal{K}$}{Koopman operator}
+\nomenclature[O]{$g(\cdot)$}{Observable (measurement) function}
+\nomenclature[O]{$\varphi$}{Koopman eigenfunction}
+\nomenclature[O]{$\lambda$}{Koopman eigenvalue}
+\nomenclature[O]{$\mathbb{E}[\cdot]$}{Expectation operator}
+\nomenclature[O]{$\mathit{Var}[\cdot]$}{Variance operator}
 
 
 

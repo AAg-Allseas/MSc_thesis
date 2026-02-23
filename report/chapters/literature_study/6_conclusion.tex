@@ -1,0 +1,46 @@
+\chapter{Conclusion}
+Dynamic positioning behaviour of ships in offshore has traditionally been predicted using quasi-static force balances.
+The industry is now transitioning to time-domain simulations, which better capture transients and footprint behavior.
+These simulations are computationally costly and still subject to model error, and perfect knowledge of the simulated
+system is rarely available. Quantifying aleatoric and epistemic uncertainty in a DP system remains an open research
+question, and therefore the central topic of this thesis.
+
+Based on the gap in the research on dynamic positioning simulation, a research question was formulated as follows:
+
+\emph{How can a ship's short-term dynamic positioning behaviour efficiently be forecast while considering environmental and system uncertainty?}
+
+To answer this question, a set of research goals were set. The first two of these are covered by the literature review
+and scoping study. 
+
+Current deterministic simulation frameworks are unsuitable for uncertainty quantification, as the many simulations
+required for Monte-Carlo UQ would be intractable for operational decision making. For this reason, surrogate approaches
+were investigated. Across the literature, uncertainty is commonly separated into aleatoric and epistemic components.
+Most surrogate pipelines capture stochastic dynamics in the surrogate model, after which a UQ method is applied to
+characterize model uncertainty.
+
+Several UQ methods were reviewed, with polynomial chaos expansions (PCE) and machine learning approaches as the most
+prominent. PCE is widely used for UQ but becomes inefficient for long time-domain simulations and suffers from the curse
+of dimensionality. Machine learning methods are more recent but offer greater flexibility for probabilistic prediction.
+Among these, Bayesian neural networks and deep ensembles are well aligned with the need to quantify uncertainty in
+surrogate DP models.
+
+For modelling the dynamics, two main approaches stand out. Operator learning, through DeepONet or Koopman methods, offers
+computationally inexpensive inference and enables fast propagation of stochastic signals through the system dynamics.
+These approaches can be paired with epistemic UQ methods. Between the two, DeepONet appears more suitable for the task
+at hand. Neural stochastic differential equations provide an alternative by directly modelling stochastic dynamics with
+learned drift and diffusion terms. In the pilot tests on a toy DP model, neural SDEs performed better than DeepONet.
+
+Through the literature review and initial tests, the first two research goals have been completed.
+
+\section{Thesis Planning}
+The literature review and initial tests have provided a solid backbone for the next stages of the thesis.
+
+First, frameworks for working with the neural SDEs will be investigated. In particular, the use of Diffrax will be
+tested. Using the most suitable approach from this study, the toy model problem will be fully trained to confirm the
+ability of neural SDEs to model DP behaviour. 
+
+LatentSDE vs SDE-GAN?
+Deep ensembles for epistemic uncertainty quantification
+More complex DP model - Convert to MSS example to python, generate a whole lot of training data
+Generalisation of NeuralSDE with different model parameters as inputs
+Transient thruster failures

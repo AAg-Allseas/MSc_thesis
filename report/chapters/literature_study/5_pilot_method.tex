@@ -175,12 +175,14 @@ batch size does not increase linearly. The cause of the speed difference between
 unknown at the time of writing. Overall, the manual test showed a speed increase of 1.75x with respect to the toy model.
 
 \section{DeepONet}
+\TODO{Update when tests are actually finished, depending on what (if anything) works}
+
 The second approach tested was DeepONet. For these tests, the multiple input operator network described in
 \textcite{jinMIONetLearningMultipleInput2022} is used. The networks are built upon the PyTorch implementation used by
 \textcite{moyaDeepONetgridUQTrustworthyDeep2023} in their work on uncertainty quantification with DeepONets.
 
 \subsection{Architecture}
-\TODO{Update with regards to 1 or 3 DOF, depending on what works}
+
 The MIONet approach uses a separate branch network per input function. The inputs used are the external stochastic force
 and an initial position. The branch nets consist of two types: the initial condition is encoded using two linear layers,
 whereas the force traces are encoded using 1-dimensional convolutional layers. \Cref{fig:mionet_architecture} gives a
@@ -189,9 +191,33 @@ graphical representation as well as the dimensions of each layer.
 \begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{report/images/diagrams/3dof_mionet.pdf}
-    \caption{MIONet architecture used}
+    \caption{MIONet architecture used (3 degrees of freedom)}
     \label{fig:mionet_architecture}
 \end{figure}
 
 Each convolutional layer in \cref{fig:mionet_architecture} consists of a convolution, a dropout layer, and a max pool
-layer with a kernel size of 2. All the layers used the GELU activation function.
+layer with a kernel size of 2. All the layers used the GELU activation function. In the test case where multiple degrees of freedom were considered, each degree of freedom of the input force was passed
+to an independent convolutional network. Each output dimension had an independent tree network with shared branches. 
+
+\subsubsection{Training}
+
+Training was performed on series of the training sets subsampled to be 10000 items long. These were then sampled every
+0.5 seconds to give a series of 1000 measurements. Before training and testing, the dataset was scaled using the mean
+and standard deviation of each individual feature. The time was scaled between 0 and 1. Training was performed over
+10000 epochs. An initial learning rate of 0.01 was used with a schedule to reduce it on a plateau of test loss. A sample
+size of 2048 random timesteps was used to train and test. A 80-20 training testing data split was used. 
+
+DeepONet was first tested with a 1 degree of freedom case. A new dataset was generated from the toy model with pure
+surge force and motion. 100 different seeds were used. 
+
+A 3 DOF case was tested with the original dataset. The model struggled to generalise well. The model tended to predict
+the mean of all the time-traces per signal before overfitting to the training data. To combat this, dropout was included
+in the model architecture, which did improve the performance slightly. 
+
+
+\section{Conclusion}
+Whether due to limitations in the specific architecture used in this work or inherent limitations of the DeepONet framework, the method does
+not appear to work as well as neural SDEs for the problem at hand. Furthermore, neural SDEs offer more flexibility for
+use in practice, as they do not require a fixed sample length or interval, or generation of a force series for training.
+This makes the approach more suitable for real-world applications where data is not guaranteed to be perfectly sampled. As such neural SDEs will be used moving forward in this research.
+
