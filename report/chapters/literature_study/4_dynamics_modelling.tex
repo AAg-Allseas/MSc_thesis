@@ -277,18 +277,41 @@ Passing a continous input to a neural network is a challenge. Two approaches tha
 decomposition where the coefficients are passed into the network, or by sampling the function at fixed discrete points.
 These discrete samples should be consistent with each other, as should the spectral method. 
 
-\textcite{yeDeepONetBasedUncertainty2023} used the DeepONet architecture to propegate stochastic loading through power
-systems. The aim was to learn a surrogate operator to quantify uncertainty on rotor angle trajectories while subject to
-stochastic loads. They used a time trace of an Ornstein-Uhlenbeck process as the input function, with fully connected
-FFNNs for the branch and trunk networks.
+The results obtainined by \textcite{luLearningNonlinearOperators2021} demonstrate a remarkably low generalisation error
+with DeepONet compared to more traditional neural network approaches. The theoretical reasoning behind this low error is
+unknown to the authors. The approach works for a diverse set of problems; the paper reports tests of PDEs, ODEs and
+SDEs. In all the test cases DeepoONet showed a remarkable performance. The training cost of the network is higher than
+with regular neural networks, as the per epoch cost is the product of the number of training runs and the samples per
+run. The trade-off is that relatively small training sets are needed. 
 
-\textcite{moyaDeepONetGridUQTrustworthyDeep2022} introduced bayesian DeepONet and probabilistic deepOnet also for power
-systems.
+\textcite{yeDeepONetBasedUncertainty2023} present a DeepONet-based framework for uncertainty quantification in power
+system dynamics under stochastic loads. The system is modeled as a set of stochastic differential-algebraic equations
+(SDAEs), where load fluctuations follow an Ornstein=Uhlenbeck process. The authors argue that conventional methods—such
+as Monte Carlo simulation or Gaussian Process surrogates—are either computationally prohibitive or fail to capture
+temporal correlations, especially because they require separate models at each time step. DeepONet is employed to learn
+the solution operator mapping entire stochastic load trajectories to full dynamic system responses. Simple MLPs were
+used for the branch and trunk nets. An unstacked architecture is used. This lead to
+substantial improvements in efficiency and accuracy: across IEEE 39 and WECC 179-bus systems, DeepONet produced low
+trajectory prediction errors (\(MAPE \approx 1-1.5\%\)) and provided more reliable variance estimates than Gaussian
+Process approaches, while reducing computational cost by over an order of magnitude compared to Monte Carlo simulation.
 
-\textcite{jinMIONetLearningMultipleInput2022} introduce MIONet, DeepONet with multiple input functions. It works by
-using multiple branch networks that output the same dimension, then concatenating them as elementwise products into the
-regular branch output. 
+\textcite{moyaDeepONetGridUQTrustworthyDeep2022} developed DeepONet-Grid-UQ, a DeepONet-based framework for predicting
+post-fault power system trajectories together with uncertainty estimates. The authors framed the task as an
+operator-learning problem, where DeepONet learned a mapping from fault-on trajectories to corresponding post-fault
+responses. To make these predictions trustworthy, they introduced two uncertainty-aware variants: Bayesian DeepONet,
+which used Stochastic Gradient Hamiltonian Monte-Carlo (SGHMC) sampling to approximate a posterior over network
+parameters, and Probabilistic DeepONet, which produced Gaussian predictive distributions through probabilistic training.
+Both approaches were validated on the IEEE 16-machine 68-bus system. They achieved low mean prediction errors (\(L1: ~1.6 -1.8\%, L2: ~2.0\%\)) and constructed 95\% confidence intervals that captured about 93-94\% of ground truth trajectories. Their uncertainty estimates remained reliable even under noisy inputs. In an applied test on under-voltage limit violations, both models avoided false-negative alarms while maintaining conservative false-positive rates, demonstrating their practical relevance for operational security assessment.
+Overall, the study showed that DeepONets could be extended with probabilistic and Bayesian components to deliver robust, uncertainty-aware operator learning for safety-critical dynamical systems, complementing earlier DeepONet work by emphasizing reliability as well as accuracy.
 
+\textcite{jinMIONetLearningMultipleInput2022} introduce MIONet, DeepONet with multiple input functions. Their work
+extended the universal approximation theorum to demonstrate that multiple input operator learning can be framed through
+low-rank tensor product structures. The proposed architecture combined several branch networks, one per input
+function, with a trunk network, merging their outputs through tensor-product-based interactions. Across ODE and PDE
+benchmarks, MIONet consistently outperformed DeepONet (e.g., 1.69\% vs. 2.41\% error for nonlinear ODEs, and 1.97\% vs.
+5.25\% for diffusion-reaction PDEs), particularly when prior structural knowledge such as periodicity was encoded. These
+results showed that MIONet offered a more expressive and scalable approach for operator learning problems requiring
+multiple inputs.
 
 
 \section{Neural Stochastic Differential Equations}
