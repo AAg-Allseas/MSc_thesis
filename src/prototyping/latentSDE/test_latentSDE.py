@@ -18,7 +18,7 @@ def load_and_sample(path: Path,
                     hidden_size: int,
                     timestep: float,
                     start_time: float = 0,
-                    end_time: float = 10800) -> np.ndarray:
+                    end_time: float = 10800) -> tuple[torch.Tensor, torch.Tensor]:
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -36,6 +36,7 @@ def load_and_sample(path: Path,
     ts = torch.from_numpy(ts).to(device)
 
     bm = torchsde.BrownianInterval(start_time, end_time, size=(batch_size, latent_size), dt=timestep, device=device)
+
     return latent_sde.sample(batch_size=batch_size, ts=ts, bm=bm).to("cpu"), ts.to("cpu")
 
 

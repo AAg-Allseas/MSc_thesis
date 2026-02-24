@@ -1,0 +1,22 @@
+pgf.texsystem: xelatex
+text.usetex: true
+pgf.preamble: \usepackage{amsmath, amssymb}
+savefig.bbox: tight
+savefig.format: pdf
+
+## Axes
+axes.grid: True
+
+## Grid
+grid.linewidth: 0.5
+grid.alpha: 0.5
+
+## Legend
+legend.frameon: False
+
+## Font
+font.size: 8.0
+font.family: sans-serif
+
+## Line
+lines.linewidth: 1.0

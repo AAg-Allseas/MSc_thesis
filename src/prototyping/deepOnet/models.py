@@ -209,3 +209,34 @@ def model_1dof() -> MIONet:
     )
 
     return MIONet(branches, trunk, output_dim)
+
+def model_1dof_2() -> MIONet:
+    latent_dim = 256
+    output_dim = 1
+    input_dim = 1
+
+    branches = [
+        BranchConstructor(
+            name="initial_conditions",
+            layer_sizes=[input_dim, 256, 256, latent_dim],
+            activation="sin",
+            dropout=0.1
+        ),
+        CNN1DBranchConstructor(
+            name="surge_force",
+            in_channels=1,
+            channels     =[128, 128,  96,  64,  32,  32],
+            kernel_sizes =[  7,  15,  31,  63, 127, 255],
+            output_dim=latent_dim,
+            activation="gelu",
+            dropout=0.1
+        ),
+    ]
+
+    trunk = MLPConstructor(
+        layer_sizes=[1, 128, 256, 256, latent_dim],
+        activation="gelu",
+        dropout=0.1
+    )
+
+    return MIONet(branches, trunk, output_dim)

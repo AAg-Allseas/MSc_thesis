@@ -9,7 +9,8 @@ from src.prototyping.dataloader import ParquetDataset
 
 
 def plot_timetraces(dataset: ParquetDataset, 
-                    color: Optional[str]=None) -> None:
+                    color: Optional[str]=None,
+                    figsize: Optional[tuple]=None) -> None:
     samples = []
     for i in range(len(dataset)):
         times, sample, _ = dataset[i]
@@ -17,7 +18,7 @@ def plot_timetraces(dataset: ParquetDataset,
     samples = np.array(samples).swapaxes(0, 1)
 
 
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=figsize)
 
     # Surge
     ax.plot(times, samples[..., 0], alpha=0.1, color=color)

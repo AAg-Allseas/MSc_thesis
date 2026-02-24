@@ -11,8 +11,9 @@ from torch.utils.data import DataLoader
 from src.prototyping.data_handling import find_parquet_files
 from src.prototyping.dataloader import ParquetDataset
 from src.prototyping.deepOnet.model_deepOnet import MIONet
-from src.prototyping.deepOnet.models import model_1dof, model_2, model_cnn_1, model_cnn_2
+from src.prototyping.deepOnet.models import model_1dof, model_1dof_2, model_2, model_cnn_1, model_cnn_2
 from src.prototyping.deepOnet.utils import BranchConstructor, MLPConstructor, prepare_batch
+from src.visualisation.general_plotting.config import LINEWIDTH
 
 
 
@@ -85,11 +86,13 @@ def plot_prediction(
             )
             predictions = model(x)
         
+        predictions = dataset_samples.inverse_scale(predictions)
+        samples = dataset_samples.inverse_scale(samples)
         # Move to CPU for plotting
-        ts_np = ts.squeeze().cpu().numpy()
+        ts_np = ts.squeeze().cpu().numpy() * 500 # Rescale
         pred_np = predictions.squeeze().cpu().numpy()
         true_np = samples.squeeze().cpu().numpy()
-        
+    
         # Downsample if necessary to avoid memory issues
         n_points = len(ts_np)
         if n_points > max_plot_points:
@@ -106,11 +109,15 @@ def plot_prediction(
         
         # Create subplot grid for all features
         n_features = pred_np.shape[-1]
-        n_cols = 4
-        n_rows = (n_features + n_cols - 1) // n_cols
+        # Compute grid as square as possible
+        n_cols = int(np.ceil(np.sqrt(n_features)))
+        n_rows = int(np.ceil(n_features / n_cols))
         
-        fig, axes = plt.subplots(n_rows, n_cols, figsize=(16, 3 * n_rows))
-        axes = axes.flatten()
+        fig, axes = plt.subplots(n_rows, n_cols, figsize=(0.75 * LINEWIDTH, 0.75 * 3/4 * LINEWIDTH))
+        if n_features > 1:
+            axes = axes.flatten()
+        else:
+            axes = [axes]
         
         for feature_idx in range(n_features):
             ax = axes[feature_idx]
@@ -118,7 +125,6 @@ def plot_prediction(
             ax.plot(ts_np, pred_np[:, feature_idx], label='Prediction', alpha=0.8, linestyle='--')
             
             title = feats_samples[feature_idx] if feature_idx < len(feats_samples) else f"Feature {feature_idx}"
-            ax.set_title(title)
             ax.set_xlabel("Time (s)")
             ax.set_ylabel("Value (scaled)")
             ax.legend(fontsize=8)
@@ -128,7 +134,6 @@ def plot_prediction(
         for idx in range(n_features, len(axes)):
             axes[idx].set_visible(False)
         
-        fig.suptitle(f"MIONet Predictions (Sample {sample_idx})", fontsize=14)
         fig.tight_layout()
         
         return fig
@@ -136,19 +141,16 @@ def plot_prediction(
     raise IndexError(f"Sample index {sample_idx} out of range")
 
 
-if __name__ == "__main__":
-    # Use non-interactive backend to avoid tkinter memory issues
+def main():
     import matplotlib
     matplotlib.use('Agg')  # Use non-interactive backend
     
     # Example usage
-    checkpoint = r"C:/Soft_dev/MSc_thesis/mlruns/2/ddca770c0b4543b9b18767153482c299/artifacts/checkpoints/checkpoint_epoch_4900.pth"
-    model = model_1dof()
-    fig = plot_prediction(checkpoint, model, sample_idx=10)
-    
-    # Save to file instead of showing interactively
-    output_path = Path(r"C:/Soft_dev/MSc_thesis/plots/deeponet_prediction.png")
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(output_path, dpi=100, bbox_inches='tight')
-    print(f"Plot saved to {output_path}")
-    plt.close(fig)
+    checkpoint = r"C:/Soft_dev/MSc_thesis/mlruns/2/0e12a6785b6445a289a629b3ad998da3/artifacts/checkpoints/checkpoint_epoch_1350.pth"
+    model = model_1dof_2()
+    return plot_prediction(checkpoint, model, sample_idx=10)
+
+if __name__ == "__main__":
+    # Use non-interactive backend to avoid tkinter memory issues
+    main()
+    plt.show()

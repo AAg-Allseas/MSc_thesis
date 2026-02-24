@@ -4,6 +4,8 @@ from matplotlib import pyplot as plt
 import pandas as pd
 import numpy as np
 
+from src.visualisation.general_plotting.config import GOLDEN_RATIO
+
 
 def compare_timesteps() -> None:
     path = Path(r"C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\data\timestep_convergence")
@@ -168,6 +170,7 @@ def compare_timesteps() -> None:
         ax.grid(True, alpha=0.3)
         ax.set_xscale('log')
         ax.set_yscale('log')
+
     
     fig2.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.5, 0.98), ncol=len(sorted_timesteps))
     plt.tight_layout(rect=[0, 0, 1, 0.96])
@@ -228,7 +231,7 @@ def plot_cumulative_error_summary() -> None:
     sorted_timesteps = sorted(final_errors.keys())
 
     # --- Figure 1: pos_eta mean ---
-    fig1, ax1 = plt.subplots(figsize=(6, 4))
+    fig1, ax1 = plt.subplots(figsize= GOLDEN_RATIO * 0.45)
     means, stds = [], []
     for dt in sorted_timesteps:
         col_means = [np.mean(final_errors[dt][col]) for col in pos_eta_cols]
@@ -239,16 +242,15 @@ def plot_cumulative_error_summary() -> None:
     ax1.plot(sorted_timesteps, means, marker='o', linewidth=2)
     ax1.fill_between(sorted_timesteps, means - stds, means + stds, alpha=0.2)
     ax1.set_xlabel("Timestep (s)")
-    ax1.set_ylabel("Final Cumulative Error")
-    ax1.set_title(r"$\eta$ (Position)")
+    ax1.set_ylabel("Cumulative Error")
     ax1.set_xscale('log')
     ax1.set_yscale('log')
     ax1.grid(True, alpha=0.3)
     fig1.tight_layout()
-    fig1.savefig(save_path / "cumulative_error_pos_eta.png", dpi=300)
+    fig1.savefig(save_path / "cumulative_error_pos_eta", dpi=300)
 
     # --- Figure 2: rpm_fixed mean ---
-    fig2, ax2 = plt.subplots(figsize=(6, 4))
+    fig2, ax2 = plt.subplots(figsize=GOLDEN_RATIO * 0.45)
     means, stds = [], []
     for dt in sorted_timesteps:
         col_means = [np.mean(final_errors[dt][col]) for col in rpm_fixed_cols]
@@ -259,14 +261,13 @@ def plot_cumulative_error_summary() -> None:
     ax2.plot(sorted_timesteps, means, marker='o', linewidth=2)
     ax2.fill_between(sorted_timesteps, means - stds, means + stds, alpha=0.2)
     ax2.set_xlabel("Timestep (s)")
-    ax2.set_ylabel("Final Cumulative Error")
-    ax2.set_title("RPM of Fixed thrusters")
+    ax2.set_ylabel("Cumulative Error")
     ax2.set_xscale('log')
     ax2.set_yscale('log')
     ax2.grid(True, alpha=0.3)
-    fig2.tight_layout()
-    fig2.savefig(save_path / "cumulative_error_rpm_fixed.png", dpi=300)
 
+    fig2.tight_layout()
+    fig2.savefig(save_path / "cumulative_error_rpm_fixed", dpi=300)
     plt.show()
 
 

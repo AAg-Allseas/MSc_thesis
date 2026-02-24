@@ -54,12 +54,12 @@ integrating through time with an Euler-Maruyama scheme.
 \begin{figure}[H]
     \centering
     \begin{subfigure}{0.45\textwidth}
-        \includegraphics[width=\linewidth]{plots/cumulative_error_pos_eta.png}
+        \includegraphics{plots/cumulative_error_pos_eta.pdf}
         \caption{Mean position error between surge and sway}
     \end{subfigure}
     \hspace{0.05\textwidth}
     \begin{subfigure}{0.45\textwidth}
-        \includegraphics[width=\linewidth]{plots/cumulative_error_rpm_fixed.png}
+        \includegraphics{plots/cumulative_error_rpm_fixed.pdf}
         \caption{RPM Error for fixed thrusters}
     \end{subfigure}
     \caption{Mean cumulative error per timestep size for position and thruster RPM. Error bar indicates variation between different realisations of the forcing process}
@@ -145,13 +145,20 @@ epochs. Training was set to run over 5000 epochs. A timestep of 0.05 was used fo
 period of 250 seconds was used, equating to a series of length 5000. A single file was used, resulting in a training set
 of 40 time traces.
 
+\begin{figure}[H]
+    \centering
+    \includegraphics{plots/pilot_losses_latentsde.pdf}
+    \caption{Training losses for LatentSDE training}
+    \label{fig:pilot_latentsde_training}
+\end{figure}
+
 \subsection{Evaluation}
 Training of the model was stopped after 492 epochs. This was after 17 hours and 49 minutes. The prior was then sampled
 and integrated over a period of 250 seconds. The generated traces of the surge motion are shown in \cref{fig:pilot_latentsde_generation}. 
 
 \begin{figure}[H]
     \centering
-        \includegraphics[width=\linewidth]{plots/surge_reconstructed_latentsde.png}
+        \includegraphics{plots/pilot_latentSDE.pdf}
     \caption{Generated surge motions (Red) and training trajectories (Blue)}
     \label{fig:pilot_latentsde_generation}
 \end{figure}
@@ -210,10 +217,21 @@ size of 2048 random timesteps was used to train and test. A 80-20 training testi
 DeepONet was first tested with a 1 degree of freedom case. A new dataset was generated from the toy model with pure
 surge force and motion. 100 different seeds were used. 
 
-A 3 DOF case was tested with the original dataset. The model struggled to generalise well. The model tended to predict
-the mean of all the time-traces per signal before overfitting to the training data. To combat this, dropout was included
-in the model architecture, which did improve the performance slightly. 
+\begin{figure}[H]
+    \centering
+    \includegraphics{plots/pilot_losses_deepOnet.pdf}
+    \caption{Testing loss for 1 DoF DeepONet. Figure is capped at 400 epochs for clarity}
+    \label{fig:pilot_deeponet_test_loss}
+\end{figure}
 
+\subsection{Evaluation}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics{plots/pilot_deepOnet_1dof.pdf}
+    \caption{Randomly selected surge reconstruction of 1 DOF DeepONet. Both axes are normalised}
+    \label{fig:deeponet_pilot}
+\end{figure}
 
 \section{Conclusion}
 Whether due to limitations in the specific architecture used in this work or inherent limitations of the DeepONet framework, the method does

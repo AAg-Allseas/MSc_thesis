@@ -79,6 +79,7 @@
     }
 \fi
 
+%% Other packages
 \RequirePackage{subcaption}
 \RequirePackage{nicefrac}
 \RequirePackage{cleveref}
@@ -91,6 +92,11 @@
 \RequirePackage{xcolor}
 \RequirePackage{xkeyval}
 \RequirePackage[export]{adjustbox}
+\RequirePackage{pgf}
+
+
+%% ------------------------ Fonts -----------------------
+
 \def\@largetitlesize{96pt}
 
 \ifxetex
@@ -202,7 +208,12 @@
                 \item\relax}
                {\endlist}
 
+%% ---------------- Colours -----------------------
 
+%% For Matplotlib's .pgf files
+\definecolor{textcolor}{rgb}{0,0,0}
+\definecolor{mathcolor}{rgb}{0,0,0}
+\DeclareRobustCommand{\mathdefault}[1]{#1}
 
 %% Define the TU Delft house style colors.
 \definecolor{tudelft-cyan}{cmyk}{1,0,0,0}
@@ -222,19 +233,8 @@
 \definecolor{tudelft-yellow}{cmyk}{0.02,0,0.54,0}
 
 \def\@pagecolor{tudelft-cyan}
-%\if@whitetitle
-%  \def\titlecolor{tudelft-white}
-%\else   
-%  \def\titlecolor{tudelft-black}
-%\fi
+\colorlet{title}{black}
 
-%% Use TU Delft cyan as the color for titles, unless the 'print' option is
-%% specified. % JMT changed this: all titles black!
-% \if@print
-    \colorlet{title}{black}
-%\else
-%    \colorlet{title}{tudelft-cyan}
-%\fi
 
 %% We use A4 paper with slightly smaller margins than the default (scale = 0.7).
 \geometry{a4paper,hscale=0.75,vscale=0.8}
@@ -304,6 +304,9 @@
 %% The margin around text boxes.
 \newlength\@cover@margin
 \setlength\@cover@margin{12pt}
+
+
+%% ------------------------ Cover page -----------------------------
 
 %% Define the options for the makecover command.
 \define@boolkey{cover}{back}[true]{}
