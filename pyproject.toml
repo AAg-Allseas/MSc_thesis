@@ -3,12 +3,10 @@ name = "msc_thesis_awn_aperghis"
 version = "1.0.0"
 description = "template repository to include overleaf report"
 authors = [{ name = "Albert Aperghis", email = "a.w.n.aperghis@student.tudelft.nl" }]
-requires-python = ">=3.10,<3.14"
+requires-python = ">=3.12,<3.14"
 readme = "README.md"
 classifiers = [
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
@@ -51,3 +49,9 @@ explicit = true
 [build-system]
 requires = ["uv_build>=0.9.11,<0.10.0"]
 build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "databricks-connect>=18.0.3",
+    "ruff>=0.15.0",
+]

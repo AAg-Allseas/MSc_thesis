@@ -232,7 +232,9 @@
     "todo-tree.highlights.useColourScheme": true,
     "debugpy.debugJustMyCode": false,
     "run-buttons.justMyCode": false,
-    "python-envs.defaultEnvManager": "ms-python.python:system",
+    "python-envs.defaultEnvManager": "ms-python.python:venv",
     "python.defaultInterpreterPath": ".venv/Scripts/python.exe",
     "ltex.language": "en-GB",
+    "jupyter.interactiveWindow.cellMarker.codeRegex": "^# COMMAND ----------|^# Databricks notebook source|^(#\\s*%%|#\\s*\\<codecell\\>|#\\s*In\\[\\d*?\\]|#\\s*In\\[ \\])",
+    "jupyter.interactiveWindow.cellMarker.default": "# COMMAND ----------",
 }

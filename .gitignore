@@ -25,3 +25,6 @@ mlflow.db
 # Ruff
 .ruff_cache
 mlruns
+
+.databricks
+%OUTDIR%
