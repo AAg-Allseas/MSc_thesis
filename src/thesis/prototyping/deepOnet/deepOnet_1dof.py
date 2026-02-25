@@ -8,7 +8,7 @@ import mlflow.pytorch
 import torch
 from torch import nn
 
-from src.utils import is_databricks, save_checkpoint_artifact
+from src.msc_thesis_awn_aperghis.utils import is_databricks, save_checkpoint_artifact
 from src.prototyping.data_handling import find_parquet_files
 from src.prototyping.deepOnet.train_deepOnet import load_samples_sensors, train, test
 from src.prototyping.deepOnet.model_deepOnet import MIONet

@@ -17,3 +17,25 @@ targets:
   # prod:
   #   workspace:
   #     host: https://adb-5270772889732093.13.azuredatabricks.net
+
+
+workspace:
+  artifact_path: /Volumes/main_udev/ai_labs/aag/artifacts
+
+
+artifacts:
+  mypkg:
+    type: whl
+    build: uv build --wheel       # uv builds your wheel
+    path: .
+
+# resources:
+#   jobs:
+#     train_job:
+#       name: thesis
+#       tasks:
+#         - task_key: train
+          # notebook_task:
+          #   notebook_path: notebooks/train.ipynb
+#           libraries:
+#             - whl: ./dist/*.whl
