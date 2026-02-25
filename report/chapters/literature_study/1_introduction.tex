@@ -5,7 +5,7 @@ forecasting of DP behaviour. The main research goal and sub-goals are formulated
 study paper.
 
 \section{Background}
-Since the introduction of the first ship equipped with dynamic positioning in the 1960's, the use of dynamic positioning
+Since the introduction of the first ship equipped with dynamic positioning in the 1960s, the use of dynamic positioning
 (DP) has become much more widespread in the offshore industry \parencite{HistoryDP2017}. Current industry practice for
 making operational decisions is to use quasi-static force balances \parencites
 {RecommendedPracticeSpecification2025}{AssessmentStationKeeping2021}. In these calculations, a force balance is found
@@ -29,7 +29,7 @@ time-domain simulations to capture power peaks, the footprint of the ship and tr
 Several studies have been done on the difference between quasi-static calculations and time-domain simulations,
 specifically on the difference in predicted capability. \Cref{subfig:comparison experiment} shows a
 comparison of a dynamic calculation with a static calculation, with experimental data as further context.
-\Cref{subfig:comparison failure} shows a comparison of intact and worst-case single failure capabilites. As \cref{fig:comparison static dynamic dp capability} shows, the quasi-static apporach
+\Cref{subfig:comparison failure} shows a comparison of intact and worst-case single failure capabilities. As \cref{fig:comparison static dynamic dp capability} shows, the quasi-static approach
 generally overestimates the DP capability. The factor by which is not constant however and ship dependent. As such
 dynamic DP simulations are necessary if improved accuracy is desired \parencite{borhaugExperimentalValidationDynamic2012}. 
 
@@ -54,16 +54,16 @@ In addition to finding a significant difference between the quasi-static and dyn
 \textcite{borhaugExperimentalValidationDynamic2012} compared their results to experimental data. They found an average
 difference of \qty{10}{\%} between the experimental data and their simulations. While this is useful in confirming the
 increased accuracy of the time domain approach as opposed to the quasi-static approach, \qty{10}{\%} is still a large
-margin for operational decision making.
+margin for operational decision-making.
 
 Researchers from the Maritime Research Institute Netherlands (MARIN) also developed a time domain DP simulator
-\parencite{serrarisDPStationkeepingAccuracy2017}. In their paper they highlight that while static DP solvers are useful
+\parencite{serrarisDPStationkeepingAccuracy2017}. Their paper highlights that while static DP solvers are useful
 when estimating the ultimate capability of a ship, they are unable to say anything about the accuracy of the DP
 system. In many operations, such as crane operations, pipelay, drilling or crew transfers
 \parencites{tannuriUtilizationNumericalSimulation2011}{serrarisDPStationkeepingAccuracy2017}{theilenNumericalSimulationShip2024},
-the maximum excursion can be a limiting factor much before the total power consumption or maximum thrust. In 2025, the International
+the maximum excursion can be a limiting factor much before the total power consumption or maximum thrust. The International
 Marine Contractors Association (IMCA) updated their recommended practices for evaluating DP behaviour
-\parencite{RecommendedPracticeSpecification2025}. In the revised version, dynamic simulations are recommended for cases
+\parencite{RecommendedPracticeSpecification2025} in 2025. In the revised version, dynamic simulations are recommended for cases
 where the footprint is critical, reinforcing the statement from \textcite{serrarisDPStationkeepingAccuracy2017}. 
 
 By using time-domain simulations rather than a quasi-static force balance, more information can be used to determine the
@@ -73,12 +73,12 @@ operational limits. These could be defined as the maximum excursion over three h
 When performing post-processing after simulations, two main approaches can be considered. The first is to
 directly predict output statistics of the system, such as the 3-hour most probable maximum footprint or peak thruster
 power, using regression models that map environmental and system parameters to these quantities. The second approach is
-to forecast the full time series, then calculate statistics through post-processing. 
+to forecast the full time-series, then calculate statistics through post-processing. 
 
 Whilst the direct regression approach is attractive due to its low-dimensional output space and computational efficiency,
 experience from nonlinear oscillator and power system surrogate modelling has shown that extreme statistics such as
 maxima are highly nonlinear functionals of the time series. Polynomial chaos expansions constructed directly for
-maximal responses exhibit large errors, whereas NARX-based surrogates that reproduce the full time history, and only
+maximal responses exhibit large errors, whereas NARX-based surrogates that reproduce the full time-history, and only
 then derive maxima, achieve accurate predictions of both instantaneous statistics and extremes
 \parencites{maiSurrogateModellingStochastic2016}{ebadollahiTimedependentUncertaintyQuantification2025}{yeDeepONetBasedUncertainty2023}.
 A direct regression on output statistics therefore compresses the complex, non-linear and time-dependent DP dynamics—including
@@ -105,7 +105,7 @@ effects, thruster dynamics and controller tuning \parencite{serrarisTimeDomainAn
 and introduce uncertainty into the final predictions. Additionally, environmental loads are subject to uncertainty due
 to their stochastic nature \parencite{vanessenRequiredTestDurations2023}.
 
-So far, most quantifications of ship DP behavior use deterministic approaches. These generally use 3-hour simulations 
+So far, most quantifications of ship DP behaviour use deterministic approaches. These generally use 3-hour simulations 
 \parencites{serrarisDPStationkeepingAccuracy2017}{RecommendedPracticeSpecification2025}{AssessmentStationKeeping2021} 
 to generate a point forecast with a single set of parameters, which is then post-processed. In these simulations,
 uncertainty in the simulation parameters is not considered.
@@ -118,7 +118,7 @@ operational decisions explicit \parencite{nowotarskiRecentAdvancesElectricity201
 Quasi-static capability calculation has seen some use of probabilistic forecasting in a study performed by
 \textcite{mauroProbabilisticApproachDynamic2022}. A Quasi-Monte Carlo was used to investigate the effect of different
 significant wave height (\(H_s\)), peak periods (\(T_p\)), and wind speed (\(V_w\)) combinations. Based on the
-probability of each combination occuring, a capability plot with confidence interval was generated
+probability of each combination occurring, a capability plot with confidence interval was generated
 (\cref{fig:probabilistic_capability_plot_mauro}). 
 
 \begin{figure}[H]
@@ -132,11 +132,11 @@ probability of each combination occuring, a capability plot with confidence inte
 \end{figure}
 
 This approach required the use of a very large number of samples to converge. \Cref{fig:convergence_history_mauro} shows
-the convergence history of their approach in red, with classic monte-carlo runs overlaid. In both cases, thousands of
-runs were needed for the final value to converge. This metthod is likely to be prohibitively expensive for use with a
+the convergence history of their approach in red, with classic Monte-Carlo runs overlaid. In both cases, thousands of
+runs were needed for the final value to converge. This method is likely to be prohibitively expensive for use with a
 time-domain approach. \textcite{serrarisDPStationkeepingAccuracy2017} mentioned that a single time domain simulation
-using the MARIN framework would take approximately 10 minutes; to blindly use monte-carlo simulations would render the
-approach useless for use in offshore decision making.
+using the MARIN framework would take approximately 10 minutes; to blindly use Monte-Carlo simulations would render the
+approach useless for use in offshore decision-making.
 
 \begin{figure}[H]
     \centering
@@ -156,9 +156,10 @@ use in predicting power consumption in electrical grids, it is likely to be suit
 of these approaches use some form of surrogate model to more efficiently calculate the dynamic responses of a system.
 
 \subsection{Uncertainty quantification}
+
 Uncertainty quantification is a field of mathematics that focuses on propagating input uncertainty through a
 mathematical system to quantify the uncertainty of the output
-\parencite{ebadollahiTimedependentUncertaintyQuantification2025}. Typically this is done with Monte-Carlo simulations,
+\parencite{ebadollahiTimedependentUncertaintyQuantification2025}. Typically, this is done with Monte-Carlo simulations,
 but as discussed in \cref{subsec:probabilistic_predictions}, this would be too computationally expensive to blindly use with
 dynamic DP analyses. Alternative methods for uncertainty quantification exist. These often consist of some form of
 surrogate model to inexpensively model the system's dynamics, which can then be combined with an uncertainty model to
@@ -199,8 +200,8 @@ are as follows:
 \end{enumerate}
 
 \section{Report Structure}
-During the scoping study, the first three goals will be adressed. A literature study will adress the first two goals,
-while a pilot test of the identified methods will adress the third. The last two methods will be the scope of the
+During the scoping study, the first three goals will be addressed. A literature study will fulfil the first two goals,
+while a pilot test of the identified methods will tackle the third. The last two methods will be the scope of the
 following thesis.
 
 First, a general overview of the
