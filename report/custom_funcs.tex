@@ -3,3 +3,23 @@
 \newcommand{\partdifff}[2]{\frac{\partial^2 #1}{\partial #2^2}}
 \newcommand{\diff}[2]{\frac{d #1}{d #2}}
 \newcommand{\difff}[2]{\frac{d^2 #1}{d #2^2}}
+
+\newcommand{\nomencols}[1]{%
+  \ifnum#1=1\relax
+    % single-column: no multicol wrapper
+    \renewcommand{\nompreamble}{}%
+    \renewcommand{\nompostamble}{}%
+  \else
+    % multi-column: use #1 columns
+    \renewcommand{\nompreamble}{\begin{multicols}{#1}}%
+    \renewcommand{\nompostamble}{\end{multicols}}%
+  \fi
+  % Enable automatic line breaks
+  \renewcommand{\nomlabel}[1]{\hfil ##1 \hfil}%
+  % Set the maximum width of the nomenclature entries
+  \setlength{\nomitemsep}{-\parsep}%
+}
+
+\newcommand{\TODO}[1]{\todo[inline, color=red!60]{\textbf{To Do:}\\#1}}
+
+\newcommand{\bigO}[1]{\(\mathcal{O}\mathit{\left(#1\right)}\)}

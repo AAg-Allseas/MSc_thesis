@@ -1,0 +1,67 @@
+
+# Previous work
+ - Increased use of dynamic DP simulations
+ - Deterministic DP simulations, no margin for varying input parameters 
+ - Time consuming simulations
+
+
+ - Probabilistic approach to capability - calculated capability for different Hs/Tp/Vw combinations, then determined most probable capability based on chance of each Hs/Tp/Vw combination occuring \cite{mauroProbabilisticApproachDynamic2022}
+ - Hydrodynamic load estimation using PINNs, used as added mass etc isn't perfect. Estimateed based on measured motions. \cite{dingHydrodynamicsIdentificationDynamic2025}
+ - Simulation of pipe coupled with DP \cite{aiModelingSimulationDeepwater2018}, \cite{armaogluAdvantagesUsingTimeDomain2014}, \cite{li-pingCouplingTimeDomainAnalysis2014}
+ 
+ - Developed a fast method for evaluating the DP capability in time domain for early design. Not sure how it is fast though, this isn't discussed \cite{luebckeFastMethodEvaluation2015}
+
+ - \cite{serrarisDPStationkeepingAccuracy} performed DP capability analyses with aNySIM from MARIN. performed 8700 simulations of each 10 minutes approximately to determine capability under various conditions. Only had 9 headings
+
+ - Following studies quantified size of their modelling errors. All used deterministic models:
+    - \cite{borhaugExperimentalValidationDynamic2012}, comparison to model tests. 10\% error in power demand
+    - \cite{martelliTimedomainMethodologyAssess2022} performed model tests, compared static capability to dynamic. Non-linear factor differences, changed for each condition
+    - \cite{donnarummaNUMERICALMODELSSHIP2015} compared high fidelity model to low fidelity, two different power trains. Much larger power peaks, peaks 25\% to 50\% power, wheras simplified had constant 20\% consumption
+
+ These errors tended to be quite large for use in decision making.
+
+\cite{hopPipeIntegrityPipelay2024} and \cite{devriesEfficientModellingOffshore2020} modelled pipelay dynamics. 
+
+- System identification of non-linear systems is a large and relatively known field
+    - Create model of mainly unknown system to predict behaviour.
+
+
+- \cite{tsiakalosScalableProbabilisticLoad2026a} propose a pipeline to predict power grid consumption while subject to exogenous variables such as weather conditions. They use ML to make the predictions as well as quantify the uncertainty of the prediction. 
+    -   Used UMAP to reduce input dimensionality, then performed clustering to identify patterns for different households
+    - Train a forecaster for each cluster to allow it to specialise more.
+    - uncertainty was based on the forecasters, as these output quantiles or distributions. The more certain the forecaster was, the smaller the uncertainty.
+    - Main goal was to used the clustering to improve accuracy for longer forecasts compared to a global forecaster
+    - Relevance to DP -> Dynamic system subject to exogenous variables. Quantifies uncertainty of prediction
+
+- \cite{ebadollahiTimedependentUncertaintyQuantification2025} propose a method using NARX (Nonlinear Auto-Regressive with eXogenous input) to perform uncertainty quantification on non-linear dynamic systems. As an example they used a pickup truck travelling over bumps.
+    - Used PDD (Polynomial dimensional decomposition) to propegate uncertainty
+
+- \cite{salinasDeepARProbabilisticForecasting2020} discusses a recurrent neural network architecture to create probabilistic forecasts with uncertainty.
+    - Introduces DeepAR, a probabilistic forecasting method using autoregressive recurrent neural networks trained on large sets of related time series for improved accuracy and scalability.
+    - Handles scale variability through rescaling and weighted sampling, and supports flexible likelihood functions (Gaussian for real-valued data, Negative Binomial for count data).
+    - Generates full predictive distributions via Monte Carlo sampling, outperforming traditional methods in both point and probabilistic forecasts across multiple datasets. 
+
+- \cite{yogeeshIntervalBasedMultiBodyDynamics2025} predict vessel motions using fuzzy-set logic
+    - Uses deterministic calculations over an interval to predict effect of uncertain inputs.
+    - 
+
+So far not covered:
+How DP behaviour is influenced by varying parameters, how sensitive is it to uncertainty?
+Probabilistic dynamic DP perediction, quantified uncertainty (how good is the prediction likely to be?)
+
+# Possible approaches
+
+## PCE
+- gPC:Note suited for time domain
+- TD-gPC: Suited for TD, does increase in computational cost quite quickly
+- Hybrid Heuveline approach: Need to look into
+- PC-NARX: Look into
+- PDD-NARX: more efficient than PC-NARX?
+
+## Surrogate with MC
+
+## Bayesian NN
+
+## Gaussian processes
+
+## DeepAR

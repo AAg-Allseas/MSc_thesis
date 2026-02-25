@@ -8,6 +8,7 @@
 \newif\if@roman
 \@romantrue
 \newif\if@whitelogo
+\newif\if@parspace
 \DeclareOption{dutch}{\@dutchtrue\@englishfalse}
 \DeclareOption{roman}{\@romantrue}
 \DeclareOption{noroman}{\@romanfalse}
@@ -15,7 +16,9 @@
 \DeclareOption{nativefonts}{\@nativefontstrue}
 \DeclareOption{print}{\@printtrue}
 \DeclareOption{whitelogo}{\@whitelogotrue}
+\DeclareOption{parspace}{\@parspacetrue}
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{book}}
+
 \ExecuteOptions{english}
 \ProcessOptions\relax
 
@@ -57,11 +60,43 @@
 \fi
 \RequirePackage{metalogo}
 \RequirePackage{tikz}
-\RequirePackage[noindentafter]{titlesec}
+
+\if@parspace    
+    \RequirePackage{titlesec}
+    \RequirePackage{parskip}
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{0.5\baselineskip plus 2pt minus 1pt}
+\else
+    \RequirePackage[noindentafter]{titlesec}
+\fi
+
+\if@twoside
+
+\else
+    \captionsetup{
+    justification=centering,
+    singlelinecheck=false
+    }
+\fi
+
+%% Other packages
+\RequirePackage{subcaption}
+\RequirePackage{nicefrac}
+\RequirePackage{cleveref}
+\RequirePackage{float}
+\RequirePackage{multicol}
+\RequirePackage{nomencl}
+\RequirePackage{xstring}
+\RequirePackage{siunitx}
 \RequirePackage{titletoc}
 \RequirePackage{xcolor}
 \RequirePackage{xkeyval}
 \RequirePackage[export]{adjustbox}
+\RequirePackage{pgf}
+
+
+%% ------------------------ Fonts -----------------------
+
 \def\@largetitlesize{96pt}
 
 \ifxetex
@@ -94,19 +129,13 @@
 
 
 \if@nativefonts
-    %% The native font is Utopia Regular with Fourier math. We use Latin Modern
-    %% as a fallback, since Utopia lacks support for sans-serif and monospace.
     \RequirePackage[T1]{fontenc}
     \RequirePackage[utf8]{inputenc}
-%    \RequirePackage{lmodern}
     \if@roman
-%      \RequirePackage{lato}
-%      \RequirePackage{helvet}
       \RequirePackage[thin]{roboto}
       \RequirePackage{fourier}
     \else
       \RequirePackage[thin]{roboto}
-%      \RequirePackage[default]{lato}
       \RequirePackage{helvet}
       \renewcommand{\familydefault}{\sfdefault}
     \fi
@@ -119,28 +148,16 @@
         \renewcommand{\familydefault}{\rmdefault}
         \def\titlefont{\fontfamily{fla}}
         \def\sectitleshape{\fontshape{n}}
-        \def\sectitlestyle{\rmfamily\titleshape\bfseries}%{\familydefault\bfseries}
+        \def\sectitlestyle{\rmfamily\titleshape\bfseries}
         \def\chaptitlestyle{\rmfamily\titleshape}
     \else
-%        \renewcommand{\familydefault}{\tudsffamily}
-%        \def\titleshape{\fontshape{n}}
         \def\titlefont{\fontfamily{fla}}
-        \def\sectitlestyle{\sffamily\titleshape\bfseries}%        \def\sectitlestyle{\titleshape\bfseries}
+        \def\sectitlestyle{\sffamily\titleshape\bfseries}
         \def\chaptitlestyle{\sffamily\titleshape}
     \fi
-%    \def\largetitleshape{\upshape}
-%    \if@print
+
     \def\titlestyle{\titlefont\titleshape}
-%    \else
-%        \def\titlestyle{\titlefont\titleshape}
-%        \def\sectitlestyle{\sffamily\titleshape\bfseries}
-%    \fi
-%    \def\titlestyle{\titlefont\titleshape\bfseries}
-%    \if@print
-%        \def\headerstyle{\titlefont\titleshape\bfseries}
-%    \else
-        \def\headerstyle{\titlefont}
-%    \fi
+    \def\headerstyle{\titlefont\titleshape\bfseries}
 \else
     %% Apart from Bookman Old Style and Arial, we use Courier New for monospace
     %% and Cambria for math.
@@ -166,10 +183,7 @@
         ItalicFont = *-ItalicMT,
         BoldItalicFont = *-BoldItalicMT
     ]{CourierNewPS}
-    \setmathfont[
-        Path = report/fonts/,
-        Extension = .ttf
-    ]{CambriaMath}
+
     %% The default style for text is Tahoma (sans-serif).
     \renewcommand*\familydefault{\sfdefault}
     %% The default style for titles is Bookman Old Style (serif). 
@@ -180,17 +194,12 @@
     \def\largetitleseries{}
     \def\largetitlestyle{\largetitlefont\largetitleseries\largetitleshape}
     \def\chaptitlefamily{\tudsffamily}
-%    \if@print
-%        \def\titlestyle{\titlefont\titleshape}
-%%        \def\largetitlestyle{\largetitlefont\titleshape\bfseries}
-%        \def\sectitlestyle{\tudsffamily\titleshape\bfseries}
-%    \else
-        \def\titlestyle{\titlefont\titleshape}
-%        \def\largetitlestyle{\largetitlefont\titleshape}
-        \def\sectitlestyle{\tudsffamily\titleshape\bfseries}
-        \def\chaptitlestyle{\chaptitlefamily}
-%    \fi
-    \def\headerstyle{\titlestyle}
+
+    \def\titlestyle{\titlefont\titleshape}
+    \def\sectitlestyle{\tudsffamily\titleshape\bfseries}
+    \def\chaptitlestyle{\chaptitlefamily}
+
+    \def\headerstyle{\titlestyle\bfseries}
 \fi
 
 % Use roman (Georgia) in quote environment
@@ -198,6 +207,13 @@
                {\list{}{\rightmargin\leftmargin}\tudrmfamily\selectfont%
                 \item\relax}
                {\endlist}
+
+%% ---------------- Colours -----------------------
+
+%% For Matplotlib's .pgf files
+\definecolor{textcolor}{rgb}{0,0,0}
+\definecolor{mathcolor}{rgb}{0,0,0}
+\DeclareRobustCommand{\mathdefault}[1]{#1}
 
 %% Define the TU Delft house style colors.
 \definecolor{tudelft-cyan}{cmyk}{1,0,0,0}
@@ -217,19 +233,8 @@
 \definecolor{tudelft-yellow}{cmyk}{0.02,0,0.54,0}
 
 \def\@pagecolor{tudelft-cyan}
-%\if@whitetitle
-%  \def\titlecolor{tudelft-white}
-%\else   
-%  \def\titlecolor{tudelft-black}
-%\fi
+\colorlet{title}{black}
 
-%% Use TU Delft cyan as the color for titles, unless the 'print' option is
-%% specified. % JMT changed this: all titles black!
-% \if@print
-    \colorlet{title}{black}
-%\else
-%    \colorlet{title}{tudelft-cyan}
-%\fi
 
 %% We use A4 paper with slightly smaller margins than the default (scale = 0.7).
 \geometry{a4paper,hscale=0.75,vscale=0.8}
@@ -300,6 +305,9 @@
 \newlength\@cover@margin
 \setlength\@cover@margin{12pt}
 
+
+%% ------------------------ Cover page -----------------------------
+
 %% Define the options for the makecover command.
 \define@boolkey{cover}{back}[true]{}
 \define@boolkey{cover}{split}[true]{}
@@ -367,27 +375,30 @@
         \ifKV@cover@whitelogo
           \ifKV@cover@back
               \node at (current page.south west)[anchor=south west,inner sep=20pt]{
-                  \includegraphics{cover/logo_white}
+                  \includegraphics{report/images/cover/logo_white}
               };
               \node at (current page.south east)[anchor=south east,inner sep=20pt]{
-                  \includegraphics{cover/logo_white}
+                  \includegraphics{report/images/cover/logo_white}
               };
           \else
               \node at (current page.south west)[anchor=south west,inner sep=20pt]{
-                  \includegraphics{cover/logo_white}
+                  \includegraphics{report/images/cover/logo_white}
               };
+                \node at (current page.south east)[anchor=south east,inner sep=30pt]{
+                    \includegraphics[width=145pt]{report/images/cover/Logo Allseas_DIAP_white_FC}
+                };
           \fi
         \else
           \ifKV@cover@back
               \node at (current page.south west)[anchor=south west,inner sep=20pt]{
-                  \includegraphics{cover/logo_black}
+                  \includegraphics{report/images/cover/logo_black}
               };
               \node at (current page.south east)[anchor=south east,inner sep=20pt]{
-                  \includegraphics{cover/logo_black}
+                  \includegraphics{report/images/cover/logo_black}
               };
           \else
               \node at (current page.south west)[anchor=south west,inner sep=20pt]{
-                  \includegraphics{cover/logo_black}
+                  \includegraphics{report/images/cover/logo_black}
               };
           \fi
         \fi
@@ -455,7 +466,7 @@
         \else
           \coordinate (tcorner) at ($(top left)+(\@cover@x,-\@cover@y)$);
           \coordinate (acorner) at ($(top left)+(\@cover@ax,-\@cover@ay)$);
-  %        \coordinate (lcorner) at ($(bottom left)+(2cm,2cm)$);
+
           %% Calculate the top left and bottom right coordinates of the front and
           %% back boxes.
           \ifKV@cover@frontbottom
@@ -467,8 +478,7 @@
           \fi
           \coordinate (front bottom right) at ($(front top left)+(\@cover@frontboxwidth,-\@cover@frontboxheight)$);
           \coordinate (back bottom right) at ($(back top left)+(\@cover@splitboxwidth,-\@cover@splitboxheight)$);
-          %% Draw the front box in black.
-  %        \fill[fill=tudelft-black](front top left) rectangle (front bottom right);
+
           %% Calculate the width and height of the front text box.
           \setlength\@cover@fronttextwidth{\@cover@frontboxwidth}
           \addtolength\@cover@fronttextwidth{-2\@cover@margin}
@@ -490,29 +500,13 @@
                   {\largetitlestyle\color{\@authorcolor}\fontsize{26}{26}\selectfont\@author}
               \end{minipage}
           };
-          %% Draw the back box in cyan.
-  %        \fill[fill=tudelft-cyan](back top left) rectangle (back bottom right);
-          %% Print the affiliation.
           \ifx\@affiliation\undefined\else
   %            \node at (back bottom right)[rotate=90,anchor=south west,inner sep=\@cover@margin]{
               \node at (acorner)[rotate=90,anchor=south west,inner sep=\@cover@margin]{
                   \tudsffamily\color{\@afilcolor}\@affiliation
               };
           \fi
-%          \ifKV@cover@back\ifx\@cover@text\undefined\else
-%              %% Calculate the width and height of the back text box.
-%              \setlength\@cover@backtextwidth{\@cover@backboxwidth}
-%              \addtolength\@cover@backtextwidth{-2\@cover@margin}
-%              \setlength\@cover@backtextheight{\@cover@backboxheight}
-%              \addtolength\@cover@backtextheight{-2\@cover@margin}
-%              %% Create the back text box.
-%              \node at (back top left)[anchor=north west,inner sep=\@cover@margin]{
-%                  \begin{minipage}[t][\@cover@backtextheight]{\@cover@backtextwidth}
-%                      \tudsffamily\color{tudelft-white}\@cover@text
-%                  \end{minipage}
-%              };
-%          \fi
-         
+%      
        \fi
     \end{tikzpicture}
     %% Restore the margins and turn the page white again.
@@ -542,16 +536,27 @@
 }
 
 %% Fancy style for the main matter.
-\fancypagestyle{mainmatter}{%
-    \fancyhf{}
-    %% Page numbers on the top left and top right.
-    \fancyhead[LE,RO]{\titlefont\titleshape\thepage}
-    %% Chapter name on the left (even) page.
-    \fancyhead[RE]{\titlefont\titleshape\nouppercase{\leftmark}}
-    %% Section name on the right (odd) page.
-    \fancyhead[LO]{\titlefont\titleshape\nouppercase{\rightmark}}
-}
+\if@twoside
+    \fancypagestyle{mainmatter}{%
+        \fancyhf{}
+        %% Page numbers on the top left and top right.
+        \fancyhead[LE,RO]{\titlefont\titleshape\thepage}
+        %% Chapter name on the left (even) page.
+        \fancyhead[RE]{\titlefont\titleshape\nouppercase{\leftmark}}
+        %% Section name on the right (odd) page.
+        \fancyhead[LO]{\titlefont\titleshape\nouppercase{\rightmark}}
+    }
+\else
 
+    \fancypagestyle{mainmatter}{%
+        \fancyhf{}
+        %% Page numbers on the top  top right.
+        \fancyhead[R]{\titlefont\titleshape\thepage}
+        %% Chapter name on the left (even) page.
+        \fancyhead[L]{\titlefont\titleshape\nouppercase{\leftmark}}
+        %% Section name on the right (odd) page.
+        % \fancyhead[LO]{\titlefont\titleshape\nouppercase{\rightmark}}
+    }
 %% The mainmatter style is default for normal pages.
 \pagestyle{mainmatter}
 

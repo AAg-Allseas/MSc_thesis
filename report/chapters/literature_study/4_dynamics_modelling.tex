@@ -1,0 +1,616 @@
+\chapter{Dynamics Modelling}
+\label{chapter:dynamic_modelling}
+A continuous time dynamical system can be considered in the following form:
+
+\begin{equation}
+    \diff{\mathbf{x}(t)}{t} = \mathbf{f}\left(\mathbf{x}(t), t; \boldsymbol{\beta}\right)
+\end{equation}
+
+A discrete time system can analogously be considered in the following form:
+
+\begin{equation}
+    \mathbf{x}_{k + 1} = \mathbf{F}(\mathbf{x}_k, t; \mathbb{\beta})
+    \label{eq:discrete_dynamical_system}
+\end{equation}
+
+As this only depends on the state at the current time, these processes can be considered as Markov processes.
+
+In this chapter, three approaches to modelling the dynamics of nonlinear systems are considered. First a brief overview
+of state space models is given, followed by a review of operator learning techniques. Of the two considerd, Koopman
+operators and DeepONet, the DeepONet approach seems the most promising for the problem at hand. Finally neural
+stochastic differential equations are covered. 
+
+\section{State-space models}
+State-space models (SSMs) describe dynamical systems using an internal state that evolves over time in response to inputs. In continuous time, a linear SSM is typically written as:
+\begin{equation}
+    \mathbf{x}'(t) = A\mathbf{x}(t) + B\mathbf{u}(t), \qquad \mathbf{y}(t) = C\mathbf{x}(t) + D\mathbf{u}(t)
+\end{equation}
+
+where $\mathbf{x}(t)$ is the latent state, $\mathbf{u}(t)$ the input, and $\mathbf{y}(t)$ the observed output.
+Discretising yields a recurrent update:
+
+\begin{equation}
+    \mathbf{x}_k = \bar{A}\mathbf{x}_{k-1} + \bar{B}\mathbf{u}_k, \qquad \mathbf{y}_k = \bar{C}\mathbf{x}_k
+\end{equation}
+
+SSMs can be viewed equivalently as continuous-time ODEs, discrete-time recurrences, or as convolutional systems with an impulse-response kernel. This flexibility makes them attractive for sequence modelling.
+
+However, standard SSMs with generic matrices $A$ struggle with long-range dependencies, as linear first-order systems
+tend to forget or amplify information exponentially over time. The HiPPO framework and Structured State Space (S4)
+models address this by using special matrix structures that allow the state to efficiently summarise the input history.
+S4, in particular, uses a diagonal-plus-low-rank parametrisation for computational efficiency, enabling deep stacks of
+SSM layers to achieve state-of-the-art results on long-sequence tasks with costs comparable to efficient Transformer
+variants \parencites{guEfficientlyModelingLong2022}{guMambaLinearTimeSequence2024}.
+
+Despite these advances, S4 and related deep SSMs remain fundamentally linear latent models. Nonlinearities are introduced between layers, but each layer itself implements a linear time-invariant update. This is well suited for modelling deterministic long-range dependencies, such as in language or audio, where the main challenge is memory rather than capturing strong nonlinearity or stochasticity.
+
+In contrast, the systems of interest in this thesis are stochastically excited nonlinear dynamical systems. Here, the
+quantities of interest are often full response trajectories or probability distributions, not just deterministic means.
+Classical linear SSMs (and their deep variants) struggle to capture the combined effects of strong nonlinearity and
+stochastic forcing without resorting to very high state dimensions or extensive tuning. As such, this thesis will focus
+on the other topics discussed in this chapter.
+
+\section{Operator learning}
+An approach to modelling dynamics is operator learning. With operator learning, one aims to learn an operator that maps
+one function into another. Two main approaches are covered in this section. First Koopman operators will be discussed
+followed by more general operator learning with DeepONets. 
+
+\subsection{Koopman operator theory}
+Koopman operator theory states that it is possible to represent a nonlinear dynamical system in terms of an
+infinite-dimensional linear operator acting on a Hilbert space of measurement functions of the state of the system
+\parencite{bruntonDatadrivenScienceEngineering2019}. This was demonstrated by
+\citeauthor{koopmanHamiltonianSystemsTransformation1931} in \citeyear{koopmanHamiltonianSystemsTransformation1931}. This
+operator is linear, making analysis of the system much easier. It is however infinite, so must be truncated for real
+applications. 
+
+\subsubsection{Mathematical Formulation}
+The Koopman operator is a linear operator that acts on a measurement function as follows:
+\begin{equation}
+    \mathcal{K} g = g(\mathbf{F})
+\end{equation}
+For a discrete system as described in \eqref{eq:discrete_dynamical_system}, this formulation becomes the following:
+
+\begin{align}
+    \mathcal{K}g(\mathbf{x}_k) = g(\mathbf{F}(\mathbf{x}_k)) \\
+    \mathcal{K} g(\mathbf{x}_k) = g(\mathbf{x}_{k + 1})
+\end{align}
+
+This means the Koopman operator is a linear operator that advances the observation of a state forward in time. This is
+true for any observable function \( g\) and any state \( \mathbf{x}_k \). \Cref{fig:koopman_visualisation} visualises
+the transformation performed by the Koopman operator and the measurement functions.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{report/images/literature_study/bruntonDataDrivenDynamicalSystems2019.png}
+    \caption{Schematic illustrating the Koopman operator for nonlinear dynamical systems. The dashed lines from yk → xk
+    indicate that we would like to be able to recover the original state.
+    \parencite{bruntonDataDrivenDynamicalSystems2019}}
+    \label{fig:koopman_visualisation}
+\end{figure}
+
+The operator is, however, infinite in dimension. This provides a significant challenge for computing. Instead of capturing
+the development of all the measurement functions, one can identify key measurement functions that evolve linearly over time.
+\parencite{bruntonDatadrivenScienceEngineering2019}. This can be done by determining the eigenfunctions of the Koopman
+operator \( (\varphi(\mathbf{x}_k)) \). As the eigenfunctions form a basis for the measurement space, each measurement
+function can be formulated as an infinite weighted sum of eigenfunctions. This infinite sum can be approximated by
+truncating at some point. 
+
+\begin{equation}
+    g_i(\mathbf{x}) = \sum_{j = 1}^{M} v_{ij}\varphi_j(\mathbf{x})
+    \label{eq:koopman_measurement_spec_decomp}
+\end{equation}
+
+By truncating the inifinte sum, the measurement space can be approximated. The challenge of
+using the Koopman operator has now shifted to selecting the best finite set of eigenfunctions to capture the systems
+dynamics.
+
+\subsubsection{Data-driven Koopman analysis}
+Analytically determining the Koopman eigenfunctions and their weights for a complex non-linear dynamical system is not
+practically feasible. As such data-driven techniques are the method of choice for real world systems.
+
+DMD is a data-driven technique used to identify modes that represent spatial patterns that evolve linearly in time. DMD
+approximates the Koopman operator while restricted to a set of direct measurements of the state. It is based purely on
+data, and requires no prior knowledge of the system's governing equations. Its simple and efficient numerical
+implementation has made it popular in recent years \parencite{bruntonDataDrivenDynamicalSystems2019}.
+
+The governing principle is as follows: Snapshots of the dynamical system are arranged into two data matrices. These
+matrices are then used to solve for a linear operator that maps one data matrix onto the other. 
+
+\begin{equation}
+    \label{eq:dmd_X_matrices}
+    \begin{split}
+    \mathbf{X} &= \left[\mathbf{g}(\mathbf{x}(t_1)), \mathbf{g}(\mathbf{x}(t_2)),\dots,\mathbf{g}(\mathbf{x}(t_m)) \right] \\
+    \mathbf{X'} &= \left[\mathbf{g}(\mathbf{x}(t'_1)), \mathbf{g}(\mathbf{x}(t'_2)),\dots,\mathbf{g}(\mathbf{x}(t'_m)) \right]
+\end{split}
+\end{equation}
+
+\begin{equation}
+    \mathbf{X'} \approx \mathcal{K}\mathbf{X}
+\end{equation}
+
+DMD provides a method for obtaining $\mathcal{K}$ efficiently using a singular value decompostion of $\mathbf{X}$. This
+This method can be extended by using a library of nonlinear measurement functions and fitting a linear operator to the
+augmented state. Then two augmented data matrices are constructed, analogously to \eqref{eq:dmd_X_matrices}. These can then be solved to
+obtain a linear operator. If the measurement functions fully spans a Koopman invarient subspace, the extended DMD
+operator converges to the Koopman operator in the limit of $m$. However, if the measurements contains the wrong
+functions, the model will overfit or give incorrect modal responses. Correctly determining the functions that should be
+contained in $\mathbf{g}$ is thus essential.
+
+\subsubsection{Neural networks for Koopman theory}
+Even for relatively simple dynamical systems, the Koopman eigenfunctions can be arbitrarily complex
+\parencite{bruntonDataDrivenDynamicalSystems2019}. Creating a suitable library for use with eDMD can be challenging.
+Deep learning could provide an alternative approach \parencite{luschDeepLearningUniversal2018}
+
+The goal of determining an invertable function \(\varphi\) and Koopman operator \(\mathcal{K}\) such that \( y_{k} =
+\varphi(x_k) \) and \( y_{k + 1} = \mathcal{K}y_k \). This problem fits well with a deep auto-encoder based approach. An
+additional constraint added is that the dynamics of the latent variables must linarly represent the dynamics of the
+system. This forces the encoder to act as Koopman eigenfunctions. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{report/images/literature_study/luschDeepLearningUniversal2018.png}
+    \caption{Deep neural network architecture used to identify Koopman eigenfunctions φ(x). The network is based on a
+    deep auto-encoder (a), which identifies intrinsic coordinates y = φ(x). Additional loss functions are included to
+    enforce linear dynamics in the auto-encoder variables (b,c) \parencite{luschDeepLearningUniversal2018}}
+    \label{fig:lusch_koopman_AE_architecture}
+\end{figure}
+
+This approach is not without its challenges. While there is no more need to select a basis for the eDMD method, one now
+has to decide on the number of latent nodes needed, as well as other hyperparameters. This approach also has a larger
+upfront computational cost to train the system as well as needing a large amount of data.
+
+\subsubsection{Koopman Theory for Stochastic Systems}
+The above sections discuss the Koopman operator for deterministic systems. If a stochastic dynamical system is to be
+considered however, the formulation can be adjusted. This is given by \textcite{crnjaric-zicKoopmanOperatorSpectrum2020}
+in the following form: 
+
+\begin{equation}
+    \mathcal{K}(\mathbf{x}) = \mathbb{E}[g(\mathbf{F}(\mathbf{x}))]
+\end{equation}
+
+The eigenvalue formulation can then analogously be formulated:
+
+\begin{equation}
+    \mathcal{K}\varphi(\mathbf{x}) = \lambda^S(t)\varphi(\mathbf{x})
+\end{equation}
+
+where $\varphi$ are the eigenfunctions of the stochastic Koopman Operator and $\lambda^S(t)$ are the stochastic Koopman
+eigenvalues. The stochastic Koopman operator tracks how the expected state of the stochastic dynamical system develops
+in measurement space. It does not however track the variance of the the state. 
+
+\subsection{Variational Approach for Markov Processes}
+\textcite{wuVariationalApproachLearning2019} developed a method to approximate the Koopman operator from data of
+stochastic systems. Their approach is based on stochastic Koopman theory coupled with canonical covariance analysis. This
+approach was extended by \textcite{mardtVAMPnetsDeepLearning2018} to use deep learning. 
+
+The method uses two neural encoders to estimate the measurement function at any given timestep. These are indicated as
+\(\mathcal{X}_0 \text{ and } \mathcal{X}_1\) respectively. By passing two states through these networks time-lagged by
+time \(\tau\), the covariance can be calculated.
+
+\begin{equation}
+    \begin{aligned}
+        C_{00} &= \mathbb{E}_t \left[\mathcal{X}_0(\mathbf{x}_t)\mathcal{X}_0(\mathbf{x}_t)^T\right] \\
+        C_{01} &= \mathbb{E}_t \left[\mathcal{X}_0(\mathbf{x}_t)\mathcal{X}_1(\mathbf{x}_{t + \tau})^T\right] \\
+        C_{11} &= \mathbb{E}_{t + \tau} \left[\mathcal{X}_1(\mathbf{x}_{t + \tau})\mathcal{X}_1(\mathbf{x}_{t + \tau})^T\right] \\
+    \end{aligned}
+\end{equation}
+
+The optimal Koopman operator can then be found by minimising the least-square error between
+\(\mathcal{X}_1(\mathbf{x}_{t + \tau})\) and \(\mathcal{X}_0(\mathbf{x}_t)\). This becomes:
+
+\begin{equation}
+    \mathcal{K} = C_{00}^{-1} C_{01}
+\end{equation}
+
+Directly solving this would result in a trivial answer. To avoid this issue,
+\parencites{wuVariationalApproachLearning2019}{mardtVAMPnetsDeepLearning2018} use the VAMP-2 score. This additionally
+has an advantage for use in deep learning, as the gradients provided by the VAMP-2 score are easier to handle resulting
+in smoother training.
+
+\begin{equation}
+    \label{eq:VAMP_2}
+    \hat{R}_2\left[\mathcal{X}_0, \mathcal{X}_1\right] = \left|\left| C_{00}^\frac{-1}{2}C_{01} C_{11}^\frac{-1}{2}\right|\right|^2 
+\end{equation}
+
+By using \eqref{eq:VAMP_2} as a loss function for the two networks, these can be trained to learn \(\mathcal{X}_0 \text{ and } \mathcal{X}_1\).
+
+\subsection{DeepONet}
+DeepONet, proposed by \textcite{luLearningNonlinearOperators2021}, works based on the universal operator approximation
+theorem. The theorem states that a neural network with a single hidden layer can approximate any nonlinear continuous
+function or operator. 
+
+\textcite{luLearningNonlinearOperators2021} used this theorum to develop DeepONet, a network architecture designed to
+approximate nonlinear operators. Let \(u(x)\) be an input signal with \(G(u)\) is the corresponding output function.
+Then \(G(u)(y)\) is a real number. The network therefore takes two inputs, the function \(u(x)\) and the point at which
+to sample, \(y\). 
+
+The universal approximation theorem for operators is as follows \parencite{chenUniversalApproximationNonlinear1995}. Let \(\sigma\) be a continuous non-polynomial function.
+\(G\) is a nonlinear continuous operator. For any \(\epsilon > 0\) there exists a set of positive integers \(n,p,m\) and
+constants \(c_i^k, \zeta_{ij}^k, \theta_i^k, \zeta_k, \zeta_k\in\mathbb{R}, x_j\in\mathbb{R}, w_k\in\mathbb{R}, i = 1,
+\dots, n, k = 1,\dots,p, j = 1,\dots m \) such that:
+
+\begin{equation}
+    \left| G(u)(y) - \sum^p_{k = 1} \underbrace{ \sum^n_{i = 1} c_i^k\sigma\left(\sum^m_{j = 1}\zeta_{ij}^ku(x_j) + \theta^k_i\right)}_{\text{Branch network}} \, \underbrace{\sigma(w_k\cdot y + \zeta_k)}_{\text{Trunk network}}\right| < \epsilon
+\end{equation}
+
+\textcite{luLearningNonlinearOperators2021} adapts this formulation from using a single shallow network to two deep
+networks: a branch network and a trunk network. These are then combined to form the total operator. The branch net can
+consist of multiple networks and handels
+the input function whereas the trunk network handles the location to evaluate the operator at. The specific network
+architecture choices for the branch and trunk networks are arbitrary and depend on the problem at hand. 
+
+\begin{equation}
+    G(u)(y) \approx \sum^p_{k = 1}\underbrace{b_k(u(x_1), u(x_2), \dots, u(x_m))}_{\text{Branches}}\,\underbrace{t_k(y)}_{\text{Trunk}}
+\end{equation}
+
+In practice, \(p\) is often of at least order 10 \parencite{luLearningNonlinearOperators2021}. An interpretation
+of this approach is that DeepONet acts as a spectral decomposition on an arbitrary basis. This basis is determined by
+the trunk network, while the weights are determined by the branches. As such, the branch
+networks are combined into a single network that outputs a vector \([b_1, b_2, \dots b_p]\). The overall architecture is illustrated in \cref{fig:deeponet_architecture}. The architecture with a single network is
+referred to as \emph{unstacked} whereas the version with separate branch networks is referred to as \emph{stacked}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{report/images/literature_study/luLearningNonlinearOperators2021.png}
+    \caption{\textbf{a.} Stacked DeepONet with multiple branch networks. \textbf{b.} Unstacked DeepONet with single
+    branch network \parencite{luLearningNonlinearOperators2021}}
+    \label{fig:deeponet_architecture}
+\end{figure}
+
+Passing a continous input to a neural network is a challenge. Two approaches that can be used are either a spectral
+decomposition where the coefficients are passed into the network, or by sampling the function at fixed discrete points.
+These discrete samples should be consistent with each other between training sets, as should the spectral method. 
+
+The results obtained by \textcite{luLearningNonlinearOperators2021} demonstrate a remarkably low generalisation error
+with DeepONet compared to more traditional neural network approaches. For a test case on the antiderivitive operator,
+the best loss for a forward neural network was \(\approx 10^ - 4\). DeepONet achieved a loss in the range \(10^{-5} -
+10^{-6}\). The theoretical reasoning behind this low error is unknown to the authors. The approach works for a diverse
+set of problems; the paper reports tests of PDEs, ODEs and SDEs. Among the test cases DeepONet showed a remarkable
+performance. For the stochastic ODE they report a test MSE of \(\sim 8 \cdot 10^{-5} \) The training cost of the network
+is higher than with regular neural networks, as the per epoch cost is the product of the number of training runs and the
+samples per run. The trade-off is that relatively small training sets are needed. Furthermore, the network trains in
+relatively few epochs compared to other architectures.
+
+\textcite{yeDeepONetBasedUncertainty2023} present a DeepONet-based framework for uncertainty quantification in power
+system dynamics under stochastic loads. The system is modeled as a set of stochastic differential-algebraic equations
+(SDAEs), where load fluctuations follow an Ornstein-Uhlenbeck process. The authors argue that conventional methods, such
+as Monte Carlo simulation or Gaussian Process surrogates, are either computationally prohibitive or fail to capture
+temporal correlations, especially because they require separate models at each time step. DeepONet is employed to learn
+the solution operator mapping entire stochastic load trajectories to full dynamic system responses. Simple MLPs were
+used for the branch and trunk nets. An unstacked architecture is used. This lead to
+substantial improvements in efficiency and accuracy: across IEEE 39 and WECC 179-bus systems, DeepONet produced low
+trajectory prediction errors (\(MAPE \approx 1-1.5\%\)) and provided more reliable variance estimates than Gaussian
+Process approaches, while reducing computational cost by over an order of magnitude compared to Monte Carlo simulation.
+
+\textcite{moyaDeepONetGridUQTrustworthyDeep2022} developed DeepONet-Grid-UQ, a DeepONet-based framework for predicting
+post-fault power system trajectories together with uncertainty estimates. The authors framed the task as an
+operator-learning problem, where DeepONet learned a mapping from fault-on trajectories to corresponding post-fault
+responses. To make these predictions trustworthy, they introduced two uncertainty-aware variants: Bayesian DeepONet,
+which used Stochastic Gradient Hamiltonian Monte-Carlo (SGHMC) sampling to approximate a posterior over network
+parameters, and Probabilistic DeepONet, which produced Gaussian predictive distributions through probabilistic training.
+Both approaches were validated on the IEEE 16-machine 68-bus system. They achieved low mean prediction errors (\(L1: ~1.6 -1.8\%, L2: ~2.0\%\)) and constructed 95\% confidence intervals that captured about 93-94\% of ground truth trajectories. Their uncertainty estimates remained reliable even under noisy inputs. In an applied test on under-voltage limit violations, both models avoided false-negative alarms while maintaining conservative false-positive rates, demonstrating their practical relevance for operational security assessment.
+Overall, the study showed that DeepONets could be extended with probabilistic and Bayesian components to deliver robust, uncertainty-aware operator learning for safety-critical dynamical systems, complementing earlier DeepONet work by emphasizing reliability as well as accuracy.
+
+\textcite{jinMIONetLearningMultipleInput2022} introduce MIONet, DeepONet with multiple input functions. Their work
+extended the universal approximation theorum to demonstrate that multiple input operator learning can be framed through
+low-rank tensor product structures. The proposed architecture combined several branch networks, one per input
+function, with a trunk network, merging their outputs through dot products. Across ODE and PDE
+benchmarks, MIONet consistently outperformed DeepONet (e.g., 1.69\% vs. 2.41\% error for nonlinear ODEs, and 1.97\% vs.
+5.25\% for diffusion-reaction PDEs), particularly when prior structural knowledge such as periodicity was encoded. These
+results showed that MIONet offered a more expressive and scalable approach for operator learning problems requiring
+multiple inputs.
+
+
+\section{Neural Stochastic Differential Equations}
+Neural Ordinary Differential Equations are a powerful tool for modelling dynamics of systems. Neural stochastic
+differential equations are their stochastic analogue. This section will discuss these approaches for use in modelling
+stochastic dynamical systems. First an overview will be given of neural ODEs, followed by an overview of neural
+stochastic differential equations. 
+
+\subsection{Neural Ordinary Differential Equations}
+A second method for modeling dynamics is neural ordinary differential equations (Neural ODEs). First published by
+\textcite{chenNeuralOrdinaryDifferential2018}, neural ODEs are derived from residual neural networks (ResNet). A ResNet
+works as follows:
+
+\begin{equation}
+    \mathbf{h}_{k + 1} = \mathbf{h}_k + f_\theta\left(\mathbf{h}_k, k\right)
+    \label{eq:resnet}
+\end{equation}
+
+These iterative updates can be interpreted as an Euler discretisation of a continuous system. In the continuous time limit, the dynamics can be described by the following:
+
+\begin{equation}
+    \diff{\mathbf{h}(t)}{t} = f_\theta(\mathbf{h}(t), t)
+    \label{eq:neural_ode}
+\end{equation}
+
+The time stepping can then be handled by a time integration algorithm. 
+
+\subsubsection{Advantages of Neural ODEs}
+Neural ODEs have several advantages over ResNets
+for the modelling of dynamical systems \parencite{chenNeuralOrdinaryDifferential2018}. 
+
+ResNets approximate the Euler discretisation of a dynamic system. This is one of the simplest time integration methods
+and numerous more efficient and accurate integration schemes are available. Neural ODEs allow the use of more advanced time stepping schemes
+allowing the cost of the model to scale better with the complexity of the problem. Furthermore, as neural ODEs act in
+continuous time, the effect of irregularly sampled data is mitigated. When training on simulated data, this is less
+significant, but when using real data from various sensors on board a ship this can be a significant advantage. 
+
+A further advantage is that neural ODEs do not calculate the gradients of the weights using backpropagation. Rather, a second ODE
+is solved backwards in time and the gradients are obtained from there. This means that the memory cost of training is
+independent of the length of the time series. 
+
+Finally, for the modelling of time series, a neural ODE, by its nature, uses the same parameters for each timestep. This
+reduces the complexity of the model as well as improving the generalisability of the network.
+
+\subsubsection{Limitations of Neural ODEs}
+These advantages are not without their limitations however. Many of the limitations of solving regular ODEs are also
+prevelant with neural ODEs. The computational cost and accuracy is highly dependent on the solver chosen. For stiff
+systems explicit solvers become infeasible so implicit solvers are needed, increasing computational cost
+\parencite{anantharamanStablyAcceleratingStiff2022}. Neural
+ODEs must also be Lipschitz continuous to have a solution. This holds if the weights of the network are finite and the
+activation functions are also Lipschitz continuous. Due to the sequential nature of neural ODEs, it is challenging to
+run them parallel on modern hardware such as GPUs. While the neural network evaluation is easily parallisable, the time
+integration can only run sequentially.
+
+\subsection{Theoretical formulation of neural SDEs}
+\label{subsec:neural_sde}
+A limitation primarily relevant to this study is that in the form of neural ODEs given in \eqref{eq:neural_ode}, the network is unable
+to deal with stochastic systems. Stochastic differential equations (SDEs) can similarily be approximated by neural
+networks to give a neural SDE. The general form of these is given as follows \parencites{jiaNeuralJumpStochastic2020}{liuHowDoesNoise2020}{tzenNeuralStochasticDifferential2019}:
+
+\begin{equation}
+    dh(t) = f_\theta(h(t), t) dt + g_\varphi(h(t), t) dW, \quad dW \sim \mathcal{N}(0, dt)
+\end{equation}
+
+Where \(f\) and \(g\) are neural networks parameterised by weights \(\theta\) and \(\varphi\) respectively. \(W\) is a
+Wiener process sampled from a Gaussian distribution. \(f\) is the drift term, this describes the deterministic dynamics
+of the system. The diffusion term, \(g\), models the stochastic components of the dynamical system. 
+
+Similar to neural ODEs, this formulation results in a model that effectively defines the dynamics of the system in
+continuous time. To progress the model in time, a stochastic time integration scheme can be used such as Euler-Maruyama,
+stochastic Runge-Kutta or stochastic Heun integration \parencite{kidgerEfficientAccurateGradients2021}.
+
+\subsection{Adjoint method for neural SDEs}
+\label{subsec:adjoint_sde}
+
+Training neural SDEs and ODEs ideally avoids storing the full forward path in GPU memory, but this conflicts with
+backpropagation requirements, which depend on intermediate states to compute gradients with respect to model parameters.
+To work around this limitation in neural ODEs, the adjoint sensitivity method is typically used: instead of
+backpropagating through every solver step, one solves an adjoint ODE backwards in
+time.\parencite{chenNeuralOrdinaryDifferential2018} \textcite{liScalableGradientsStochastic2020} adapted this idea to
+the stochastic setting, showing how to define and numerically solve a backward-in-time adjoint \emph{SDE} that yields
+gradients with constant memory cost.
+
+Consider a Stratonovich SDE with Lipschitz continuous drift \(b\) and diffusion \(\sigma\)
+
+\[
+Z_T = z_0 + \int_0^T b(Z_t, t)\,dt + \int_0^T \sigma(Z_t, t) \circ dW_t,
+\]
+
+and write \(\Phi_{s,t}(z) := Z_t^{s,z}\) for the solution at time \(t\) started from state \(z\) at time \(s\). For fixed \(s\) and \(t\), we can also view \(\Phi_{s,t}\) as a (random) change of variables on state space, with
+inverse map
+
+\[
+\check{\Psi}_{s,t} := \Phi_{s,t}^{-1}.
+\]
+
+\(\check{\Psi}_{s,t}(z)\) can be understood as: "which state at time \(s\) would have evolved into \(z\) at
+time \(t\), under this particular realization of the Brownian path?". \textcite{liScalableGradientsStochastic2020} show
+that \(\check{\Psi}_{s,t}\) itself satisfies a backward Stratonovich SDE. This backward SDE
+simply describes running the original dynamics in reverse time along the same stochastic path, with appropriate sign
+changes in the drift and diffusion terms.
+
+The goal of the adjoint method is to compute the gradient of a scalar loss \(\mathcal{L}\) that depends on the terminal
+state \(Z_T\), with respect to both the initial condition and the model parameters (which enter through \(b\) and
+\(\sigma\)). We define the adjoint process by
+
+\[
+A_{s,t}(z) := \frac{\partial \mathcal{L}(\Phi_{s,t}(z))}{\partial z},
+\]
+
+so that \(A_{s,t}(z)\) represents the sensitivity of the loss to perturbations of the state at time \(t\), when the
+system was started from \(z\) at time \(s\). In particular, \(A_{0,T}(z_0)\) is the gradient of the loss with respect to
+the terminal state produced by the forward SDE. 
+
+This adjoint process can be characterized as the solution of a backward SDE that is coupled to the original dynamics: as we integrate backwards from \(T\) to
+\(0\), we jointly evolve the state via the backward flow \(\check{\Psi}\), and the adjoint via an SDE whose
+drift and diffusion depend on the Jacobians of \(b\) and \(\sigma\) with respect to the state and parameters. Instead of
+storing the entire forward trajectory and differentiating through the solver, the
+dynamics can be re-simulated in reverse time and propagate sensitivities through this backward SDE. This yields
+gradients with respect to initial conditions and parameters using only \(\mathcal{O}(1)\) memory, at the cost of solving
+an additional SDE backwards in time.
+
+The adjoint SDE is not solved analytically but numerically, using essentially the same solver infrastructure as for the
+forward dynamics. Following \textcite{liScalableGradientsStochastic2020}, the backward integration is done with a chosen
+timestep such that the adjoint variables and the backward flow are jointly evolved from $T$ back to~$0$. This timestep
+does not have to be the same as that of the forward SDE. This mirrors the continuous-time adjoint method for ODEs, but
+now in the stochastic setting.
+
+A challenge is that the backward SDE must reuse the identical Brownian path from the forward computation, while
+still avoiding storage of all forward-time increments. \textcite{liScalableGradientsStochastic2020} resolve this using
+the virtual Brownian tree (VBT), which reconstructs increments on demand via Brownian bridges and splittable
+random seeds, achieving $\mathcal{O}(1)$ memory and logarithmic-time generation for any interval. This enables adaptive
+step sizes in the forward solver without memory overhead. This method was improved upon by
+\textcite{kidgerEfficientAccurateGradients2021}. They introduce the Brownian Interval construction. Unlike VBT,
+which reconstructs increments in $\mathcal{O}(\log L)$ time and with small approximation errors, the Brownian Interval
+provides exact Brownian samples with average $\mathcal{O}(1)$ time and memory cost, using a binary interval tree together with a
+small LRU cache. This yields substantial speedups and improves stability of the backward SDE by avoiding stochastic noise from approximate reconstruction. If memory is not an issue however, storing the Brownian motion at each iterval is
+the most time efficient method as the Brownian motion does not have to be reconstructed at each timestep.
+
+\textcite{kidgerEfficientAccurateGradients2021} propose an algebraically reversible solver for Stratonovich SDEs: the
+reversible Heun method. It allows exact reconstruction of all intermediate forward states during the backward pass,
+eliminating the gradient inaccuracies that arise when standard solvers must be approximately inverted in reverse-time
+adjoint integration. Its computational cost remains one function evaluation per step while matching the strong
+convergence rates of classical midpoint/Heun schemes.
+
+\subsection{Training architectures}
+Literature discusses two main training paradigms for neural SDEs. These are the \emph{Latent SDE} method proposed by
+\textcite{liScalableGradientsStochastic2020} and the \emph{SDE-GAN} approach by
+\textcite{kidgerNeuralSDEsInfiniteDimensional2021}. 
+
+Both approaches model the dynamics in a latent space because the observations themselves are not Markovian \parencite{kidgerNeuralSDEsInfiniteDimensional2021}. In practice,
+observations are partial, noisy, and often irregularly sampled, so they do not contain all information required to
+predict future behavior. This means each observation still depends on earlier (unobserved) states, which makes the
+observed process non-Markovian. 
+
+In contrast, the latent dynamics can be modeled as Markovian, since the latent state is constructed to contain all
+information needed for future evolution. Neural latent-SDE and SDE-GAN explicitly exploit this by learning
+hidden dynamics that depend only on the current latent state, rather than on the full observation history. This allows
+efficient forecasting and simulation without storing past states.
+
+\subsubsection{Latent SDE}
+\label{subsubsec:latentsde}
+The latent SDE method was developed by \textcite{liScalableGradientsStochastic2020} to train neural SDEs. The key
+problem it aims to avoid is the fact that directly fitting an SDE to observed data by maximising the likelyhood often
+causes the learned diffusion to tend to zero. This causes the model to overfit the data. It overcomes this issue by
+using a variational approach. 
+
+The approach is similar to that used in a variational autoencoder \parencite{kingmaAutoEncodingVariationalBayes2014}. A
+prior and approximate posterior are assumed as Neural SDEs, each with their own drift term but a shared diffusion term.
+
+\begin{equation}
+    \begin{aligned}
+        d\tilde{z}_{t}&=\mu_{\theta} (\tilde{z}_{t},t)dt+\sigma (\tilde{z}_{t},t)dw_{t}& ({{\mathrm {prior}}})\\ 
+        dz_{t}&=\mu _{\phi} (z_{t},t)dt+\sigma (z_{t},t)dw_{t} &({{\mathrm {approx. ~posterior}}})\\
+        \tilde{z}_{0}&=z_{0}\sim \psi (x_{0})& ({{\mathrm {initial~ latent ~state}}})\\ 
+        x_{t}& = f(z_{t})& ({{\mathrm {decoded ~states}}})
+    \end{aligned}
+\end{equation}
+The drift and diffusion functions, \(\mu_{\theta}, \mu _{\phi} \text{ and } \sigma \) are Lipschitz in state and time.
+\( \psi \text{ and } f\) are an encoder and decoder respectively. 
+
+The approximate posterior aims to learn the true posterior distribution of the system. It does this by mapping
+observations to a latent path. The posterior network does this with information from the observations.
+\textcite{liScalableGradientsStochastic2020} achieved this by encoding observations into a context vector which is
+passed to the drift network each timestep.
+
+The prior aims to generate latent trajectories that match the approximate posterior. It generates a latent path from a
+given starting point. Unlike with a variational autoencoder, the prior is not fixed and is learned as it needs to capture the latent dynamics.
+
+The decoder network encodes the latent space states into observation space. The encoder network can be used in two ways.
+\textcite{ryzhikovLatentStochasticDifferential2023} used it to encode the initial state of the observations to determine
+the initial latent state. \textcite{liScalableGradientsStochastic2020} used a gated recurrent unit (GRU) encoder to add a context vector to the
+input parameters of the the approximate posterior.
+
+The loss function is the ELBO. It consists of two components, the reconstruction loss and the KL divergence loss. The
+reconstruction loss minimises the difference between the observations and the decoded latent state generated by the
+posterior SDE. The KL divergence loss maps the difference between the paths generated by
+the prior and the paths generated by the posterior. The ELBO can be written as:
+
+\begin{equation} 
+    \log p(x_{1}, x_{2}, {\dots }, x_{N}|\theta) \geq \mathbb{E}_{z_{t}}\left[{\Sigma
+_{i=1}^{N}\log p(x_{t_{i}}|z_{t_{i}})-\int _{0}^{T}\frac {1}{2}|u(z_{t},t)|^{2}dt}\right]
+\end{equation}
+
+Where:
+
+\begin{equation} 
+    u(z_{t},t)=\frac {\mu _{\theta} (z_{t},t)-\mu _{\phi} (z_{t},t)}{\sigma (z_{t},t)}
+\end{equation} 
+
+The term containing \(u(z_t, t)\) can be considered as the KL-divergence term. By augmenting the foreward SDE's state
+with an additional variable with drift \(\frac {1}{2}|u(z_{t},t)|^{2}\) and diffusion \(0\), the gradient with respect
+to the prior and variational parameters can be determined using the adjoint method discussed in
+\cref{subsec:adjoint_sde}. \Cref{fig:latentsde_training} shows a schematic overview of the data flow in an individual
+training loop.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics{report/images/diagrams/latentSDE_training_loop.pdf}
+    \caption{Schematic overview of LatentSDE training loop}
+    \label{fig:latentsde_training}
+\end{figure}
+
+Overall in the training scheme, the posterior enusures the true dynamics are captured in the latent space. The prior is
+trained to generate latent dynamics and the decoder converts latent space into observed space. The latent SDE is
+relatively easy to train, however similar to variational inference, the diffusion will often be too small \parencite{kidgerNeuralDifferentialEquations2022}
+
+\subsubsection{SDE-GAN}
+The SDE-GAN method trains the neural SDE as a generative adversorial network (GAN). The SDE-GAN method was proposed by
+\textcite{kidgerNeuralSDEsInfiniteDimensional2021}. The approach stems from traditional SDE training methods where some
+statistics of the model are fit to the data. 
+
+A GAN works by training two networks, a generator and a discriminator. The generator creates a dataset from noise; the
+discriminator aims to distinguish the generated dataset from a real dataset. By pitting these two networks against each
+other, the generator eventually learns to produce realistic datasets.
+
+\textcite{kidgerNeuralSDEsInfiniteDimensional2021} train neural SDEs through such a framework. The generator is the
+neural SDE to be trained. This is passed a randomly sampled initial state and brownian motion and parametrised by \(\theta\).
+
+\begin{equation}
+    \begin{aligned}
+        dz_{t}&=\mu _{\theta} (z_{t},t)dt+\sigma_\theta (z_{t},t)dw_{t}\\
+        z_{0}&=\psi_\theta(v) \quad v\sim \mathcal{N}(0, 1)\\ 
+        x_{t}& = f_\theta(z_{t})
+    \end{aligned}
+\end{equation}
+
+The discriminator is another neural SDE, paramtrised by \(\phi\). 
+
+\begin{equation}
+    \begin{aligned}
+        dh_{t}&= f_{\phi} (h_{t},t)dt+ g_\phi (h_{t},t)dx_{t}\\
+        h_{0}&=\psi_\phi(x_0) \\ 
+        x_{t}& = m_\phi(z_{t})
+    \end{aligned}
+\end{equation}
+
+Rather than relying on a Brownian motion path, the discriminator uses the generated or observed path. This means the
+discriminator can be viewed as a neural controlled differential equation. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{report/images/literature_study/kidgerNeuralSDEsInfiniteDimensional2021.png}
+    \caption{Visualisation of SDE-GAN \parencite{kidgerNeuralSDEsInfiniteDimensional2021}}
+    \label{fig:sde-gan_visualisation}
+\end{figure}
+
+The training loss used is the Wasserstein distance. The discriminator aims to maximise the difference between the
+discriminated generated series and the discriminated data, whereas the generator aims to minimise the discretised score
+of the generated data. 
+
+\textcite{kidgerNeuralDifferentialEquations2022} state that while SDE-GANs generally produce more accurate results that
+the latent SDE approach, it is more challenging to train. This is analogous to standard GAN training compared to VAE
+training. GANs generally suffer from three major limitations: vanishing gradients, non-convergence and mode collapse \parencite{barshaIndepthReviewAnalysis2025}.
+Vanishing gradients occur when the discriminator learns faster than the generator and becomes too profficient in
+discrimitating. This results in the generator's gradient being negligable and preventing learning. Non-convergence is
+when model parameters exhibit oscillatory behaviour, resulting in a failure to reach a converged state. Finally mode
+collapse is when the generated outputs are restricted to a few specific cases rather than capturing the full diversity
+of the training data. This is essentially overfitting of the model. 
+
+A hybrid approach is briefly mentioned to avoid the disadvantages of both. This alternates which method is
+used each training epoch.
+
+\subsubsection{Futher work}
+Futher research has been done on these methods. \textcite{el-lahamVariationalNeuralStochastic2025} and
+\textcite{ryzhikovLatentStochasticDifferential2023} used the latent-SDE framework together with change point detection.
+Multiple SDEs were trained with the latent SDE approach and switched between based off some change point metric. This
+allows for the modelling of systems which have a sudden shift in the underlying dynamics. 
+
+\textcite{liuContinuousTimeStochasticDifferential2021} introduces Variational Stochastic Differential Networks (VSDN), a
+continuous-time stochastic recurrent model designed for irregular and sparse time-series data. VSDN embeds system
+dynamics into latent neural SDEs whose drift and diffusion functions depend on latent states and historical observations
+extracted through ODE-RNN encoders, enabling the model to capture complex stochastic dependencies. The work further
+develops continuous-time VAE and IWAE objectives and provides both filtering and smoothing inference models, allowing
+the posterior dynamics to incorporate past-only or past-and-future observations. Experiments on human motion-capture
+datasets show that VSDN substantially outperforms existing continuous-time baselines, including LatentODE, GRU-ODE, and
+LatentSDE, in both prediction and interpolation tasks.
+
+Neural SDEs have also been used as regularisation for neural ODEs \parencite{liuHowDoesNoise2020}. This approach used a
+fixed diffusion matrix, the form of which influencing which regularisation method was applied. The approach saw success
+in increasing the robustness of neural ODEs
+
+\textcite{lookDeterministicApproximationNeural2023} propose an alternative to Monte-Carlo-based inference for Neural
+SDEs, which can be computationally expensive and produce poorly calibrated uncertainty estimates. Rather than relying on
+sampling, they introduce a deterministic transition-kernel approximation called Bidimensional Moment Matching (BMM).
+This method propagates the mean and covariance of the system state both through time and through the neural network
+layers, allowing for uncertainty quantification without Monte Carlo sampling. The approach is designed to be
+computationally efficient and scalable to high-dimensional systems while maintaining accurate uncertainty calibration.
+The paper discusses the use of this method during testing, as opposed to sampling multiple times. Its ability to be
+implemented during training is mentioned only in passing. 
+
+\textcite{lookDifferentialBayesianNeural2019} developed a neural SDE using Bayesian neural networks as the drift and
+diffusion networks. This allows their approach to capture both epistemic and aleatoric uncertainty. While the paper does
+show their approach is better suited to capturing uncertainty than \parencite{liuHowDoesNoise2020}, it does not discuss
+how the networks are trained.

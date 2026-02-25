@@ -1,0 +1,270 @@
+\chapter{Uncertainty Quantification}
+\label{chapter:uncertainty_quantification}
+
+
+
+This chapter will investigate the fundamentals of uncertainty quantification. Techniques and methods relevant to the
+quantification of uncertainty in DP simulations be identified and documented.
+
+\section{What is Uncertainty Quantification?}
+A typical uncertainty quantification problem involves a mathematical model subject to
+uncertainty about the correct parameter values \parencite{sullivanIntroductionUncertaintyQuantification2015}.
+\textcite{higdonUncertaintyQuantificationError2009} define uncertainty quantification as follows:
+
+\begin{quotation}
+    "Uncertainty quantification (UQ) studies all sources of error and uncertainty, including the following: systematic
+    and stochastic measurement error; ignorance; limitations of theoretical models; limitations of numerical
+    representations of those models; limitations of the accuracy and reliability of computations, approximations, and
+    algorithms; and human error. A more precise definition is UQ is the end-to-end study of the reliability of
+    scientific inferences"
+    \parencite{higdonUncertaintyQuantificationError2009}.
+\end{quotation}
+
+In general in the study of UQ, one is interested in the relationship between the input and output. Two general examples
+are the forward and the inverse problem \parencite{sullivanIntroductionUncertaintyQuantification2015}. In both examples
+we will consider a general model of a physical system:
+
+\begin{equation}
+y = f(x)
+\end{equation}
+
+In the forward problem, \(f, \, x \) are known. \(y\) can be calculated. However, if \(f\) is an imperfect model or
+\(x\) is subject to some uncertainty, then this uncertainty will in some way affect \(y\). This is known as
+\textit{forward propagation of uncertainty}.
+
+In the inverse problem, \(y, \, x\) are measured. We are interested in determining \(f\). These measurements are subject to noise, and as \(f\) is a model of a
+real system and thus has infinitely many degrees of freedom, the problem is underdetermined. 
+
+For the considered case of a DP system, the forward problem is primarily of relevance, as the dynamics of the system are
+known and the effect of uncertainty in the model and inputs is of relevance to the forecasted behavior.
+
+\section{Types of Uncertainty}
+In general, sources of uncertainty can be divided into two categories based on their origin. These are aleatoric
+uncertainty and epistemic uncertainty \parencite{sullivanIntroductionUncertaintyQuantification2015}. Within any given system, these two forms of uncertainty are not mutually exclusive
+\parencite{foxDistinguishingTwoDimensions2011}. 
+
+Aleatoric uncertainty refers to uncertainty inherent in a system. It is irreducible, regardless of the accuracy of the
+model or amount of training data. Pure aleatoric uncertainty is understood as the variability observed when repeatedly measuring outcomes from the same process; it reflects the distribution of observed results across all possible outcomes. \parencite{foxDistinguishingTwoDimensions2011}. It is attributed to stochastic behaviour. An example of aleatoric uncertainty could be noise in a measurement sensor. 
+
+Epistemic uncertainty is uncertainty due to a lack of knowledge. Pure epistemic uncertainty can be seen as the
+confidence one has in a single observation.
+This can be due to uncertainty in parameter values or
+in the accuracy of the model. Epistemic uncertainty can be improved by obtaining more data or using a higher fidelity
+model. 
+
+When modelling a dynamic positioning system, both forms of uncertainty are present. The system is subject to stochastic
+wave and wind loading, as well as noise in sensor measurements. These are sources of aleatoric uncertainty. The fact
+that the system is being modelled means epistemic uncertainty is being introduced, as no model will fully capture every
+part of the system with complete accuracy. Additional epistemic uncertainty is added in the model parameters, as factors
+such as hydrodynamic coefficients are unlikely to be completely accurate at any given time.  
+
+\section{Spectral Methods}
+Spectral methods are numerical techniques that represent stochastic processes as series expansions using an orthogonal
+basis of functions. They decompose random variables into components, similar to Fourier analysis
+\parencite{heuvelineHybridGeneralizedPolynomial2014}. Polynomial Chaos Expansions (PCE) are a common spectral method for
+uncertainty quantification.
+
+\subsection{Generalized Polynomial Chaos}
+PCE uses polynomials as the orthogonal basis. Originally developed to model Wiener processes using Hermite polynomials, it was extended by
+\textcite{xiuWienerAskeyPolynomial2002} to use other polynomials and thus represent other probability distributions. The
+generalized polynomial chaos expansion (gPC) works as follows:
+
+Let \(X\) be a random variable in probability space \(\left(\Omega, \mathcal{F}, \mathbb{P}\right)\), where \(\Omega\) is
+the sample space with \(\omega \in \Omega\). \(X\) can then be formulated as follows
+\parencite{heuvelineHybridGeneralizedPolynomial2014}:
+
+\begin{equation}
+\label{eq:gPC_explain_X}
+X(\omega) = \sum_{i = 0}^{\infty}c_i\boldsymbol{\Psi}_i(\boldsymbol{\xi})
+\end{equation}
+
+\(\boldsymbol{\xi}\) is a random variable subject to some probability distribution. \({\boldsymbol{\Psi}}\) is a set of orthogonal polynomials that describes the
+distribution of the random variable. \(c_i\) is a weight given to each term of the polynomial. These are determined by
+pointwise sampling at a given point in time. Given a time-dependent process \(X = X(t, \omega)\), \(c_i\) has to be
+re-evaluated at each timestep. 
+
+infinite sums are not possible in reality, so the sum is truncated at point \(M\). This gives an approximation of \(X\)
+defined as:
+
+\begin{equation}
+X^M(t, \omega) \coloneq \sum_{i = 0}^{M}c_i(t)\boldsymbol{\Psi_i}(\boldsymbol{\xi})
+\end{equation}
+Where M is given by:
+\begin{equation}
+M = \frac{(P + L)!}{P!L!} - 1
+\end{equation}
+
+The truncation order \(M\) is dependent on two discretisation parameters: \(L\) and \(P\). \(P\) is the maximal polynomial order
+used, and \(L\) is the dimension of the vector of random variables \(\boldsymbol{\xi} = (\xi_1, \dots, \xi_L)\). The value of M
+grows rapidly as the dimensionality of the problem increases. The mean and variance of the result can be determined from
+the resulting expansion. 
+
+\begin{align}
+    \overbar{X}(t) &= c_0(t) \\
+    \mathit{Var} \, \left[ X(t) \right] &= \sum_{i = 1}^{M} c_i(t)^2
+\end{align}
+
+Overall, this method works more efficiently than Monte Carlo, as the coefficients for the sum can be estimated using far
+fewer model evaluations. Additionally, once the polynomial surrogate model is constructed, it can be evaluated quickly
+for any variations of the input values. 
+
+\subsection{Time-Dependent Generalized Polynomial Chaos}
+\textcite{gerritsmaTimedependentGeneralizedPolynomial2010} introduced the concept of time-dependent generalized
+polynomial chaos (TD-gPC). One of the limitations of gPC is a lack of convergence when the dependence on \(\boldsymbol{\xi}\) is
+strongly non-linear. This is especially the case when considering long-term integration
+\parencite{heuvelineHybridGeneralizedPolynomial2014}. The difference between this method and the time-independent method
+is that, with TD-gPC, the orthogonal polynomials can be adjusted if the distributions of \( \boldsymbol{\xi} \) change.
+This increases the accuracy of the PCE over long-term simulations. 
+
+The TD-gPC approach does have some limitations in the application to dynamic systems. For longer simulations, the
+accuracy of the method decreases \parencite{gerritsmaTimedependentGeneralizedPolynomial2010}, thus requiring recalculation
+and adding extra computing cost. \textcite{ebadollahiTimedependentUncertaintyQuantification2025} also mentions a
+deterioration of the performance of TD-gPC for longer simulations. The computational cost rapidly increases as the
+required polynomial order increases as time evolves. This makes it inefficient for strongly nonlinear dynamic systems.
+The technique does not scale well for higher dimension problems
+\parencites{heuvelineHybridGeneralizedPolynomial2014}{maiSurrogateModellingStochastic2016}. 
+
+\subsection{Limitations}
+
+Although spectral methods are powerful for problems with smooth responses and low-dimensional uncertainty, they become
+impractical for dynamic positioning systems. DP models involve high-dimensional, nonlinear dynamics and stochastic
+environmental inputs, which lead to rapid growth in computational cost and poor convergence for spectral approaches.
+
+Additionally, Polynomial Chaos Expansions (PCE) and other spectral decompositions are typically constructed for a
+specific set of uncertain parameters and their probability distributions. For each operating condition and set of
+parameters of the DP system, the output distribution can vary significantly. As such, the expansion must be recomputed
+or retrained. This means that a tool intended to evaluate behavior under varying conditions would require repeated
+recalculation of the PCE; coupled with the curse of dimensionality makes PCE inefficient compared to more flexible approaches such as neural network-based
+surrogate models for the desired purpose.
+
+\section{Neural Network Approaches}
+
+This section outlines existing methods used to capture epistemic and aleatoric uncertainty with neural networks. In
+general, approaches capture either epistemic or aleatoric uncertainty separately \parencite{galUncertaintyDeepLearning2016}. Epistemic uncertainty is modelled by
+placing prior distributions over the weights of the model and capturing how these vary given input data. Aleatoric
+uncertainty is quantified by placing a distribution over the output of the model \parencite{kendallWhatUncertaintiesWe2017}
+
+\subsection{Bayesian Neural Networks}
+Bayesian neural networks (BNNs) offer a probabilistic extension of standard neural networks, replacing fixed model
+parameters with distributions to capture uncertainty in both learning and prediction. This Bayesian treatment provides a
+principled framework for understanding model confidence, especially in settings where data are limited, noisy, or shift
+over time. Bayes' theorum is the fundamental principle behind BNNs. It is formulated as follows:
+
+\begin{equation}
+    P(H \mid D)
+    = \frac{P(D \mid H) P(H)}{P(D)}
+    = \frac{P(D, H)}{\int_H P(D, H') \, d H'}.
+\end{equation}
+Here, $H$ denotes a hypothesis (or model), with prior $P(H)$, and $D$ denotes the observed data.
+The term
+\[
+    P(D) = \int_H P(D, H') \, d H'
+\]
+is called the evidence. The likelihood $P(D \mid H)$ describes how probable the observed data is under the hypothesis, and the posterior $P(H \mid D)$ tells us how likely each hypothesis is after observing the data.
+
+Bayesian neural networks are neural networks trained using this Bayesian approach.
+A stochastic neural network is a neural network that uses either stochastic weights or stochastic activation functions.
+A BNN is a stochastic neural network trained by Bayesian inference \parencite{mackayPracticalBayesianFramework1992}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{report/images/literature_study/jospinHandsOnBayesianNeural2022.png}
+    \caption{(a) Point-estimate neural network, (b) stochastic neural network with a probability distribution over the activations, and (c) stochastic neural network with a probability distribution over the weights. \parencite{jospinHandsOnBayesianNeural2022}}
+\end{figure}
+
+The stochastic model is chosen by the user and consists of a prior distribution over possible model parameterizations and a prior confidence.
+In the notation above, these correspond to $H$, with the training data playing the role of $D$.
+The choice of prior is an architectural decision similar to the choice of loss function in point-estimate networks.
+The goal of training is to obtain the posterior $p(\theta \mid D)$, the probability distribution of the weights $\theta$ given the observed data.
+
+The standard procedure is to use a Gaussian distribution over the weights as the prior
+\parencite{jospinHandsOnBayesianNeural2022}, though Gaussian priors are not necessarily better than other choices
+\parencite{silvestroPriorChoiceAffects2020}.
+
+When using a BNN for prediction, the marginal predictive distribution $p(y \mid x, D)$ quantifies the uncertainty in the prediction.
+In practice, this can be approximated by sampling weight configurations from the posterior $p(\theta \mid D)$ and evaluating the network, yielding a set of predictions that follow $p(y \mid x, D)$.
+
+BNNs quantify epistemic uncertainty through the posterior over weights $p(\theta \mid D)$ and aleatoric uncertainty through the data noise encoded in the likelihood $p(y \mid x, \theta)$ \parencite{jospinHandsOnBayesianNeural2022,kendallWhatUncertaintiesWe2017}.
+In practice, the evidence term $P(D)$ is not feasible to calculate exactly, meaning the posterior cannot be obtained in closed form.
+To address this, two main families of approximate inference methods are used: Markov chain Monte Carlo (MCMC) and variational inference (VI).
+
+MCMC constructs a Markov chain whose stationary distribution matches the desired posterior distribution.
+A common algorithm, the Metropolis-Hastings algorithm, starts from an initial random guess and then repeatedly samples new candidate points around the current state from a proposal distribution.
+The candidate is accepted with a probability given by the ratio of the target density at the candidate point and at the current point.
+Other algorithms, such as Hamiltonian Monte Carlo, exist to improve the efficiency of this process.
+Because successive samples are autocorrelated, the chain must be subsampled, which increases the number of samples required.
+MCMC approaches also suffer from a burn-in period, during which the initial samples do not yet follow the target distribution.
+Finally, designing efficient proposals becomes increasingly challenging in higher-dimensional parameter spaces.
+
+Variational inference works by introducing a variational distribution $q_\phi(\theta)$ parameterised by $\phi$, and then optimising $\phi$ so that $q_\phi(\theta)$ matches the true posterior $p(\theta \mid D)$ as closely as possible.
+The discrepancy between $q_\phi$ and the exact posterior is commonly measured using the Kullback-Leibler (KL) divergence.
+Directly minimising this KL divergence would require access to the exact posterior, which is unavailable.
+Instead, one maximises the evidence lower bound (ELBO), which can be written as the log evidence minus the KL divergence; maximising the ELBO is therefore equivalent to minimising the KL divergence
+\parencite{kingmaAutoEncodingVariationalBayes2014,blundellWeightUncertaintyNeural2015}.
+In practice, this is generally done using stochastic gradient descent, treating the negative ELBO as a loss function.
+
+However, naive stochastic gradients suffer from high variance due to the stochasticity in sampling from $q_\phi(\theta)$.
+To address this, methods such as Bayes by Backprop
+\parencite{blundellWeightUncertaintyNeural2015} use the reparameterisation trick
+\parencite{kingmaAutoEncodingVariationalBayes2014} to express samples from $q_\phi(\theta)$ as deterministic functions of fixed noise variables and the parameters~$\phi$.
+This moves the stochasticity outside the main computational graph, allowing unbiased, low-variance gradients of the ELBO to be propagated back through the network.
+
+BNN in practice suffer from high computational costs during training and inference due to the sampling required. This
+often makes them unsuitable for use in large, high dimensional systems
+\parencite{willardIntegratingPhysicsBasedModelling2022}. Furthermore, variational inference is known to underestimate
+uncertainty \parencite{kruegerBayesianHypernetworks2017}.
+
+\subsection{Monte Carlo Dropout}
+Dropout is a technique generally used to regularise neural nets to improve their robustness and generalisability. It is
+usually used during training and works by randomly enabling or disabling a set number of neurons.
+\textcite{galDropoutBayesianApproximation2016} showed that by enabling dropout not just during training allows the network to
+approximate a distributional posterior. Resampling the model multiple times with different dropout activations
+essentially results in sampling multiple similar models, each with their own parameterisation of the problem. This
+results in a distribution of output predictions, thus quantifying the uncertainty in the model.
+
+The theoretical basis is that dropout can be interpreted as variational inference over a BNN where
+the variational distribution is a Bernoulli distribution \parencite{galDropoutBayesianApproximation2016}. This allows
+the model to give a bayesian average without training a full ensemble. This allows the model to quantify epistemic
+uncertainty. An alternative interpretation of this approach is that dropout results in an ensemble of neural networks
+with shared parameters \parencite{lakshminarayananSimpleScalablePredictive2017}. 
+
+In practice, the approach is simple to implement as dropout is often already used for training regularisation. The only
+change needed to the architecture to enable dropout is adding dropout layers between the hidden layers
+\parencite{wabinaNeuralStochasticDifferential2023}. The approach is fast and scales well compared to BNNs, and still
+gives usable results. The prediction of the uncertainty is limited however, as the Bernoulli variational distribution is restrictive. This
+limits its ability to capture the true posterior distribution of the network. The quality of the uncertainty
+quantification is also sensitive to the dropout rate; the rate must therefore be tuned to get the desired behavior.
+Finally, by disabling parts of the network, the quality of each individual prediction will be worse. Overall, this
+method of uncertainty quantification is the crudest of the neural network approaches discussed in this section.
+
+\subsection{Hypernetworks}
+
+A hypernetwork is a network used to approximate the posterior of the weights of a network of interest. It does this by
+sampling random noise and outputting a sample from the approximate posterior of the network in the form of a set of
+weights and biases \parencite{kruegerBayesianHypernetworks2017}. The major advantage hypernetworks have over BNNs is
+that the posterior they estimated can be arbitrarily complex as opposed to being fit by variational distributions. This
+means the uncertainty quantification is much more accurate than other methods discussed, without the cost of MCMC. This
+is particularly useful when the system expresses strong multi-modality as this would likely be underestimated by other
+approaches.
+
+In practice however hypernetworks tend to be expensive to train and sample as the full set of weights of the model
+network have to be generated each iteration. While the accuracy of the uncertainty estimate can theoretically exceed
+deep ensembles, real examples have shown they tend to perform similarly for capturing epistemic uncertainty.
+
+\subsection{Deep ensembles}
+
+Deep ensembles are a method to quantify epistemic uncertainty. Proposed in
+\citeyear{lakshminarayananSimpleScalablePredictive2017} by
+\citeauthor{lakshminarayananSimpleScalablePredictive2017} as a method for uncertainty quantification, they work by training multiple of the same neural network
+from different random initial weights and biases. At inference time, each of these networks is sampled. If the networks are in
+agreement the epistemic uncertainty is low, wheras if the networks disagree the epistemic uncertainty is high. 
+
+The approach is simple and requires minimal modifications to the neural networks architecture to implement. The quality
+of the uncertainty quantification is high and the computation cost at inference time is low, as only a relatively small
+number of samples are needed compared to the other approaches discussed.
+\textcite{lakshminarayananSimpleScalablePredictive2017} found that random shuffling of the dataset and random
+initialisation of the weights was sufficient to obtain good results. This reinforces the observation
+\textcite{leeWhyHeadsAre2015} made while investigating how to create a diverse set of ensemble networks.
+
+A major limitation of the deep ensemble approach is that the cost of training is high, as the same model needs to be
+trained repeatedly. For an ensemble of five networks, the training cost is fivefold. 

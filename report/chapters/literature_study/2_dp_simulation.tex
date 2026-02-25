@@ -1,0 +1,122 @@
+\chapter{DP Simulation}
+\label{chapter:DP_simulation}
+A dynamic positioning system is a system on board a ship that controls the ship's actuators such that the position of
+the ship is kept constant, thus counteracting environmental forces \parencite{duDynamicPositioningShips2018}. This
+allows ships to perform operations such as pipe-laying or construction in places where the water depth would otherwise be
+restricting. A DP vessel can also reposition much faster than a ship operating on anchors
+\parencite{aiModelingSimulationDeepwater2018}.
+
+This chapter will describe the main components of a DP system and outline the mathematical properties of the system.
+
+\section{DP System}
+This section will describe the main components that make up a DP system. A global overview will be given, and each
+individual component will be further explained.
+
+Most dynamic positioning (DP) systems share a common architecture consisting of four main components: the reference
+system, observer, controller, and actuators \parencite{witOptimalThrustAllocation2009}. \Cref{fig:dp_overview}
+illustrates these components and their interactions. The overall workflow is as follows: sensors measure the vessel’s
+position and velocity; this data is processed by a state estimator to filter out noise and high-frequency motions.
+The estimated state is then compared to a desired setpoint to compute the position error. Based on this error, the
+controller determines the required force, which is passed to a thrust allocation algorithm that translates it into
+actuator commands. Finally, the actuators generate thrust forces that act on the vessel alongside external environmental
+forces \parencite{cadetIntroductionKalmanFilter2003}. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{report/images/diagrams/DP_overview.pdf}
+    \caption{Overview of DP system components, adapted from \parencite{cadetIntroductionKalmanFilter2003}}
+    \label{fig:dp_overview}
+\end{figure}
+
+\subsection{State estimator}
+A ship is subject to a wide range of exciting frequencies. In general, these can be split into high and low frequency
+excitations. A DP system aims to compensate just the low frequency motions. The response time of a ships actuators is
+generally such that high frequency motions cannot be compensated for. Additionally, filtering saves the actuators from
+excessive wear and tear \parencite{serrarisTimeDomainAnalysis2009}. Furthermore, the
+position and velocity must be measured with sensors; the measurements are subject to noise. To solve both of these issues, a Kalman filter is generally used. The Kalman filter uses an internal model of the dynamics to predict the state, using
+measurements to correct the estimate. As the dynamics of the ship are non-linear, extended Kalman filters are often
+used. These linearise the equations of motion around the current estimated state at each timestep. 
+
+The Kalman filter also estimates the so-called “DP current” \parencite{cadetIntroductionKalmanFilter2003}, a virtual
+current force which represents the combined effect of all unknown forces acting on the vessel. This state behaves
+similarly to the integral term in a Proportional-Integral-Derivative (PID) controller, as it compensates for
+steady-state errors by
+accounting for persistent disturbances.
+
+\subsection{Controller and thrust allocation}
+The controller takes the state estimate and converts it into a desired thruster force. The simplest form of this
+controller is a PID controller, though the integral term is often neglected; this function is instead handled by the
+state estimator. Other controller architectures also exist.
+
+Once the desired thrust is known, it is passed to a thrust allocation algorithm. Typically, ships have more than one
+actuator per degree of freedom, making them over-actuated. This means there are an infinite number of ways to configure
+the actuators. To address this issue, an optimisation algorithm is used that aims to match the desired thrust through
+actuator settings such as motor RPM and azimuthing angle. The objective is to do this with as little power consumption
+as possible, while respecting constraints such as forbidden zones, actuator ramp, thrust, and directional rate limitations, and total power consumption per switchboard \parencite{overengDynamicPositioningUsing2021}
+
+
+
+\subsection{Actuators}
+The actuators are generally defined as any active device producing a force that can be used for station keeping. These
+include azimuthing thrusters, fixed propellers, rudders, and tunnel thrusters. The actuators are limited by physical
+constraints such as delayed repsonses, ramp-up periods and the rate of directional change. The maximum thrust available is also a
+significant limitation. A thruster operating at 100\% capacity is referred to as being saturated. These constraints are
+the one of the main reasons time-domain simulations are needed; otherwise, the ship would be able to maintain position almost perfectly
+\parencite{borhaugExperimentalValidationDynamic2012}. Thrusters are generally are controlled by their revolutions per
+minute (RPM), as this is directly measureable. The mapping from RPM to thrust is non-linear and very dependent on the
+relative water velocity over the propeller.
+
+Actuators can be subject to a large number of disturbances. The main effects that influence the force generated are
+thruster-hull interactions, thruster-thruster interactions, and thruster-current interactions
+\parencite{serrarisTimeDomainAnalysis2009}. These are difficult to accurately include as these are very complex
+phenomena.
+
+\subsection{Vessel Model}
+A general maneuvering model for ships is given by \textcite{fossenHandbookMarineCraft2014}. This model is valid for low-speed maneuvering. This model generally neglects fluid memory using a zero frequency assumption for the damping and
+added mass matrices. An alternative approach uses power-averaged matrices based on the exciting wave spectrum.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{report/images/literature_study/Coordinate-systems-global-reference-frame-e-and-the-body-fixed-coordinate-b.png}
+    \caption{Reference frames used for DP simulations \parencite{choDynamicalSlidingMode2022}}
+    \label{fig:dp_reference_frames}
+\end{figure}
+
+Ships on DP are generally viewed in either a body-fixed reference frame or a north-east-down (NED) world-fixed frame.
+\Cref{fig:dp_reference_frames} shows the relation between the two. Converting between the two is done with the following formula:
+
+\begin{equation}
+    \dot{\eta} = J(\eta)\nu
+\end{equation}
+
+
+Whereby \(\eta\) is the NED position, \(\nu\) is the body-fixed velocity, and \(J(\eta)\) is a rotation matrix mapping the
+body-fixed velocity into NED velocity. In the body-fixed rotating reference frame, the equations of motion become the following:
+
+\begin{equation}
+    \label{eq:general_eq_motion}
+    (M_{RB} + M_A) \dot{\nu} + (C_{RB}(\nu) + C_A(\nu))\nu + (D + D_n(\nu))\nu + G\eta = \tau
+\end{equation}
+
+In this formulation, \(M_{RB}\) is the rigid body mass and \(M_A\) is the hydrodynamic added mass. \(D\) is the linear
+damping matrix and \(D_n(\nu)\) is the nonlinear damping. The fact that the body-fixed reference frame can be rotating
+introduces a Coriolis-centripetal force. This consists of two parts: that caused by rigid body mass \(C_{RB}(\nu)\)
+and from hydrodynamic added mass \(C_A(\nu)\). \(\tau\) consists of all the external forces acting on the ship. This is
+generally viewed as a linear superposition of environmental forces, actuator forces, and other external forces such as
+moorings.
+
+\Cref{eq:general_eq_motion} has several nonlinearities. In the hydrodynamics, the quadratic damping is proportional to
+the velocity squared. The thruster forcing is also nonlinear due to the thruster dynamics and Kalman filtering.
+Furthermore, the system is causal, dynamic, and time-invariant. 
+
+\section{Environmental Forces}
+A significant portion of the external loading comprises environmental forces. In most cases where DP is considered, current is
+considered constant, as the timescale at which it changes is significantly longer than that of the system
+\parencite{RecommendedPracticeEnvironmental2019}. It can in most cases also be considered irrotational
+\parencite{fossenManouveringModels2014}. Both wind and waves are modelled as random processes characterised by energy
+density spectra. This results in stochastic loading with known statistical properties.
+
+A stochastic process is a process that, when indexed at time \(t\), does not have a single deterministic trajectory but
+rather a set of possible trajectories \parencite{sullivanIntroductionUncertaintyQuantification2015}. The stochastic
+nature of the environmental forces results in the DP system also being a stochastic process \parencite{bruvollMultiAgentSystem2013}.
+

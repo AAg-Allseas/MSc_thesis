@@ -1,21 +1,53 @@
 [project]
-name = "overleaf_template"
+name = "msc_thesis_awn_aperghis"
 version = "1.0.0"
 description = "template repository to include overleaf report"
-authors = [
-    "Your Name <your.email@example.com>"
-]
+authors = [{ name = "Albert Aperghis", email = "a.w.n.aperghis@student.tudelft.nl" }]
+requires-python = ">=3.10,<3.14"
 readme = "README.md"
-requires-python = ">=3.10"
-package-mode=false
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+package-mode = false
+dependencies = [
+    "diffrax>=0.7.0",
+    "ipykernel>=7.2.0",
+    "ipywidgets>=8.1.8",
+    "matplotlib>=3.10.8",
+    "mlflow>=2.19; sys_platform == 'win32'",
+    "numpy>=2.2.6",
+    "pandas>=2.3.3",
+    "pyarrow>=4.0.0",
+    "ruff>=0.15.0",
+    "scikit-learn>=1.7.2",
+    "snakeviz>=2.2.2",
+    "torch>=2.10.0; sys_platform == 'win32'",
+    "torchsde>=0.2.6",
+    "torchvision>=0.25.0; sys_platform == 'win32'",
+    "tqdm>=4.67.3",
+]
 
+[tool.uv]
+package = false
 
-[tool.poetry]
-package-mode=false
+[tool.uv.sources]
+torch = [
+  { index = "pytorch-cu128", marker = "sys_platform == 'win32'" },
+]
+torchvision = [
+  { index = "pytorch-cu128", marker = "sys_platform == 'win32'" },
+]
 
-[tool.poetry.dependencies]
-python = ">=3.10"
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["uv_build>=0.9.11,<0.10.0"]
+build-backend = "uv_build"

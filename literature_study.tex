@@ -1,0 +1,70 @@
+\makeatletter
+\makeatother
+
+% \documentclass[whitelogo, roman, parspace, oneside, draft]{tudelft-report}
+\documentclass[whitelogo, roman, parspace, oneside]{tudelft-report}
+
+
+\usepackage{csquotes}
+\usepackage[style=apa]{biblatex}
+\addbibresource{report/bibliography/zotero_bib.bib}
+
+\usepackage[todonotes={color=green!40}]{changes}
+\usepackage{comment}
+
+\makenomenclature
+\begin{document}
+
+\input{report/custom_funcs}
+
+%% Use Roman numerals for the page numbers of the title pages and table of
+%% contents.
+\frontmatter
+
+%% Uncomment following 19 lines for a cover with a picture on the lower half only
+\title[tudelft-white]{Scoping Study}
+\subtitle[tudelft-black]{
+    Efficient probabilistic \\
+    forecasting of dynamic \\
+    positioning behaviour\\}
+\author[tudelft-white]{A.W.N. Aperghis}
+\affiliation{Technische Universiteit Delft}
+\coverimage{report/images/cover/Rosmari_Allseas Solitaire_Drone_15.jpg}
+\titleoffsetx{1cm}
+\titleoffsety{10cm}
+\afiloffsetx{1cm}
+\afiloffsety{25cm}
+\covertext[tudelft-white]{
+}
+\setpagecolor{tudelft-cyan}
+\makecover[whitelogo]
+
+
+%% Include an optional title page.
+\input{report/title_scoping_study}
+
+\input{report/chapters/literature_study/0_nomenclature}
+
+\newpage
+\tableofcontents
+
+%% Use Arabic numerals for the page numbers of the chapters.
+\mainmatter
+
+\input{report/chapters/literature_study/1_introduction}
+\input{report/chapters/literature_study/2_dp_simulation}
+\input{report/chapters/literature_study/3_uncertainty_quantification}
+\input{report/chapters/literature_study/4_dynamics_modelling}
+\input{report/chapters/literature_study/5_pilot_method}
+\input{report/chapters/literature_study/6_conclusion}
+
+%% Use letters for the chapter numbers of the appendices.
+% \appendix
+
+% \input{a_example}
+
+\printbibliography
+
+
+\end{document}
+

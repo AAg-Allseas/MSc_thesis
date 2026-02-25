@@ -1,0 +1,69 @@
+\section{Koopman Operator Theory}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\subsubsection{Hankel-DMD}
+A variant of DMD is Hankel-DMD. Instead of just considering the transformation of the current state, the Hankel-DMD
+approach includes time-delayed measurements \parencite{bruntonDataDrivenDynamicalSystems2019}. This allows the Koopman transformation to include longer term memory
+effects. 
+
+\TODO{Sparse identification of koopman eigenfunctions
+
+motivation for identifying eigenfunctions rather than entire matrix:
+
+- Identifying regression models based on nonlinear measurements will
+generally result in closure issues \parencite{luschDeepLearningUniversal2018}\\
+- Resulting models are often high dimension, can become uninterpretable
+
+- In practice obtaining eigenfunctions is difficult
+}
+
+
+
+\subsection{Koopman theory for stochastic systems}
+The above sections discuss the Koopman operator for deterministic systems. If a stochastic dynamical system is to be
+considered however, the formulation can be adjusted. This is given by \textcite{crnjaric-zicKoopmanOperatorSpectrum2020}
+in the following form: 
+
+\begin{equation}
+    \mathcal{K}g(\mathbf{x}) = \mathbb{E}[g(\mathbf{F}(\mathbf{x}))]
+\end{equation}
+
+\todo{check equation}
+
+The eigenvalue formulation can then analogously be formulated:
+
+\begin{equation}
+    \mathcal{K}\varphi(\mathbf{x}) = \lambda^S(t)\varphi(\mathbf{x})
+\end{equation}
+
+where $\varphi$ are the eigenfunctions of the stochastic Koopman Operator and $\lambda^S(t)$ are the stochastic Koopman
+eigenvalues. The stochastic Koopman operator tracks how the expected state of the stochastic dynamical system develops
+in measurement space. It does not however track the variance of the the state.
+
+\textcite{crnjaric-zicKoopmanOperatorSpectrum2020} discusses two approactes for determining the stochastic Koopman
+operator. Both are based on the DMD approach, applied to the expected value of the measured state rather than on
+deterministic tracjectories. The first is a modification of the regular DMD approach, while the second modifies the
+Hankel-DMD approach. These methods do not inherintly consider the probability distrubution of the resulting
+trajectories however.
+
+
+\todo{Update text on VAMP}
+Both VAMP \parencite{mardtVAMPnetsDeepLearning2018} and \textcite{zhaoDatadrivenProbabilityDensity2023} aim to approximate the Koopman operator using time-lagged covariance matrices derived from observed data. VAMP employs a variational principle to optimize the approximation within a chosen feature space, formulating the problem through the maximization of a score function based on covariance and cross-covariance matrices. \textcite{zhaoDatadrivenProbabilityDensity2023} adopt a conceptually similar framework but introduce alternative notation and implementation details, while retaining the core idea of leveraging covariance structures to estimate the operator. In essence, both methods share the same mathematical foundation, differing primarily in presentation and specific optimization strategies.
+
+% https://scholar.google.com/scholar?q=related:cdgg75wUJSYJ:scholar.google.com/&scioq=vampnet&hl=en&as_sdt=0,5&inst=6173373803492361994
+
+
+
