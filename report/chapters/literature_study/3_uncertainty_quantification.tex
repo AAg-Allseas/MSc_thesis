@@ -4,7 +4,7 @@
 
 
 This chapter will investigate the fundamentals of uncertainty quantification. Techniques and methods relevant to the
-prediction of DP performance will be identified and documented.
+quantification of uncertainty in DP simulations be identified and documented.
 
 \section{What is Uncertainty Quantification?}
 A typical uncertainty quantification problem involves a mathematical model subject to
@@ -44,8 +44,7 @@ uncertainty and epistemic uncertainty \parencite{sullivanIntroductionUncertainty
 \parencite{foxDistinguishingTwoDimensions2011}. 
 
 Aleatoric uncertainty refers to uncertainty inherent in a system. It is irreducible, regardless of the accuracy of the
-model or amount of training data. Pure aleatoric uncertainty is interpreted as the relative frequency of observations in
-a class of possible outcomes \parencite{foxDistinguishingTwoDimensions2011}. It is attributed to stochastic behaviour. An example of aleatoric uncertainty could be noise in a measurement sensor. 
+model or amount of training data. Pure aleatoric uncertainty is understood as the variability observed when repeatedly measuring outcomes from the same process; it reflects the distribution of observed results across all possible outcomes. \parencite{foxDistinguishingTwoDimensions2011}. It is attributed to stochastic behaviour. An example of aleatoric uncertainty could be noise in a measurement sensor. 
 
 Epistemic uncertainty is uncertainty due to a lack of knowledge. Pure epistemic uncertainty can be seen as the
 confidence one has in a single observation.
@@ -120,7 +119,7 @@ This increases the accuracy of the PCE over long-term simulations.
 The TD-gPC approach does have some limitations in the application to dynamic systems. For longer simulations, the
 accuracy of the method decreases \parencite{gerritsmaTimedependentGeneralizedPolynomial2010}, thus requiring recalculation
 and adding extra computing cost. \textcite{ebadollahiTimedependentUncertaintyQuantification2025} also mentions a
-deteriouration of the performance of TD-gPC for longer simulations. The computational cost rapidly increases as the
+deterioration of the performance of TD-gPC for longer simulations. The computational cost rapidly increases as the
 required polynomial order increases as time evolves. This makes it inefficient for strongly nonlinear dynamic systems.
 The technique does not scale well for higher dimension problems
 \parencites{heuvelineHybridGeneralizedPolynomial2014}{maiSurrogateModellingStochastic2016}. 
@@ -132,10 +131,11 @@ impractical for dynamic positioning systems. DP models involve high-dimensional,
 environmental inputs, which lead to rapid growth in computational cost and poor convergence for spectral approaches.
 
 Additionally, Polynomial Chaos Expansions (PCE) and other spectral decompositions are typically constructed for a
-specific set of uncertain parameters and their probability distributions. If these distributions change or new 
-parameters are introduced, the expansion must be recomputed or retrained. This means that a tool intended to evaluate
-behavior under varying conditions would require repeated recalculation of the PCE, making it inefficient compared to
-more flexible approaches such as neural network-based surrogate models. 
+specific set of uncertain parameters and their probability distributions. For each operating condition and set of
+parameters of the DP system, the output distribution can vary significantly. As such, the expansion must be recomputed
+or retrained. This means that a tool intended to evaluate behavior under varying conditions would require repeated
+recalculation of the PCE; coupled with the curse of dimensionality makes PCE inefficient compared to more flexible approaches such as neural network-based
+surrogate models for the desired purpose.
 
 \section{Neural Network Approaches}
 
@@ -145,11 +145,11 @@ placing prior distributions over the weights of the model and capturing how thes
 uncertainty is quantified by placing a distribution over the output of the model \parencite{kendallWhatUncertaintiesWe2017}
 
 \subsection{Bayesian Neural Networks}
-Bayesian neural networks offer a probabilistic extension of standard neural networks, replacing fixed model parameters
-with distributions to capture uncertainty in both learning and prediction. This Bayesian treatment provides a principled
-framework for understanding model confidence, especially in settings where data are limited, noisy, or shift over time.
+Bayesian neural networks (BNNs) offer a probabilistic extension of standard neural networks, replacing fixed model
+parameters with distributions to capture uncertainty in both learning and prediction. This Bayesian treatment provides a
+principled framework for understanding model confidence, especially in settings where data are limited, noisy, or shift
+over time. Bayes' theorum is the fundamental principle behind BNNs. It is formulated as follows:
 
-Based on Bayes' theorem
 \begin{equation}
     P(H \mid D)
     = \frac{P(D \mid H) P(H)}{P(D)}
@@ -160,9 +160,9 @@ The term
 \[
     P(D) = \int_H P(D, H') \, d H'
 \]
-is called the evidence. The likelihood $P(D \mid H)$ describes how probable the data are under the hypothesis, and the posterior $P(H \mid D)$ tells us how likely each hypothesis is after observing the data.
+is called the evidence. The likelihood $P(D \mid H)$ describes how probable the observed data is under the hypothesis, and the posterior $P(H \mid D)$ tells us how likely each hypothesis is after observing the data.
 
-Bayesian neural networks (BNNs) are neural networks trained using this Bayesian approach.
+Bayesian neural networks are neural networks trained using this Bayesian approach.
 A stochastic neural network is a neural network that uses either stochastic weights or stochastic activation functions.
 A BNN is a stochastic neural network trained by Bayesian inference \parencite{mackayPracticalBayesianFramework1992}.
 
@@ -234,8 +234,8 @@ change needed to the architecture to enable dropout is adding dropout layers bet
 gives usable results. The prediction of the uncertainty is limited however, as the Bernoulli variational distribution is restrictive. This
 limits its ability to capture the true posterior distribution of the network. The quality of the uncertainty
 quantification is also sensitive to the dropout rate; the rate must therefore be tuned to get the desired behavior.
-Finally, by disabling parts of the network, the quality of each individual prediction will be worse. Overall, the
-uncertainty quantification is the crudest of the neural network approaches discussed in this section.
+Finally, by disabling parts of the network, the quality of each individual prediction will be worse. Overall, this
+method of uncertainty quantification is the crudest of the neural network approaches discussed in this section.
 
 \subsection{Hypernetworks}
 
@@ -256,7 +256,7 @@ deep ensembles, real examples have shown they tend to perform similarly for capt
 Deep ensembles are a method to quantify epistemic uncertainty. Proposed in
 \citeyear{lakshminarayananSimpleScalablePredictive2017} by
 \citeauthor{lakshminarayananSimpleScalablePredictive2017} as a method for uncertainty quantification, they work by training multiple of the same neural network
-from different initial weights and biases. At inference time, each of these networks is sampled. If the networks are in
+from different random initial weights and biases. At inference time, each of these networks is sampled. If the networks are in
 agreement the epistemic uncertainty is low, wheras if the networks disagree the epistemic uncertainty is high. 
 
 The approach is simple and requires minimal modifications to the neural networks architecture to implement. The quality

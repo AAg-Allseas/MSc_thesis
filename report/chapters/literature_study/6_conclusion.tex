@@ -1,4 +1,5 @@
 \chapter{Conclusion}
+\label{chapter:conclusion}
 Dynamic positioning behaviour of ships in offshore has traditionally been predicted using quasi-static force balances.
 The industry is now transitioning to time-domain simulations, which better capture transients and footprint behavior.
 These simulations are computationally costly and still subject to model error, and perfect knowledge of the simulated
@@ -33,14 +34,23 @@ learned drift and diffusion terms. In the pilot tests on a toy DP model, neural 
 Through the literature review and initial tests, the first two research goals have been completed.
 
 \section{Thesis Planning}
-The literature review and initial tests have provided a solid backbone for the next stages of the thesis.
+Based on the pilot tests in \cref{chapter:pilot_tests}, this thesis will focus on the neural SDE approach.
 
-First, frameworks for working with the neural SDEs will be investigated. In particular, the use of Diffrax will be
-tested. Using the most suitable approach from this study, the toy model problem will be fully trained to confirm the
-ability of neural SDEs to model DP behaviour. 
+In the upcoming phase, frameworks for neural SDEs will be evaluated, with particular focus on Diffrax \parencite{kidgerNeuralDifferentialEquations2022}. The aim is to identify the most suitable framework for training the toy model and demonstrating the ability of neural SDEs to capture DP behaviour. Should this approach not prove feasible, subsequent work will adopt a DeepONet-based method, contingent on its scalability to three degrees of freedom.
 
-LatentSDE vs SDE-GAN?
-Deep ensembles for epistemic uncertainty quantification
-More complex DP model - Convert to MSS example to python, generate a whole lot of training data
-Generalisation of NeuralSDE with different model parameters as inputs
-Transient thruster failures
+Once a performant neural SDE framework is established, deep ensembles will be applied to quantify epistemic uncertainty in approximating the toy DP model.
+
+To extend the study, part of the MatLab-based MSS \parencite{fossenMarineSystemsSimulator2004} will be adapted to Python, providing a more complex DP model. This Python model will be verified against MSS and used to generate a diverse training dataset, varying system parameters such as the magnitude of the forcing.
+
+The generalisability of neural SDEs to different model parameters will be investigated, as the current approach does not
+incorporate system parameters. Additionally, the ability of neural SDEs to capture transient effects, such as thruster
+failure, will be assessed.
+
+A high level planning is shown in figure \cref{fig:planning}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{report/images/literature_study/Thesis_planning.pdf}
+    \caption{High level planning of thesis}
+    \label{fig:planning}
+\end{figure}
