@@ -234,4 +234,5 @@
     "run-buttons.justMyCode": false,
     "python-envs.defaultEnvManager": "ms-python.python:system",
     "python.defaultInterpreterPath": ".venv/Scripts/python.exe",
+    "ltex.language": "en-GB",
 }

@@ -5,7 +5,7 @@ system. Their ability to capture the stochastic dynamics are evaluated with a to
 
 Both experiments in this chapter were conducted on a local Windows machine equipped with an Intel Core i7-13850HX (13th
 generation) CPU featuring 20 physical cores and 28 logical processors at a base frequency of 2.10 GHz. The system
-included 64 GB of RAM and a NVIDIA RTX 3500 Ada Generation Laptop GPU with 12 GB of dedicated VRAM. Model training was
+included 64 GB of RAM and an NVIDIA RTX 3500 Ada Generation Laptop GPU with 12 GB of dedicated VRAM. Model training was
 performed using PyTorch 2.1.0 with CUDA 12.8.
 
 \section{Toy Model}
@@ -101,7 +101,7 @@ The simulations were run for 3 simulated hours, corresponding to 216,000 timeste
 
 \section{LatentSDE}
 The first approach tested was neural SDEs. The LatentSDE method for training was chosen, as this is simpler to train
-than the SDE-GAN approach \parencite{kidgerNeuralDifferentialEquations2022}. The TorchSDE package was used for these
+than the SDE-GAN approach \parencite{kidgerNeuralDifferentialEquations2022}. The Torch SDE package was used for these
 initial tests. 
 
 \subsection{Architecture}
@@ -113,11 +113,10 @@ hidden dimension of 128. The activation function used between the linear layers 
 \parencite{kidgerNeuralDifferentialEquations2022}, a Lipschitz-continuous version of Swish or SiLU. A final hyperbolic
 tangent activation was used to prevent the latent space from exploding during training
 \parencite{kidgerNeuralSDEsInfiniteDimensional2021}. The posterior differs from the prior in that its input is
-concatentated with a context vector of 64 that encodes the measurements.
+concatenated with a context vector of 64 that encodes the measurements.
 
 The diffusion network is shared between the prior and posterior. As per the example provided in the TorchSDE, this is
-implemented as a set of neural networks that result in a diagonal additive noise. Between the layers LipSwish is used
-and a sigmoid function is used on the output.
+implemented as a set of neural networks that result in a diagonal additive noise. Between the layers LipSwish is used, and a sigmoid function is used on the output.
 
 The measurements are encoded using the encoder network. This consists of a gated recurrent unit (GRU) that takes the
 entire time series of measured states and outputs a vector of 128 at every timestep. This is then passed through
@@ -169,7 +168,7 @@ epochs. The prior was sampled and integrated over a period of 250 seconds. The g
 
 While the trajectories themselves are by no means accurate representations of the training data, they do show some
 promise for the desired application. The traces show the model has managed to learn the magnitude of the motions for
-this integration period. Some of the traces exhibit expected behavior of a DP system in their return to zero. 
+this integration period. Some of the traces exhibit expected behaviour of a DP system in their return to zero. 
 
 There are several caveats. The reconstructed traces are generated from the prior network. The model training was stopped
 after 492 epochs, meaning the contribution of the KL loss was not fully included yet. As the KL loss is the primary loss
@@ -205,7 +204,7 @@ graphical representation as well as the dimensions of each layer.
 \end{figure}
 
 Each convolutional layer in \cref{fig:mionet_architecture} consists of a convolution and a dropout layer with a dropout
-rate of 0.1. All the branch layers used the GeLu activation function. The inital condition was passed to a branch
+rate of 0.1. All the branch layers used the GeLu activation function. The initial condition was passed to a branch
 network and the force series to another. The force was downsampled to a timestep of 0.5 seconds.
 
 \subsubsection{Training and Evaluation}
@@ -214,7 +213,7 @@ Training was performed on series of the training sets subsampled to be 10000 ite
 0.5 seconds to give a series of 1000 measurements. Before training and testing, the dataset was scaled using the mean
 and standard deviation of each individual feature. The time was scaled between 0 and 1. Training was performed over
 1350 epochs. An initial learning rate of 0.01 was used with a schedule to reduce it on a plateau of test loss. A sample
-size of 2048 random timesteps was used to train and test. A 80-20 training testing data split was used. 
+size of 2048 random timesteps was used to train and test. An 80-20 training testing data split was used. 
 
 DeepONet was first tested with a 1 degree of freedom case. A new dataset was generated from the toy model with pure
 surge force and motion. 100 different seeds were used. Before training the time series was normalised to be between 0
@@ -228,7 +227,7 @@ and 1, and the input feature was normalised to have a mean of 0 and a standard d
 \end{figure}
 
 \Cref{fig:pilot_deeponet_test_loss} shows the training losses of the operator network. After \approx 250 epochs the loss
-flattens out. It does does not drop below 0.1 past this point. \Cref{fig:deeponet_pilot} shows a reconstructed time
+flattens out. It does not drop below 0.1 past this point. \Cref{fig:deeponet_pilot} shows a reconstructed time
 trace for the surge motion. 
 
 \begin{figure}[H]
@@ -240,13 +239,13 @@ trace for the surge motion.
 
 As can be seen in \cref{fig:deeponet_pilot}, the network appears capable of reconstructing the vessel motions given a
 force time history as input. In particular, the large, lower frequency motions are captured best. Some of the smaller,
-sharper oscillations are not captured as accurately. Inference of the model takes a negligable amout of time, marking a
-significant speedup compared to the toy model. This is however only a 1 dimensional case, how the method scales to
+sharper oscillations are not captured as accurately. Inference of the model takes a negligible about of time, marking a
+significant speed-up compared to the toy model. This is however only a 1 dimensional case, how the method scales to
 higher degrees of freedom is not yet known.
 
 \section{Conclusion}
-Both the experiments show capability of the researched methods for simulating the dynamics of a stochasitically excited
-DP system. As such, the decision on which to use comes down to their suitablity to real world use. 
+Both the experiments show capability of the researched methods for simulating the dynamics of a stochastically excited
+DP system. As such, the decision on which to use comes down to their suitability to real world use. 
 
 Assuming their performance issue can be overcome, neural SDEs offer more flexibility for
 use in practice, as they do not require a fixed sample length or interval, or generation of a force series for training.

@@ -33,10 +33,10 @@ In the forward problem, \(f, \, x \) are known. \(y\) can be calculated. However
 \textit{forward propagation of uncertainty}.
 
 In the inverse problem, \(y, \, x\) are measured. We are interested in determining \(f\). These measurements are subject to noise, and as \(f\) is a model of a
-real system and thus has infinitely many degrees of freedom, the problem is underdetermined. 
+real system and thus has infinitely many degrees of freedom, the problem is under-determined. 
 
 For the considered case of a DP system, the forward problem is primarily of relevance, as the dynamics of the system are
-known and the effect of uncertainty in the model and inputs is of relevance to the forecasted behavior.
+known and the effect of uncertainty in the model and inputs is of relevance to the forecasted behaviour.
 
 \section{Types of Uncertainty}
 In general, sources of uncertainty can be divided into two categories based on their origin. These are aleatoric
@@ -83,7 +83,7 @@ distribution of the random variable. \(c_i\) is a weight given to each term of t
 pointwise sampling at a given point in time. Given a time-dependent process \(X = X(t, \omega)\), \(c_i\) has to be
 re-evaluated at each timestep. 
 
-infinite sums are not possible in reality, so the sum is truncated at point \(M\). This gives an approximation of \(X\)
+Infinite sums are not possible in reality, so the sum is truncated at point \(M\). This gives an approximation of \(X\)
 defined as:
 
 \begin{equation}
@@ -133,7 +133,7 @@ environmental inputs, which lead to rapid growth in computational cost and poor 
 Additionally, Polynomial Chaos Expansions (PCE) and other spectral decompositions are typically constructed for a
 specific set of uncertain parameters and their probability distributions. For each operating condition and set of
 parameters of the DP system, the output distribution can vary significantly. As such, the expansion must be recomputed
-or retrained. This means that a tool intended to evaluate behavior under varying conditions would require repeated
+or retrained. This means that a tool intended to evaluate behaviour under varying conditions would require repeated
 recalculation of the PCE; coupled with the curse of dimensionality makes PCE inefficient compared to more flexible approaches such as neural network-based
 surrogate models for the desired purpose.
 
@@ -148,7 +148,7 @@ uncertainty is quantified by placing a distribution over the output of the model
 Bayesian neural networks (BNNs) offer a probabilistic extension of standard neural networks, replacing fixed model
 parameters with distributions to capture uncertainty in both learning and prediction. This Bayesian treatment provides a
 principled framework for understanding model confidence, especially in settings where data are limited, noisy, or shift
-over time. Bayes' theorum is the fundamental principle behind BNNs. It is formulated as follows:
+over time. Bayes' theorem is the fundamental principle behind BNNs. It is formulated as follows:
 
 \begin{equation}
     P(H \mid D)
@@ -224,7 +224,7 @@ results in a distribution of output predictions, thus quantifying the uncertaint
 
 The theoretical basis is that dropout can be interpreted as variational inference over a BNN where
 the variational distribution is a Bernoulli distribution \parencite{galDropoutBayesianApproximation2016}. This allows
-the model to give a bayesian average without training a full ensemble. This allows the model to quantify epistemic
+the model to give a Bayesian average without training a full ensemble. This allows the model to quantify epistemic
 uncertainty. An alternative interpretation of this approach is that dropout results in an ensemble of neural networks
 with shared parameters \parencite{lakshminarayananSimpleScalablePredictive2017}. 
 
@@ -233,7 +233,7 @@ change needed to the architecture to enable dropout is adding dropout layers bet
 \parencite{wabinaNeuralStochasticDifferential2023}. The approach is fast and scales well compared to BNNs, and still
 gives usable results. The prediction of the uncertainty is limited however, as the Bernoulli variational distribution is restrictive. This
 limits its ability to capture the true posterior distribution of the network. The quality of the uncertainty
-quantification is also sensitive to the dropout rate; the rate must therefore be tuned to get the desired behavior.
+quantification is also sensitive to the dropout rate; the rate must therefore be tuned to get the desired behaviour.
 Finally, by disabling parts of the network, the quality of each individual prediction will be worse. Overall, this
 method of uncertainty quantification is the crudest of the neural network approaches discussed in this section.
 
@@ -257,11 +257,11 @@ Deep ensembles are a method to quantify epistemic uncertainty. Proposed in
 \citeyear{lakshminarayananSimpleScalablePredictive2017} by
 \citeauthor{lakshminarayananSimpleScalablePredictive2017} as a method for uncertainty quantification, they work by training multiple of the same neural network
 from different random initial weights and biases. At inference time, each of these networks is sampled. If the networks are in
-agreement the epistemic uncertainty is low, wheras if the networks disagree the epistemic uncertainty is high. 
+agreement the epistemic uncertainty is low, whereas if the networks disagree the epistemic uncertainty is high. 
 
 The approach is simple and requires minimal modifications to the neural networks architecture to implement. The quality
 of the uncertainty quantification is high and the computation cost at inference time is low, as only a relatively small
-number of samples are needed compared to the other approaches discussed.
+number of samples are needed, compared to the other approaches discussed.
 \textcite{lakshminarayananSimpleScalablePredictive2017} found that random shuffling of the dataset and random
 initialisation of the weights was sufficient to obtain good results. This reinforces the observation
 \textcite{leeWhyHeadsAre2015} made while investigating how to create a diverse set of ensemble networks.
