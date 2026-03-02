@@ -24,18 +24,22 @@ workspace:
 
 
 artifacts:
-  mypkg:
+  thesis:
     type: whl
     build: uv build --wheel       # uv builds your wheel
     path: .
+    dynamic_version: true
 
-# resources:
-#   jobs:
-#     train_job:
-#       name: thesis
-#       tasks:
-#         - task_key: train
-          # notebook_task:
-          #   notebook_path: notebooks/train.ipynb
-#           libraries:
-#             - whl: ./dist/*.whl
+resources:
+  jobs:
+    train_job:
+      name: thesis
+      tasks:
+        - task_key: train
+          notebook_task:
+            notebook_path: src/databricks_test.ipynb
+          # libraries:
+          #   - whl: ./dist/*.whl
+          existing_cluster_id:
+            0212-141545-suh1awug
+          
