@@ -94,6 +94,8 @@
 \RequirePackage[export]{adjustbox}
 \RequirePackage{pgf}
 
+%% ------------------------ SI Units -------------------
+\sisetup{input-digits = 0123456789\pi} % Add pi as digit
 
 %% ------------------------ Fonts -----------------------
 

@@ -1,4 +1,4 @@
-\chapter{Dynamics Modelling}
+\chapter{Nonlinear Dynamics Modelling}
 \label{chapter:dynamic_modelling}
 A continuous time dynamical system can be considered in the following form:
 
@@ -15,12 +15,16 @@ A discrete time system can analogously be considered in the following form:
 
 As this only depends on the state at the current time, these processes can be considered as Markov processes.
 
-In this chapter, three approaches to modelling the dynamics of nonlinear systems are considered. First a brief overview
-of state space models is given, followed by a review of operator learning techniques. Of the two considered, Koopman
-operators and DeepONet, the DeepONet approach seems the most promising for the problem at hand. Finally, neural
-stochastic differential equations are covered. 
+In this chapter, three approaches to modelling the dynamics of nonlinear systems are considered. First, state-space
+models are reviewed in \cref{sec:state_space_models}. Operator learning techniques are then discussed in
+\cref{sec:operator_learning}, covering Koopman operator theory (\cref{subsec:koopman}), variational approaches
+(\cref{subsec:vamp}), and DeepONet (\cref{subsec:deeponet}). Finally, neural stochastic differential equations are
+covered in \cref{sec:neural_sde}, including neural ODEs (\cref{subsec:neural_ode}), SDE theory
+(\cref{subsec:neural_sde_theory}), the adjoint method (\cref{subsec:adjoint_sde}), and training architectures
+(\cref{subsec:training_architectures}). 
 
 \section{State-space models}
+\label{sec:state_space_models}
 State-space models (SSMs) describe dynamical systems using an internal state that evolves over time in response to inputs. In continuous time, a linear SSM is typically written as:
 \begin{equation}
     \mathbf{x}'(t) = A\mathbf{x}(t) + B\mathbf{u}(t), \qquad \mathbf{y}(t) = C\mathbf{x}(t) + D\mathbf{u}(t)
@@ -51,12 +55,13 @@ stochastic forcing without resorting to very high state dimensions or extensive 
 on the other topics discussed in this chapter.
 
 \section{Operator learning}
+\label{sec:operator_learning}
 An approach to modelling dynamics is operator learning. With operator learning, one aims to learn an operator that maps
-one function into another. Two main approaches are covered in this section. First Koopman operators will be discussed
-followed by more general operator learning with DeepONets. 
+one function into another. This section covers three key operator learning approaches. First, Koopman operator theory is discussed in \cref{subsec:koopman}, followed by the Variational Approach for Markov Processes in \cref{subsec:vamp}, and finally DeepONet in \cref{subsec:deeponet}. 
 
 \subsection{Koopman operator theory}
-Koopman operator theory states that it is possible to represent a nonlinear dynamical system in terms of an
+\label{subsec:koopman}
+Koopman operator theory provides a mathematically principled approach to analysing nonlinear dynamical systems by lifting them to infinite-dimensional linear operators. This section begins with the mathematical formulation in \cref{subsubsec:koopman_math}, followed by data-driven approaches in \cref{subsubsec:koopman_data}, neural network implementations in \cref{subsubsec:koopman_nn}, and extensions to stochastic systems in \cref{subsubsec:koopman_stochastic}. Koopman operator theory states that it is possible to represent a nonlinear dynamical system in terms of an
 infinite-dimensional linear operator acting on a Hilbert space of measurement functions of the state of the system
 \parencite{bruntonDatadrivenScienceEngineering2019}. This was demonstrated by
 \citeauthor{koopmanHamiltonianSystemsTransformation1931} in \citeyear{koopmanHamiltonianSystemsTransformation1931}. This
@@ -64,6 +69,7 @@ operator is linear, making analysis of the system much easier. It is however inf
 applications. 
 
 \subsubsection{Mathematical Formulation}
+\label{subsubsec:koopman_math}
 The Koopman operator is a linear operator that acts on a measurement function as follows:
 \begin{equation}
     \mathcal{K} g = g(\mathbf{F})
@@ -105,6 +111,7 @@ using the Koopman operator has now shifted to selecting the best finite set of e
 dynamics.
 
 \subsubsection{Data-driven Koopman analysis}
+\label{subsubsec:koopman_data}
 Analytically determining the Koopman eigenfunctions and their weights for a complex non-linear dynamical system is not
 practically feasible. As such data-driven techniques are the method of choice for real world systems.
 
@@ -136,8 +143,8 @@ functions, the model will overfit or give incorrect modal responses. Correctly d
 contained in $\mathbf{g}$ is thus essential.
 
 \subsubsection{Neural networks for Koopman theory}
-Even for relatively simple dynamical systems, the Koopman eigenfunctions can be arbitrarily complex
-\parencite{bruntonDataDrivenDynamicalSystems2019}. Creating a suitable library for use with eDMD can be challenging.
+\label{subsubsec:koopman_nn}
+Even for relatively simple dynamical systems, the Koopman eigenfunctions can be arbitrarily complex \parencite{bruntonDataDrivenDynamicalSystems2019}. Creating a suitable library for use with eDMD can be challenging.
 Deep learning could provide an alternative approach \parencite{luschDeepLearningUniversal2018}
 
 The goal of determining an invertible function \(\varphi\) and Koopman operator \(\mathcal{K}\) such that \( y_{k} =
@@ -159,8 +166,8 @@ has to decide on the number of latent nodes needed, as well as other hyperparame
 upfront computational cost to train the system as well as needing a large amount of data.
 
 \subsubsection{Koopman Theory for Stochastic Systems}
-The above sections discuss the Koopman operator for deterministic systems. If a stochastic dynamical system is to be
-considered however, the formulation can be adjusted. This is given by \textcite{crnjaric-zicKoopmanOperatorSpectrum2020}
+\label{subsubsec:koopman_stochastic}
+The above sections discuss the Koopman operator for deterministic systems. If a stochastic dynamical system is to be considered however, the formulation can be adjusted. This is given by \textcite{crnjaric-zicKoopmanOperatorSpectrum2020}
 in the following form: 
 
 \begin{equation}
@@ -178,6 +185,7 @@ eigenvalues. The stochastic Koopman operator tracks how the expected state of th
 in measurement space. It does not however track the variance of the state. 
 
 \subsection{Variational Approach for Markov Processes}
+\label{subsec:vamp}
 \textcite{wuVariationalApproachLearning2019} developed a method to approximate the Koopman operator from data of
 stochastic systems. Their approach is based on stochastic Koopman theory coupled with canonical covariance analysis. This
 approach was extended by \textcite{mardtVAMPnetsDeepLearning2018} to use deep learning. 
@@ -194,8 +202,7 @@ time \(\tau\), the covariance can be calculated.
     \end{aligned}
 \end{equation}
 
-The optimal Koopman operator can then be found by minimising the least-square error between
-\(\mathcal{X}_1(\mathbf{x}_{t + \tau})\) and \(\mathcal{X}_0(\mathbf{x}_t)\). This becomes:
+The optimal Koopman operator can then be found by minimising the least-square error between \(\mathcal{X}_1(\mathbf{x}_{t + \tau})\) and \(\mathcal{X}_0(\mathbf{x}_t)\). This becomes:
 
 \begin{equation}
     \mathcal{K} = C_{00}^{-1} C_{01}
@@ -214,6 +221,7 @@ in smoother training.
 By using \eqref{eq:VAMP_2} as a loss function for the two networks, these can be trained to learn \(\mathcal{X}_0 \text{ and } \mathcal{X}_1\).
 
 \subsection{DeepONet}
+\label{subsec:deeponet}
 DeepONet, proposed by \textcite{luLearningNonlinearOperators2021}, works based on the universal operator approximation
 theorem. The theorem states that a neural network with a single hidden layer can approximate any nonlinear continuous
 function or operator. 
@@ -299,15 +307,27 @@ benchmarks, MIONet consistently outperformed DeepONet (e.g., 1.69\% vs. 2.41\% e
 results showed that MIONet offered a more expressive and scalable approach for operator learning problems requiring
 multiple inputs.
 
+\subsection{Applicability to DP simulation}
+The operator approach appears much more similar to the regular workflow, as it essentially replaces the DP model. Of the
+operator learning approaches discussed, DeepONet appears to be the most suited for simulating DP behaviour. This is
+because of the ability of the method to approximate highly non-linear dynamics without relying on truncation of an
+infinite sum such as with the Koopman operators.
+
+As input, it would take model parameters and a time trace of the
+external forces. For real-world applications this means that the force calculation step would still have to be included.
+This introduces extra error into the forecasts. DeepONets would be less naturally suited for training with real sensor
+data, as it requires exact time traces of the forces to predict the motions. As such using this for real applications
+would require training on simulated data, having tuned the simulation to accurately match the real ship's behaviour. The
+DeepONet approach would however be very efficient to sample, as it does not require any time integration to obtain its
+predictions.
 
 \section{Neural Stochastic Differential Equations}
-Neural Ordinary Differential Equations are a powerful tool for modelling dynamics of systems. Neural stochastic
-differential equations are their stochastic analogue. This section will discuss these approaches for use in modelling
-stochastic dynamical systems. First an overview will be given of neural ODEs, followed by an overview of neural
-stochastic differential equations. 
+\label{sec:neural_sde}
+Neural Ordinary Differential Equations are a powerful tool for modelling dynamics of systems. Neural stochastic differential equations are their stochastic analogue. This section covers the foundational concepts of Neural ODEs in \cref{subsec:neural_ode}, followed by the theoretical formulation of neural SDEs in \cref{subsec:neural_sde_theory}. The adjoint method for efficient training is discussed in \cref{subsec:adjoint_sde}, with practical training architectures presented in \cref{subsec:training_architectures}. 
 
 \subsection{Neural Ordinary Differential Equations}
-A second method for modelling dynamics is neural ordinary differential equations (Neural ODEs). First published by
+\label{subsec:neural_ode}
+A second method for modelling dynamics is neural ordinary differential equations (Neural ODEs). This subsection covers advantages in \cref{subsubsec:neural_ode_advantages} and limitations in \cref{subsubsec:neural_ode_limitations}. First published by
 \textcite{chenNeuralOrdinaryDifferential2018}, neural ODEs are derived from residual neural networks (ResNet). A ResNet
 works as follows:
 
@@ -326,6 +346,7 @@ These iterative updates can be interpreted as an Euler discretisation of a conti
 The time stepping can then be handled by a time integration algorithm. 
 
 \subsubsection{Advantages of Neural ODEs}
+\label{subsubsec:neural_ode_advantages}
 Neural ODEs have several advantages over ResNets
 for the modelling of dynamical systems \parencite{chenNeuralOrdinaryDifferential2018}. 
 
@@ -343,8 +364,9 @@ Finally, for the modelling of time series, a neural ODE, by its nature, uses the
 reduces the complexity of the model as well as improving the generalisability of the network.
 
 \subsubsection{Limitations of Neural ODEs}
+\label{subsubsec:neural_ode_limitations}
 These advantages are not without their limitations, however. Many of the limitations of solving regular ODEs are also
-prevelant with neural ODEs. The computational cost and accuracy is highly dependent on the solver chosen. For stiff
+prevalent with neural ODEs. The computational cost and accuracy is highly dependent on the solver chosen. For stiff
 systems explicit solvers become infeasible so implicit solvers are needed, increasing computational cost
 \parencite{anantharamanStablyAcceleratingStiff2022}. Neural
 ODEs must also be Lipschitz continuous to have a solution. This holds if the weights of the network are finite and the
@@ -353,7 +375,7 @@ run them parallel on modern hardware such as GPUs. While the neural network eval
 integration can only run sequentially.
 
 \subsection{Theoretical formulation of neural SDEs}
-\label{subsec:neural_sde}
+\label{subsec:neural_sde_theory}
 A limitation primarily relevant to this study is that in the form of neural ODEs given in \eqref{eq:neural_ode}, the network is unable
 to deal with stochastic systems. Stochastic differential equations (SDEs) can similarly be approximated by neural
 networks to give a neural SDE. The general form of these is given as follows \parencites{jiaNeuralJumpStochastic2020}{liuHowDoesNoise2020}{tzenNeuralStochasticDifferential2019}:
@@ -444,11 +466,8 @@ adjoint integration. Its computational cost remains one function evaluation per 
 convergence rates of classical midpoint/Heun schemes.
 
 \subsection{Training architectures}
-Literature discusses two main training paradigms for neural SDEs. These are the \emph{Latent SDE} method proposed by
-\textcite{liScalableGradientsStochastic2020} and the \emph{SDE-GAN} approach by
-\textcite{kidgerNeuralSDEsInfiniteDimensional2021}. 
-
-Both approaches model the dynamics in a latent space because the observations themselves are not Markovian \parencite{kidgerNeuralSDEsInfiniteDimensional2021}. In practice,
+\label{subsec:training_architectures}
+Literature discusses two main training paradigms for neural SDEs, with each addressing different trade-offs between accuracy and training stability. The \emph{Latent SDE} method is discussed in \cref{subsubsec:latentsde}, the \emph{SDE-GAN} approach in \cref{subsubsec:sde_gan}, and further extensions in \cref{subsubsec:further_work}. Both approaches model the dynamics in a latent space because the observations themselves are not Markovian \parencite{kidgerNeuralSDEsInfiniteDimensional2021}. In practice,
 observations are partial, noisy, and often irregularly sampled, so they do not contain all information required to
 predict future behaviour. This means each observation still depends on earlier (unobserved) states, which makes the
 observed process non-Marlovian. 
@@ -526,6 +545,7 @@ trained to generate latent dynamics and the decoder converts latent space into o
 relatively easy to train, however similar to variational inference, the diffusion will often be too small \parencite{kidgerNeuralDifferentialEquations2022}
 
 \subsubsection{SDE-GAN}
+\label{subsubsec:sde_gan}
 The SDE-GAN method trains the neural SDE as a generative adversarial network (GAN). The SDE-GAN method was proposed by
 \textcite{kidgerNeuralSDEsInfiniteDimensional2021}. The approach stems from traditional SDE training methods where some
 statistics of the model are fit to the data. 
@@ -582,6 +602,7 @@ A hybrid approach is briefly mentioned to avoid the disadvantages of both. This 
 used each training epoch.
 
 \subsubsection{Further work}
+\label{subsubsec:further_work}
 Further research has been done on these methods. \textcite{el-lahamVariationalNeuralStochastic2025} and
 \textcite{ryzhikovLatentStochasticDifferential2023} used the latent-SDE framework together with change point detection.
 Multiple SDEs were trained with the latent SDE approach and switched between based off some change point metric. This
@@ -613,3 +634,24 @@ implemented during training is mentioned only in passing.
 diffusion networks. This allows their approach to capture both epistemic and aleatoric uncertainty. While the paper does
 show their approach is better suited to capturing uncertainty than \parencite{liuHowDoesNoise2020}, it does not discuss
 how the networks are trained.
+
+\subsubsection{Applicability to DP modelling}
+All the training data used by the neural SDE approach is data that is realistically obtainable through sensor
+measurements on-board. The neural SDE approach also allows for irregularly sampled data, which is a significant
+advantage for on-board a real ship. These factors make the neural SDE approach well suited for acting as a surrogate model a DP system. The tradeoff is that the neural SDE approach is still limited by the SDE
+integration. This significantly increases the inference cost of this approach. 
+
+
+\section{Conclusion}
+\label{sec:conclusion}
+In this chapter, different methods for modelling the dynamics of a stochastically excited non-linear dynamical system
+were investigated. The focus was on efficient surrogate modelling approaches that can be used with one of the
+uncertainty quantification methods outlined in \cref{chapter:uncertainty_quantification}. Four methods are discussed:
+state-space models, Koopman operator learning, general operator learning using DeepONet and neural SDEs.
+
+Overall, DeepONet and neural SDEs have the best fit with DP system modelling. Both are capable of modelling highly
+non-linear systems efficiently, with neural SDEs offering more flexibility while DeepONet has very inexpensive
+inference. In practice, the workflow between the two methods would differ for the DP problem. The advantage the neural
+SDE approach has over DeepONet is that for real-world applications, one could train it with data already available on
+board. DeepONet based approaches require a time trace of the exciting force. The trade-off is in computational cost;
+neural SDEs are more costly than DeepONets due to the time integration of the stochastic differential equation

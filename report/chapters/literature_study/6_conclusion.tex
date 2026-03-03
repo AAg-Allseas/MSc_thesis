@@ -3,8 +3,8 @@
 Dynamic positioning behaviour of ships in offshore has traditionally been predicted using quasi-static force balances.
 The industry is now transitioning to time-domain simulations, which better capture transients and footprint behaviour.
 These simulations are computationally costly and still subject to model error, and perfect knowledge of the simulated
-system is rarely available. Quantifying aleatoric and epistemic uncertainty in a DP system remains an open research
-question, and therefore the central topic of this thesis.
+system is rarely available. Quantifying aleatoric and epistemic uncertainty in a dynamic positioning system remains an open research
+question, and therefore the central topic of this thesis. 
 
 Based on the gap in the research on dynamic positioning simulation, a research question was formulated as follows:
 
@@ -14,36 +14,54 @@ To answer this question, a set of research goals were set. The first two of thes
 and scoping study. 
 
 Current deterministic simulation frameworks are unsuitable for uncertainty quantification, as the many simulations
-required for Monte-Carlo UQ would be intractable for operational decision-making. For this reason, surrogate approaches
+required for Monte-Carlo based uncertainty quantification  would be intractable for operational decision-making. For this reason, surrogate approaches
 were investigated. Across the literature, uncertainty is commonly separated into aleatoric and epistemic components.
-Most surrogate pipelines capture stochastic dynamics in the surrogate model, after which a UQ method is applied to
+Most surrogate pipelines capture stochastic dynamics in the surrogate model, after which an uncertainty quantification method is applied to
 characterize model uncertainty.
 
-Several UQ methods were reviewed, with polynomial chaos expansions (PCE) and machine learning approaches as the most
-prominent. PCE is widely used for UQ but becomes inefficient for long time-domain simulations and suffers from the curse
+Several uncertainty quantification methods were reviewed, with polynomial chaos expansions (PCE) and machine learning approaches as the most
+prominent. PCE is widely used for uncertainty quantification but becomes inefficient for long time-domain simulations and suffers from the curse
 of dimensionality. Machine learning methods are more recent but offer greater flexibility for probabilistic prediction.
 Among these, Bayesian neural networks and deep ensembles are well aligned with the need to quantify uncertainty in
-surrogate DP models.
+surrogate dynamic positioning models.
 
 For modelling the dynamics, two main approaches stand out. Operator learning, through DeepONet or Koopman methods, offers
 computationally inexpensive inference and enables fast propagation of stochastic signals through the system dynamics.
-These approaches can be paired with epistemic UQ methods. Between the two, DeepONet appears more suitable for the task
+These approaches can be paired with epistemic uncertainty quantification methods. Between the two, DeepONet appears more suitable for the task
 at hand. Neural stochastic differential equations provide an alternative by directly modelling stochastic dynamics with
-learned drift and diffusion terms. In the pilot tests on a toy DP model, neural SDEs performed better than DeepONet.
+learned drift and diffusion terms. 
 
-Through the literature review and initial tests, the first two research goals have been completed.
+In the pilot tests on a toy dynamic positioning model, both neural SDE and DeepONet showed feasibility for the task at
+hand. As neural SDEs are a more natural fit to real-world operations, considering its dependence only on parameters
+available as sensors during operation and ability to deal with irregularly sampled data, this approach will be expanded
+in the following thesis.
+
+Through the literature review and initial tests, the first three research goals have been completed: 
+
+\begin{itemize}
+    \item Identify sources and types of uncertainty, and the techniques used to quantify it. 
+    \item  Identify existing methods for simulating stochastic dynamical systems under uncertainty.
+    \item Determine which of these methods are suitable for capturing the stochastic behaviour and model uncertainty.
+\end{itemize}
 
 \section{Thesis Planning}
-Based on the pilot tests in \cref{chapter:pilot_tests}, this thesis will focus on the neural SDE approach.
+Based on the pilot tests in \cref{chapter:pilot_tests}, this thesis will focus on the neural stochastic differential
+equation approach. The aim of the research is to answer the last two research goals:
+\begin{itemize}
+    \item Implement a selected uncertainty quantification method for short-term time-domain DP forecasting of a vessel, integrating environmental excitation and system dynamics.
+    \item Quantitatively compare the proposed probabilistic approach with deterministic and Monte-Carlo-based DP simulations in terms of accuracy, uncertainty representation, and computational efficiency.
+\end{itemize}
 
-In the upcoming phase, frameworks for neural SDEs will be evaluated, with particular focus on Diffrax \parencite{kidgerNeuralDifferentialEquations2022}. The aim is to identify the most suitable framework for training the toy model and demonstrating the ability of neural SDEs to capture DP behaviour. Should this approach not prove feasible, subsequent work will adopt a DeepONet-based method, contingent on its scalability to three degrees of freedom.
+In the upcoming phase, frameworks for neural stochastic differential equations will be evaluated, with particular focus on Diffrax \parencite{kidgerNeuralDifferentialEquations2022}. The aim is to identify the most suitable framework for training the toy model and demonstrating the ability of neural stochastic differential equations to capture dynamic positioning behaviour. Should this approach not prove feasible, subsequent work will adopt a DeepONet-based method, contingent on its scalability to three degrees of freedom.
 
-Once a performant neural SDE framework is established, deep ensembles will be applied to quantify epistemic uncertainty in approximating the toy DP model.
+Once a performant neural stochastic differential equation framework is established, deep ensembles will be applied to quantify epistemic uncertainty in approximating the toy dynamic positioning model.
 
-To extend the study, part of the MatLab-based MSS \parencite{fossenMarineSystemsSimulator2004} will be adapted to Python, providing a more complex DP model. This Python model will be verified against MSS and used to generate a diverse training dataset, varying system parameters such as the magnitude of the forcing.
+To extend the study, part of the MatLab-based Marine Systems Simulator (MSS) \parencite{fossenMarineSystemsSimulator2004} will be adapted to
+Python, providing a more complex dynamic positioning model. This Python model will be verified against MSS and used to generate a
+diverse training dataset, varying system parameters such as the magnitude of the forcing.
 
-The generalisability of neural SDEs to different model parameters will be investigated, as the current approach does not
-incorporate system parameters. Additionally, the ability of neural SDEs to capture transient effects, such as thruster
+The generalisability of neural stochastic differential equations to different model parameters will be investigated, as the current approach does not
+incorporate system parameters. Additionally, the ability of neural stochastic differential equations to capture transient effects, such as thruster
 failure, will be assessed.
 
 A high level planning is shown in figure \cref{fig:planning}.
@@ -54,3 +72,4 @@ A high level planning is shown in figure \cref{fig:planning}.
     \caption{High level planning of thesis}
     \label{fig:planning}
 \end{figure}
+

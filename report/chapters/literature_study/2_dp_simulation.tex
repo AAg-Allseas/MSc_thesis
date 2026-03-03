@@ -1,79 +1,21 @@
-\chapter{DP Simulation}
+\chapter{Simulation of Dynamic Positioning}
 \label{chapter:DP_simulation}
-A dynamic positioning system is a system on board a ship that controls the ship's actuators such that the position of
-the ship is kept constant, thus counteracting environmental forces \parencite{duDynamicPositioningShips2018}. This
+A dynamic positioning system is a system on board a ship that controls the ship's actuators such that the position and heading of
+the ship is kept within a certain bound, thus counteracting environmental and other external forces \parencite{duDynamicPositioningShips2018}. This
 allows ships to perform operations such as pipe-laying or construction in places where the water depth would otherwise be
 restricting. A DP vessel can also reposition much faster than a ship operating on anchors
 \parencite{aiModelingSimulationDeepwater2018}.
 
-This chapter will describe the main components of a DP system and outline the mathematical properties of the system.
+The goal of this chapter is to provide an overview of dynamic positioning and the simulation thereof. The chapter will start by providing a mathematical description of the dynamics of a DP vessel in
+\cref{sec:vessel_model}. Then the DP system and its components will be explained in \cref{sec:dp_system}.
+\Cref{sec:environmental_forces} will conclude the chapter with a description of the environmental forces relevant for
+dynamic positioning, as well as some of the steps required to model them. 
 
-\section{DP System}
-This section will describe the main components that make up a DP system. A global overview will be given, and each
-individual component will be further explained.
-
-Most dynamic positioning (DP) systems share a common architecture consisting of four main components: the reference
-system, observer, controller, and actuators \parencite{witOptimalThrustAllocation2009}. \Cref{fig:dp_overview}
-illustrates these components and their interactions. The overall workflow is as follows: sensors measure the vessel’s
-position and velocity; this data is processed by a state estimator to filter out noise and high-frequency motions.
-The estimated state is then compared to a desired setpoint to compute the position error. Based on this error, the
-controller determines the required force, which is passed to a thrust allocation algorithm that translates it into
-actuator commands. Finally, the actuators generate thrust forces that act on the vessel alongside external environmental
-forces \parencite{cadetIntroductionKalmanFilter2003}. 
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\linewidth]{report/images/diagrams/DP_overview.pdf}
-    \caption{Overview of DP system components, adapted from \parencite{cadetIntroductionKalmanFilter2003}}
-    \label{fig:dp_overview}
-\end{figure}
-
-\subsection{State estimator}
-A ship is subject to a wide range of exciting frequencies. In general, these can be split into high and low frequency
-excitations. A DP system aims to compensate just the low frequency motions. The response time of a ships actuators is
-generally such that high frequency motions cannot be compensated for. Additionally, filtering saves the actuators from
-excessive wear and tear \parencite{serrarisTimeDomainAnalysis2009}. Furthermore, the
-position and velocity must be measured with sensors; the measurements are subject to noise. To solve both of these issues, a Kalman filter is generally used. The Kalman filter uses an internal model of the dynamics to predict the state, using
-measurements to correct the estimate. As the dynamics of the ship are non-linear, extended Kalman filters are often
-used. These linearise the equations of motion around the current estimated state at each timestep. 
-
-The Kalman filter also estimates the so-called “DP current” \parencite{cadetIntroductionKalmanFilter2003}, a virtual
-current force which represents the combined effect of all unknown forces acting on the vessel. This state behaves
-similarly to the integral term in a Proportional-Integral-Derivative (PID) controller, as it compensates for
-steady-state errors by
-accounting for persistent disturbances.
-
-\subsection{Controller and thrust allocation}
-The controller takes the state estimate and converts it into a desired thruster force. The simplest form of this
-controller is a PID controller, though the integral term is often neglected; this function is instead handled by the
-state estimator. Other controller architectures also exist.
-
-Once the desired thrust is known, it is passed to a thrust allocation algorithm. Typically, ships have more than one
-actuator per degree of freedom, making them over-actuated. This means there are an infinite number of ways to configure
-the actuators. To address this issue, an optimisation algorithm is used that aims to match the desired thrust through
-actuator settings such as motor RPM and azimuth angle. The objective is to do this with as little power consumption
-as possible, while respecting constraints such as forbidden zones, actuator ramp, thrust, and directional rate limitations, and total power consumption per switchboard \parencite{overengDynamicPositioningUsing2021}
-
-
-
-\subsection{Actuators}
-The actuators are generally defined as any active device producing a force that can be used for station keeping. These
-include azimuth thrusters, fixed propellers, rudders, and tunnel thrusters. The actuators are limited by physical
-constraints such as delayed responses, ramp-up periods and the rate of directional change. The maximum thrust available is also a
-significant limitation. A thruster operating at 100\% capacity is referred to as being saturated. These constraints are
-the one of the main reasons time-domain simulations are needed; otherwise, the ship would be able to maintain position almost perfectly
-\parencite{borhaugExperimentalValidationDynamic2012}. Thrusters are generally controlled by their revolutions per
-minute (RPM), as this is directly measurable. The mapping from RPM to thrust is non-linear and very dependent on the
-relative water velocity over the propeller.
-
-Actuators can be subject to numerous disturbances. The main effects that influence the force generated are
-thruster-hull interactions, thruster-thruster interactions, and thruster-current interactions
-\parencite{serrarisTimeDomainAnalysis2009}. These are difficult to accurately include as these are very complex
-phenomena.
-
-\subsection{Vessel Model}
+\section{Vessel Model}
+\label{sec:vessel_model}
 A general manoeuvring model for ships is given by \textcite{fossenHandbookMarineCraft2014}. This model is valid for low-speed manoeuvring. This model generally neglects fluid memory using a zero frequency assumption for the damping and
-added mass matrices. An alternative approach uses power-averaged matrices based on the exciting wave spectrum.
+added mass matrices. An alternative approach uses power-averaged matrices based on the exciting wave spectrum
+\parencite{fossenHandbookMarineCraft2014}. These formulations are simplifications of the impulse response based Cummins equations \parencite{cumminsImpulseResponseFunction1962}.
 
 \begin{figure}[H]
     \centering
@@ -107,14 +49,141 @@ moorings.
 
 \Cref{eq:general_eq_motion} has several nonlinearities. In the hydrodynamics, the quadratic damping is proportional to
 the velocity squared. The thruster forcing is also nonlinear due to the thruster dynamics and Kalman filtering.
-Furthermore, the system is causal, dynamic, and time-invariant. 
+Furthermore, the system is causal, dynamic, and time-invariant.
+
+\section{DP System}
+\label{sec:dp_system}
+
+This section will describe the main components that make up a DP system. A global overview will be given, and each
+individual component will be further explained.
+
+Most dynamic positioning (DP) systems share a common architecture consisting of four main components: the reference
+system, observer, controller, and actuators \parencite{witOptimalThrustAllocation2009}. \Cref{fig:dp_overview}
+illustrates these components and their interactions. The overall workflow is as follows: sensors measure the vessel's
+position and velocity; this data is processed by a state estimator to filter out noise and high-frequency motions.
+The estimated state is then compared to a desired setpoint to compute the position error. Based on this error, the
+controller determines the required force, which is passed to a thrust allocation algorithm that translates it into
+actuator commands. Finally, the actuators generate thrust forces that act on the vessel alongside external environmental
+forces \parencite{cadetIntroductionKalmanFilter2003}. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics{report/images/diagrams/DP_overview.pdf}
+    \caption{Overview of DP system components, adapted from \parencite{cadetIntroductionKalmanFilter2003}}
+    \label{fig:dp_overview}
+\end{figure}
+
+
+\subsection{State estimator}
+\label{subsec:state_estimator}
+A ship is subject to a wide range of exciting frequencies. In general, these can be split into high and low frequency
+excitations. A DP system aims to compensate just the low frequency motions. The response time of a ships actuators is
+generally such that high frequency motions cannot be compensated for. Additionally, filtering saves the actuators from
+excessive wear and tear \parencite{serrarisTimeDomainAnalysis2009}. Furthermore, the
+position and velocity must be measured with sensors; the measurements are subject to noise. To solve both of these issues, a Kalman filter is generally used. The Kalman filter uses an internal model of the dynamics to predict the state, using
+measurements to correct the estimate. As the dynamics of the ship are non-linear, extended Kalman filters are often
+used. These linearise the equations of motion around the current estimated state at each timestep. 
+
+The Kalman filter also estimates the so-called “DP current” \parencite{cadetIntroductionKalmanFilter2003}, a virtual
+current force which represents the combined effect of all unknown forces acting on the vessel. The state estimator tracks the
+difference between the estimated states and the actual state and uses this to estimate the current. This is then
+typically used as a feed-forward input to the controller, complementing the integral action of the controller in reducing the steady state
+error. 
+
+
+\subsection{Controller and thrust allocation}
+\label{subsec:controller_thrust_allocator}
+The controller takes the state estimate and converts it into a desired thruster force. The simplest form of this
+controller is a PID controller, though the integral term is often neglected; this function is instead handled by the
+state estimator. Other controller architectures also exist \parencite{overengDynamicPositioningUsing2021}. For a given setpoint \(\eta_d\) and state estimate \(\hat{\eta}\), the PID control law can be formulated as follows:
+
+\begin{align}
+    \tilde{\eta} &= \hat{\eta} - \eta_d \\
+    \tau &= J^T(\hat{\eta}) \tau_{PID} - K_{ff}\tau_{wind} \\
+    \tau_{PID} &=  - K_p \tilde{\eta} - K_d \tilde{\dot{\eta}} - K_i \int_0^t\tilde{\eta}(\tau')d\tau'
+\end{align}
+
+Where \(\tau\) is the desired force in body fixed coordinates, \(\tau_{PID}\) is the control force in NED coordinates,
+\(\tilde{\eta}\) is the error term, and \(K_p, \, K_i, \, K_d\) are the proportional, integral and derivative gains
+respectively.  \(K_{ff}\) is the feed-forward gain and \(\tau_{wind}\) is the calculated wind force in body fixed coordinates, assuming wind
+feed-forward is used \parencite{AssessmentStationKeeping2021}. The derivative error is usually taken from the
+state-estimated velocity, since numerically differentiating position measurements introduces noise.
+
+Once the desired thrust is known, it is passed to a thrust allocation algorithm. Typically, ships have more than one
+actuator per degree of freedom, making them over-actuated. This means there are an infinite number of ways to configure
+the actuators. To address this issue, an optimisation algorithm is used that aims to match the desired thrust through
+actuator settings such as motor RPM and azimuth angle. The objective is to do this with as little power consumption
+as possible, while respecting constraints such as forbidden zones, actuator ramp, thrust, and directional rate limitations, and total power consumption per switchboard \parencite{overengDynamicPositioningUsing2021}
+
+
+\subsection{Actuators}
+\label{subsec:actuators}
+The actuators are generally defined as any active device producing a force that can be used for station keeping. These
+include azimuth thrusters, fixed propellers, rudders, and tunnel thrusters. The actuators are limited by physical
+constraints such as delayed responses, ramp-up periods and the rate of directional change. The maximum thrust available is also a
+significant limitation. A thruster operating at 100\% capacity is referred to as being saturated. These constraints are
+the one of the main reasons time-domain simulations are needed; otherwise, the ship would be able to maintain position almost perfectly
+\parencite{borhaugExperimentalValidationDynamic2012}. Thrusters are generally controlled by their revolutions per
+minute (RPM), as this is directly measurable. The mapping from RPM to thrust is non-linear and very dependent on the
+relative water velocity over the propeller.
+
+Actuators can be subject to numerous disturbances. The main effects that influence the force generated are
+thruster-hull interactions, thruster-thruster interactions, and thruster-current interactions
+\parencite{serrarisTimeDomainAnalysis2009}. These are difficult to accurately include as these are very complex
+phenomena.
+
 
 \section{Environmental Forces}
-A significant portion of the external loading comprises environmental forces. In most cases where DP is considered, current is
+\label{sec:environmental_forces}
+A significant portion of the external loading can come from environmental forces. In most cases where DP is considered, current is
 considered constant, as the timescale at which it changes is significantly longer than that of the system
 \parencite{RecommendedPracticeEnvironmental2019}. It can in most cases also be considered irrotational
 \parencite{fossenManouveringModels2014}. Both wind and waves are modelled as random processes characterised by energy
 density spectra. This results in stochastic loading with known statistical properties.
+
+The wave elevation at any given time and point for a random sea state can be described using a sum of many wave
+components \parencite{faltinsenSeaLoadsShips1999}:
+
+\begin{equation}
+    \zeta(t, x, y) = \sum_{j = 1}^N A_j \sin \left(\omega_j t - k_{x, j}x - k_{y, j}y - \epsilon_j\right)
+\end{equation}
+
+Here \(A_j\), \(\omega_j\), \(k_{x, j}\), \(k_{y, j}\) and \(\epsilon_j\) represent the wave amplitude, wave frequency,
+wave numbers and random phase angles per wave component \(j\). The random phase angles are uniformly sampled between
+\numrange{0}{2\pi}. \(\omega_j\) and \(k_{x, j}, k_{y, j}\) are related via the dispersion relationship and the
+incidence angle of the wave. The wave amplitude is determined by the wave spectrum \(S(\omega)\):
+
+\begin{equation}
+    \frac{1}{2} A_j^2 = S(\omega_j)\Delta \omega
+\end{equation}
+
+Where \(\Delta\omega\) is the difference between successive frequencies. The spectrum can take several forms. Most
+common forms include the Pierson-Moskowitz spectrum for fully developed seas, or the JONSWAP spectrum for seas with
+limited fetch. Both of these spectra model uni-directional seas. In reality, waves rarely come from a single direction.
+Weather forecasters therefore provide 2D spectral forecasts, showing the direction and spread of the wave energy.
+\Cref{fig:spectra} shows a 1D JONSWAP spectrum and a 2D spectrum. The
+forces are then typically calculated using response amplitude operators (RAOs) for the first order forces, and quadratic
+transfer functions (QTFs) for the second order forces. 
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.45\linewidth}
+        \includegraphics{report/images/literature_study/2D_spectrum}
+        \caption{2-dimensional wave spectrum used by Allseas, provided by the UK Met Office}
+    \end{subfigure}
+    \begin{subfigure}{0.45\linewidth}
+        \includegraphics[width=\linewidth]{report/images/literature_study/JONSWAP-spectra-with-H-s-14-40-m-T-p-14-100-s-and-g14-33-for-different-water-depths}
+        \caption{JONSWAP Spectrum for different significant wave heights \parencite{wangCalculatingCrestStatistics2014}}
+    \end{subfigure}
+    \caption{Examples of wave spectra}
+    \label{fig:spectra}
+\end{figure}
+
+Wind spectra are used analogously to wave spectra. Rather than determining the wave elevation, they are used to calculate the wind velocity. Common
+spectra include the Fr\o ya spectrum \parencite{AssessmentStationKeeping2021} or a NORSOK spectrum
+\parencite{PioneeringSpiritDP2018}. The wind force is determined using wind coefficients, generally obtained from model
+tests or from a combination of elementary blocks \parencite{RecommendedPracticeEnvironmental2019}.
+
 
 A stochastic process is a process that, when indexed at time \(t\), does not have a single deterministic trajectory but
 rather a set of possible trajectories \parencite{sullivanIntroductionUncertaintyQuantification2015}. The stochastic

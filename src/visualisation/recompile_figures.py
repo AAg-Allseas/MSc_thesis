@@ -7,6 +7,7 @@ from src.visualisation.pilot_tests.plot_deepOnet import main as plot_DeepONet
 from src.visualisation.pilot_tests.plot_latent_sde import main as plot_LatentSDE
 from src.visualisation.pilot_tests.timestep_difference import plot_cumulative_error_summary
 import src.visualisation.pilot_tests.plot_losses as pilot_losses
+import src.visualisation.general_plotting.weather_report as weather_report
 
 PLOTS= Path("plots")
 
@@ -23,3 +24,4 @@ if __name__ == "__main__":
     
     save_plot("pilot_losses_latentsde",  pilot_losses.plotLatentSDE())
     save_plot("pilot_losses_deepOnet",  pilot_losses.plotDeepONet())
+    weather_report.main()

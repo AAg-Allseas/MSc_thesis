@@ -1,13 +1,17 @@
 \chapter{Uncertainty Quantification}
 \label{chapter:uncertainty_quantification}
-
-
-
 This chapter will investigate the fundamentals of uncertainty quantification. Techniques and methods relevant to the
-quantification of uncertainty in DP simulations be identified and documented.
+quantification of uncertainty in DP simulations be identified and documented. This chapter aims to complete the first
+research goal: Identify sources and types of uncertainty, and the techniques used to quantify it. The chapter begins
+with a theoretical foundation of uncertainty quantification in \cref{sec:uncertainty_quantification_background}, followed by a discussion of
+uncertainty types in \cref{sec:types_of_uncertainty}. Two main categories of uncertainty quantification approaches are then examined:
+spectral methods (\cref{sec:spectral_methods}) and neural network-based approaches (\cref{sec:neural_network_uq}). 
+
+
 
 \section{What is Uncertainty Quantification?}
-A typical uncertainty quantification problem involves a mathematical model subject to
+\label{sec:uncertainty_quantification_background}
+This section introduces the fundamental concepts of uncertainty quantification (UQ). A typical uncertainty quantification problem involves a mathematical model subject to
 uncertainty about the correct parameter values \parencite{sullivanIntroductionUncertaintyQuantification2015}.
 \textcite{higdonUncertaintyQuantificationError2009} define uncertainty quantification as follows:
 
@@ -39,6 +43,7 @@ For the considered case of a DP system, the forward problem is primarily of rele
 known and the effect of uncertainty in the model and inputs is of relevance to the forecasted behaviour.
 
 \section{Types of Uncertainty}
+\label{sec:types_of_uncertainty}
 In general, sources of uncertainty can be divided into two categories based on their origin. These are aleatoric
 uncertainty and epistemic uncertainty \parencite{sullivanIntroductionUncertaintyQuantification2015}. Within any given system, these two forms of uncertainty are not mutually exclusive
 \parencite{foxDistinguishingTwoDimensions2011}. 
@@ -59,12 +64,13 @@ part of the system with complete accuracy. Additional epistemic uncertainty is a
 such as hydrodynamic coefficients are unlikely to be completely accurate at any given time.  
 
 \section{Spectral Methods}
+\label{sec:spectral_methods}
 Spectral methods are numerical techniques that represent stochastic processes as series expansions using an orthogonal
-basis of functions. They decompose random variables into components, similar to Fourier analysis
-\parencite{heuvelineHybridGeneralizedPolynomial2014}. Polynomial Chaos Expansions (PCE) are a common spectral method for
-uncertainty quantification.
+basis of functions. They decompose random variables into components, similar to Fourier analysis. Polynomial Chaos Expansions (PCE) are a common spectral method for
+uncertainty quantification \parencite{heuvelineHybridGeneralizedPolynomial2014}. While powerful for certain problem classes, this section explores both the capabilities of spectral approaches and their fundamental limitations for DP systems (examined in \cref{subsec:limitations}), which motivates the consideration of neural network-based alternatives (\cref{sec:neural_network_uq}).
 
 \subsection{Generalized Polynomial Chaos}
+\label{subsec:gPC}
 PCE uses polynomials as the orthogonal basis. Originally developed to model Wiener processes using Hermite polynomials, it was extended by
 \textcite{xiuWienerAskeyPolynomial2002} to use other polynomials and thus represent other probability distributions. The
 generalized polynomial chaos expansion (gPC) works as follows:
@@ -109,6 +115,7 @@ fewer model evaluations. Additionally, once the polynomial surrogate model is co
 for any variations of the input values. 
 
 \subsection{Time-Dependent Generalized Polynomial Chaos}
+\label{subsec:TD-gPC}
 \textcite{gerritsmaTimedependentGeneralizedPolynomial2010} introduced the concept of time-dependent generalized
 polynomial chaos (TD-gPC). One of the limitations of gPC is a lack of convergence when the dependence on \(\boldsymbol{\xi}\) is
 strongly non-linear. This is especially the case when considering long-term integration
@@ -125,7 +132,7 @@ The technique does not scale well for higher dimension problems
 \parencites{heuvelineHybridGeneralizedPolynomial2014}{maiSurrogateModellingStochastic2016}. 
 
 \subsection{Limitations}
-
+\label{subsec:limitations}
 Although spectral methods are powerful for problems with smooth responses and low-dimensional uncertainty, they become
 impractical for dynamic positioning systems. DP models involve high-dimensional, nonlinear dynamics and stochastic
 environmental inputs, which lead to rapid growth in computational cost and poor convergence for spectral approaches.
@@ -138,13 +145,18 @@ recalculation of the PCE; coupled with the curse of dimensionality makes PCE ine
 surrogate models for the desired purpose.
 
 \section{Neural Network Approaches}
-
-This section outlines existing methods used to capture epistemic and aleatoric uncertainty with neural networks. In
-general, approaches capture either epistemic or aleatoric uncertainty separately \parencite{galUncertaintyDeepLearning2016}. Epistemic uncertainty is modelled by
+\label{sec:neural_network_uq}
+This section outlines existing methods used to capture epistemic and aleatoric uncertainty with neural networks, which
+serve as the foundation for the dynamical system modelling approaches discussed in \cref{chapter:dynamic_modelling}.
+Five key approaches are examined here: Bayesian Neural Networks in \cref{sec:bayesian_neural_networks}, Monte Carlo
+Dropout in\cref{subsec:mc_dropout}, Hypernetworks in \cref{subsec:hypernetworks}, and Deep Ensembles
+in \cref{subsec:deep_ensembles}. In
+general, these approaches capture either epistemic or aleatoric uncertainty separately \parencite{galUncertaintyDeepLearning2016}. Epistemic uncertainty is modelled by
 placing prior distributions over the weights of the model and capturing how these vary given input data. Aleatoric
 uncertainty is quantified by placing a distribution over the output of the model \parencite{kendallWhatUncertaintiesWe2017}
 
 \subsection{Bayesian Neural Networks}
+\label{sec:bayesian_neural_networks}
 Bayesian neural networks (BNNs) offer a probabilistic extension of standard neural networks, replacing fixed model
 parameters with distributions to capture uncertainty in both learning and prediction. This Bayesian treatment provides a
 principled framework for understanding model confidence, especially in settings where data are limited, noisy, or shift
@@ -215,6 +227,7 @@ often makes them unsuitable for use in large, high dimensional systems
 uncertainty \parencite{kruegerBayesianHypernetworks2017}.
 
 \subsection{Monte Carlo Dropout}
+\label{subsec:mc_dropout}
 Dropout is a technique generally used to regularise neural nets to improve their robustness and generalisability. It is
 usually used during training and works by randomly enabling or disabling a set number of neurons.
 \textcite{galDropoutBayesianApproximation2016} showed that by enabling dropout not just during training allows the network to
@@ -238,7 +251,7 @@ Finally, by disabling parts of the network, the quality of each individual predi
 method of uncertainty quantification is the crudest of the neural network approaches discussed in this section.
 
 \subsection{Hypernetworks}
-
+\label{subsec:hypernetworks}
 A hypernetwork is a network used to approximate the posterior of the weights of a network of interest. It does this by
 sampling random noise and outputting a sample from the approximate posterior of the network in the form of a set of
 weights and biases \parencite{kruegerBayesianHypernetworks2017}. The major advantage hypernetworks have over BNNs is
@@ -252,7 +265,7 @@ network have to be generated each iteration. While the accuracy of the uncertain
 deep ensembles, real examples have shown they tend to perform similarly for capturing epistemic uncertainty.
 
 \subsection{Deep ensembles}
-
+\label{subsec:deep_ensembles}
 Deep ensembles are a method to quantify epistemic uncertainty. Proposed in
 \citeyear{lakshminarayananSimpleScalablePredictive2017} by
 \citeauthor{lakshminarayananSimpleScalablePredictive2017} as a method for uncertainty quantification, they work by training multiple of the same neural network

@@ -1,10 +1,14 @@
 \chapter{Introduction}
-In this section the background, motivation and scope of the literature study will be presented. First some background
-information on dynamic positioning industry practices will be given followed by a motivation for probabilistic
-forecasting of DP behaviour. The main research goal and sub-goals are formulated followed by a structure of the scoping
-study paper.
+In this section the background, motivation and scope of the scoping study will be presented. First some background
+information on dynamic positioning industry practices will be given followed by
+a motivation for probabilistic forecasting of DP behaviour in \cref{sec:background}. The main research goal and
+sub-goals are formulated in \cref{sec:research_question} followed by a motivation in terms of academic and societal
+added value in \cref{sec:relevance}. Finally, the structure of the scoping
+study report will be outlined in \cref{sec:report_structure}.
+
 
 \section{Background}
+\label{sec:background}
 Since the introduction of the first ship equipped with dynamic positioning in the 1960s, the use of dynamic positioning
 (DP) has become much more widespread in the offshore industry \parencite{HistoryDP2017}. Current industry practice for
 making operational decisions is to use quasi-static force balances \parencites
@@ -13,13 +17,15 @@ between environmental loads and thruster forces, neglecting any dynamics of the 
 
 When making decisions on board, dynamic positioning operators (DPOs) make use of activity specific operating guidelines
 (ASOGs) \parencites{ASOGDecisionSupport2022}{baillyguimaeraesCAMOASOGNaval2023}. These ASOGs contain requirements for
-when to cease operations, based on power consumption limits. These limits are calculated using a quasi-static approach
-and do not consider behaviour such as transients in the case of a thruster failing.
+when to cease operations, based on limits such as power or thrust consumption. Component failures are also included in
+the ASOGs. These limits are calculated using a quasi-static approach
+and do not consider behaviour such as transient excursions in the case of a thruster failing.
 
 Recently, more attention has started going to the use of time-domain simulations to predict dynamic positioning
 behaviour \parencites{RecommendedPracticeSpecification2025}{AssessmentStationKeeping2021}.
 
 \subsection{Time-domain DP simulations}
+\label{subsec:time_domain_simulations}
 When performing time-domain DP simulations, several additional factors affecting the DP behaviour of the ship are
 considered. The environmental loads are modelled as time-varying forces, and the thruster dynamics are included. This
 allows for a more realistic representation of the DP system, as the thrusters cannot instantaneously provide the
@@ -27,10 +33,10 @@ required forces to counteract environmental loads \parencite{armaogluAdvantagesU
 time-domain simulations to capture power peaks, the footprint of the ship and transient effects such as thruster failures.
 
 Several studies have been done on the difference between quasi-static calculations and time-domain simulations,
-specifically on the difference in predicted capability. \Cref{subfig:comparison experiment} shows a
+specifically on the difference in predicted operational limits. \Cref{subfig:comparison experiment} shows a
 comparison of a dynamic calculation with a static calculation, with experimental data as further context.
-\Cref{subfig:comparison failure} shows a comparison of intact and worst-case single failure capabilities. As \cref{fig:comparison static dynamic dp capability} shows, the quasi-static approach
-generally overestimates the DP capability. The factor by which is not constant however and ship dependent. As such
+\Cref{subfig:comparison failure} shows a comparison of intact and worst-case single failure limits. As \cref{fig:comparison static dynamic dp capability} shows, the quasi-static approach
+generally overestimates the limits compared to predictions based on the ships motions. The factor by which is not constant however and ship dependent. As such
 dynamic DP simulations are necessary if improved accuracy is desired \parencite{borhaugExperimentalValidationDynamic2012}. 
 
 \begin{figure}[H]
@@ -46,7 +52,7 @@ dynamic DP simulations are necessary if improved accuracy is desired \parencite{
         \parencite{nguyendongDynamicStationkeepingCapability2013}}
         \label{subfig:comparison failure}
     \end{subfigure}
-    \caption{Comparisons of quasi-static and dynamic DP capabilities}
+    \caption{Comparison of workable limits based on DP capability (static analysis) and workable limits based on DP footprint (dynamic analysis).}
     \label{fig:comparison static dynamic dp capability}
 \end{figure}
 
@@ -68,34 +74,21 @@ where the footprint is critical, reinforcing the statement from \textcite{serrar
 
 By using time-domain simulations rather than a quasi-static force balance, more information can be used to determine the
 operational limits. These could be defined as the maximum excursion over three hours
-\parencite{AssessmentStationKeeping2021} or the probability of exceeding power or thruster limits.
+\parencite{AssessmentStationKeeping2021} or the probability of exceeding power or thruster limits. The general workflow
+for performing time-domain DP simulation is shown in \cref{fig:data_flow_regular}. 
 
-When performing post-processing after simulations, two main approaches can be considered. The first is to
-directly predict output statistics of the system, such as the 3-hour most probable maximum footprint or peak thruster
-power, using regression models that map environmental and system parameters to these quantities. The second approach is
-to forecast the full time-series, then calculate statistics through post-processing. 
+\begin{figure}[H]
+    \centering
+    \includegraphics{report/images/diagrams/DataFlow_regular.pdf}
+    \caption{General data flow for time domain DP simulations. \nocite{parkProbabilisticEstimationDirectional2024}}
+    \label{fig:data_flow_regular}
+\end{figure}
 
-Whilst the direct regression approach is attractive due to its low-dimensional output space and computational efficiency,
-experience from nonlinear oscillator and power system surrogate modelling has shown that extreme statistics such as
-maxima are highly nonlinear functionals of the time series. Polynomial chaos expansions constructed directly for
-maximal responses exhibit large errors, whereas NARX-based surrogates that reproduce the full time-history, and only
-then derive maxima, achieve accurate predictions of both instantaneous statistics and extremes
-\parencites{maiSurrogateModellingStochastic2016}{ebadollahiTimedependentUncertaintyQuantification2025}{yeDeepONetBasedUncertainty2023}.
-A direct regression on output statistics therefore compresses the complex, non-linear and time-dependent DP dynamics—including
-control behaviour, thruster interactions and wave-drift induced low-frequency motions—into a single mapping, likely
-resulting in reduced fidelity, particularly in the distribution tails relevant for footprint and power margins.
-
-In contrast, a time-series surrogate preserves the dynamic structure of the DP system, which is consistent with current
-industrial practice where dynamic capability and operability analyses are performed in the time domain specifically to
-capture low-frequency excursions, transient behaviour after failures, and coupled criteria such riser
-tension or dynamic power load \parencites{smogeliDynCapFullScale}{tannuriUtilizationNumericalSimulation2011}. Such a
-surrogate can be reused across operations with different governing limits: for crane operations, acceptance is typically
-based on footprint and relative motions, whereas for pipelay or drilling the limiting factor may be thruster
-utilisation or generator loading
-\parencites{fruzzettiProbabilisticOperabilityGreenhouse2024}{mauroProbabilisticApproachDynamic2022}. Incorporating
-transient events such as thruster loss or DP controller re-tuning is also relatively straightforward at the trajectory level, but
-would require modifications or complete retraining with a statistic-only regression model.
-
+The starting point is with load characteristics, typically dependent on either a 2D wave spectrum or a 1D spectrum
+defined by a significant wave height, \(H_s\), a peak period, \(T_p\), and a wave direction. Using the input
+characteristics, a force time series is generated. This force series is passed to a model of the ship together with
+model parameters. The model generates a response time series, which is then post-processed to obtain the desired
+statistics such as 3-hour maxima for various states. 
 
 \subsection{Probabilistic predictions}
 \label{subsec:probabilistic_predictions}
@@ -103,12 +96,26 @@ In \textcite{RecommendedPracticeSpecification2025}, the IMCA also warns that tim
 due to differences between the model and the actual vessel. Factors influencing the accuracy such as complex interaction
 effects, thruster dynamics and controller tuning \parencite{serrarisTimeDomainAnalysis2009} all increase modelling error
 and introduce uncertainty into the final predictions. Additionally, environmental loads are subject to uncertainty due
-to their stochastic nature \parencite{vanessenRequiredTestDurations2023}.
+to their stochastic nature \parencite{vanessenRequiredTestDurations2023}, especially when considering more complex wave
+spectra such as multi-peaked 2-dimensional spectra \parencite{PioneeringSpiritDP2018}. 
 
 So far, most quantifications of ship DP behaviour use deterministic approaches. These generally use 3-hour simulations 
 \parencites{serrarisDPStationkeepingAccuracy2017}{RecommendedPracticeSpecification2025}{AssessmentStationKeeping2021} 
-to generate a point forecast with a single set of parameters, which is then post-processed. In these simulations,
-uncertainty in the simulation parameters is not considered.
+to generate a point forecast with a single set of parameters, which is then post-processed to obtain the desired
+statistics, such as 3-hour maxima. In these simulations,
+uncertainty in the model or simulation parameters is not considered. Hydrodynamic parameters,
+thruster curves, or other such parameters, are rarely known exactly at any given time. Weather forecasts are also
+subject to some degree of uncertainty. An example is shown in \cref{fig:hs_measurements}. Here measurements of
+significant wave height from two Allseas ships are overlaid on weather forecasts from the UK Met Office. As can be seen,
+while the forecasts are quite accurate, there is still some difference between the forecast and the realised significant
+wave heights These factors introduce extra uncertainty into the simulations' results. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{report/images/literature_study/Hs_measurements}
+    \caption{Significant wave height measurements from Allseas vs. UK Met Office forecasts}
+    \label{fig:hs_measurements}
+\end{figure}
 
 Probabilistic forecasting treats uncertain inputs and model parameters as random variables and propagates that
 uncertainty through a model to produce a predictive distribution for quantities of interest. Instead of a single point
@@ -116,7 +123,7 @@ forecast from one 3-hour run, probabilistic outputs give ranges with associated 
 operational decisions explicit \parencite{nowotarskiRecentAdvancesElectricity2018}. 
 
 Quasi-static capability calculation has seen some use of probabilistic forecasting in a study performed by
-\textcite{mauroProbabilisticApproachDynamic2022}. A Quasi-Monte Carlo was used to investigate the effect of different
+\textcite{mauroProbabilisticApproachDynamic2022}. A Quasi-Monte Carlo approach was used to investigate the effect of different
 significant wave height (\(H_s\)), peak periods (\(T_p\)), and wind speed (\(V_w\)) combinations. Based on the
 probability of each combination occurring, a capability plot with confidence interval was generated
 (\cref{fig:probabilistic_capability_plot_mauro}). 
@@ -132,11 +139,15 @@ probability of each combination occurring, a capability plot with confidence int
 \end{figure}
 
 This approach required the use of a very large number of samples to converge. \Cref{fig:convergence_history_mauro} shows
-the convergence history of their approach in red, with classic Monte-Carlo runs overlaid. In both cases, thousands of
-runs were needed for the final value to converge. This method is likely to be prohibitively expensive for use with a
+the convergence history of their approach in red, with classic Monte-Carlo runs overlaid. The figure shows the number of
+Monte-Carlo based samples against an error metric, showing the convergence of the approach.
+In both cases, thousands of
+runs were needed for the final error value to converge. This method is likely to be prohibitively expensive for use with a
 time-domain approach. \textcite{serrarisDPStationkeepingAccuracy2017} mentioned that a single time domain simulation
-using the MARIN framework would take approximately 10 minutes; to blindly use Monte-Carlo simulations would render the
-approach useless for use in offshore decision-making.
+using the MARIN framework would take approximately 10 minutes; the toy model from \cref{chapter:pilot_tests} took 2.34
+minutes per run. To blindly use Monte-Carlo simulations would render the
+approach useless for use in offshore decision-making. 
+
 
 \begin{figure}[H]
     \centering
@@ -151,12 +162,43 @@ Uncertainty modelling and probabilistic forecasting is a well established field
 power grids. Particularly power grids are of interest. A power grid is a highly non-linear dynamic system, subject to
 external loading. Power distribution is regulated by controllers, aimed at minimising total power consumption
 \parencite{sadamotoDynamicModelingStability2019}. Such a system has a lot of parallels to a dynamic positioning system;
-a DP system aims to counter external loading while minimising power consumption. As probabilistic forecasting has seen
-use in predicting power consumption in electrical grids, it is likely to be suitable for predicting DP behaviour. Most
-of these approaches use some form of surrogate model to more efficiently calculate the dynamic responses of a system.
+a DP system aims to counter external loading while minimising power consumption. Most of these approaches use some form
+of surrogate model to more efficiently calculate the dynamic responses of a system, often at the cost of some model fidelity.
+
+In predicting a dynamic system's responses with surrogate models, two main approaches can be considered. The first is to
+directly predict output statistics of the system, such as the 3-hour most probable maximum footprint or peak thruster
+power, using regression models that map environmental and system parameters to these quantities. The second approach is
+to forecast the full time-series, then calculate statistics through post-processing. 
+
+Whilst the direct regression approach is attractive due to its low-dimensional output space and computational efficiency,
+experience from nonlinear oscillator and power system surrogate modelling has shown that extreme statistics such as
+maxima are highly nonlinear functionals of the time series. Several papers investigated the difference between the two
+approaches
+\parencites{maiSurrogateModellingStochastic2016}{ebadollahiTimedependentUncertaintyQuantification2025}{yeDeepONetBasedUncertainty2023}.
+Directly modelling for maximal responses exhibit large errors, whereas surrogates that reproduce the full time-history, and only
+then derive maxima, achieve more accurate predictions of both instantaneous statistics and extremes.
+
+A direct regression on output statistics therefore may compress the complex, non-linear and time-dependent DP dynamics
+into a single mapping, likely resulting in reduced fidelity, particularly in the distribution tails relevant for
+determining operational limits, such as footprint and power margins.
+
+In contrast, a time-series surrogate preserves the dynamic structure of the DP system. This aligns better with current
+industrial practice, where dynamic capability and operability assessments are performed in the time domain to capture
+low-frequency excursions, transient behaviour after failures, and coupled criteria such as riser tension or dynamic
+power load \parencites{smogeliDynCapFullScale}{tannuriUtilizationNumericalSimulation2011}. A key advantage is that the
+same surrogate can be reused across operations with different governing limits: for crane operations, acceptance
+typically depends on footprint and relative motions, whereas for pipelay or drilling the limiting factors may be
+thruster utilisation or generator loading
+\parencites{fruzzettiProbabilisticOperabilityGreenhouse2024}{mauroProbabilisticApproachDynamic2022}. Transient events,
+such as thruster loss or environmental changes, can also be incorporated directly at the trajectory level, whereas a
+statistics-only regression model would require modification or full retraining to reflect such changes.
+
+As probabilistic forecasting has seen use in predicting dynamic behaviour in electrical grids, it is likely to be
+suitable for predicting DP behaviour. 
+
 
 \subsection{Uncertainty quantification}
-
+\label{subsec:uncertainty_quantification}
 Uncertainty quantification is a field of mathematics that focuses on propagating input uncertainty through a
 mathematical system to quantify the uncertainty of the output
 \parencite{ebadollahiTimedependentUncertaintyQuantification2025}. Typically, this is done with Monte-Carlo simulations,
@@ -173,7 +215,7 @@ can lead to significantly faster model evaluations while maintaining decent accu
 accuracy. 
 
 \section{Research question}
-
+\label{sec:research_question}
 The marine offshore sector is experiencing a growing interest in the use of time domain simulations to analyse the
 dynamic DP behaviour of ships. So far, almost all research done on dynamic positioning has used deterministic
 approaches, using realisations of random environmental conditions and accepting modelling errors. Some research has been
@@ -189,7 +231,7 @@ Based on this research gap, the following research question is defined:
 
 To answer this question, a series of research goals will be pursued. The focus of the study will be on generating
 uncertainty aware time-series predictions rather than directly obtaining statistics. In line with this focus, the goals
-are as follows:
+are as follows: 
 
 \begin{enumerate}
     \item Identify sources and types of uncertainty, and the techniques used to quantify it. 
@@ -199,9 +241,37 @@ are as follows:
     \item Quantitatively compare the proposed probabilistic approach with deterministic and Monte-Carlo-based DP simulations in terms of accuracy, uncertainty representation, and computational efficiency.
 \end{enumerate}
 
+\section{Relevance}
+\label{sec:relevance}
+
+This section will outline the relevance of this research. It will be split into two categories: academic relevance and
+societal relevance. The academic relevance section will outline the contribution to academia and the scientific value of
+the method. The societal relevance, on the other hand, is the significance of this research in a broader perspective.
+
+\subsection{Academic}
+Existing literature on dynamic positioning prediction focuses on either quasi-static force balances or time domain
+simulations. So far, uncertainty and probabilistic forecasting has only been considered in a quasi-static case
+\parencite{mauroProbabilisticApproachDynamic2022}. Time-domain simulations remain limited to deterministic realisations
+of possible DP behaviour. 
+
+Probabilistic forecasting with uncertainty quantification has been applied in other sectors
+such as finance or power networks. Using uncertainty aware forecasting techniques would allow for more robust models as
+well as improved interpretability of where errors originate from.
+
+This work will aim to apply probabilistic forecasting methods with uncertainty quantification to DP systems, thereby
+filling a gap in existing research. 
+
+\subsection{Societal}
+Including uncertainty in time domain DP predictions would provide DP operators significantly more information on which
+to base operational decisions. Ensuring these predictions are obtained efficiently would allow on-board forecasting with
+actual weather forecasts. This would improve the operability and safety of DP vessels, especially when operating close
+to their margins. 
+
 \section{Report Structure}
-During the scoping study, the first three goals will be addressed. A literature study will fulfil the first two goals,
-while a pilot test of the identified methods will tackle the third. The last two methods will be the scope of the
+\label{sec:report_structure}
+During the scoping study, the first three goals will be addressed. A literature study will fulfil the first two goals.
+This is covered by chapters \ref{chapter:DP_simulation}, \ref{chapter:uncertainty_quantification} and \ref{chapter:dynamic_modelling}.
+A pilot test of the methods identified in \cref{chapter:dynamic_modelling} will tackle the third goal in \cref{chapter:pilot_tests}. The last two methods will be the scope of the
 following thesis.
 
 First, a general overview of the
@@ -212,4 +282,4 @@ general overview of the concepts behind uncertainty quantification and will then
 concepts will be investigated: latent space models and Neural ODE approaches. Hybrid methods will also be discussed. 
 
 In \cref{chapter:pilot_tests}, a DeepONet and neural SDE (see \cref{chapter:dynamic_modelling}) will be implemented and
-compared. Based on these tests a plan is formulated for the subsequent thesis in \cref{chapter:conclusion}.
+compared. Based on these tests a plan is formulated for the subsequent thesis in \cref{chapter:conclusion}. 
