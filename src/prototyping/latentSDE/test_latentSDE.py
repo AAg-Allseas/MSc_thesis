@@ -7,6 +7,7 @@ import pstats
 import numpy as np
 import torch
 import torchsde
+from typing import Optional
 
 from src.prototyping.latentSDE.model_latentSDE import LatentSDE
 
@@ -18,7 +19,9 @@ def load_and_sample(path: Path,
                     hidden_size: int,
                     timestep: float,
                     start_time: float = 0,
-                    end_time: float = 10800) -> tuple[torch.Tensor, torch.Tensor]:
+                    end_time: float = 10800,
+                    network: str = "prior",
+                    data_sample: Optional[torch.Tensor] = None) -> tuple[torch.Tensor, torch.Tensor]:
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -34,10 +37,44 @@ def load_and_sample(path: Path,
 
     ts = np.arange(start_time, end_time, timestep)
     ts = torch.from_numpy(ts).to(device)
+    
 
-    bm = torchsde.BrownianInterval(start_time, end_time, size=(batch_size, latent_size), dt=timestep, device=device)
+    bm =  torch.randn(size=(len(ts), batch_size, latent_size), device=device) * np.sqrt(timestep)
+    zs = torch.zeros_like(bm, device=bm.device)
 
-    return latent_sde.sample(batch_size=batch_size, ts=ts, bm=bm).to("cpu"), ts.to("cpu")
+    if network == "prior":
+        eps = torch.randn(size=(batch_size, *latent_sde.pz0_mean.shape[1:]), device=latent_sde.pz0_mean.device)
+        z0 = latent_sde.pz0_mean + latent_sde.pz0_logstd.exp() * eps
+        zs[0] = z0
+
+        with torch.no_grad():
+            for i in range(1, ts.shape[0]):
+                zs[i] = zs[i-1] + latent_sde.h(ts[i], zs[i-1]) * (ts[i] - ts[i-1]) + latent_sde.g(ts[i], zs[i-1]) * bm[i]
+        xs = latent_sde.projector(zs)
+
+    elif network == "posterior":
+        if data_sample == None:
+            raise ValueError("data sample must be provided to sample posterior network")
+        
+        with torch.no_grad():
+            ctx = latent_sde.encoder(torch.flip(data_sample, dims=(0,)).contiguous())
+            ctx = torch.flip(ctx, dims=(0,)).contiguous()
+            latent_sde.contextualize((ts, ctx))
+
+            # Posterior initial condition
+            qz0_mean, qz0_logstd = latent_sde.qz0_net(ctx[0]).chunk(chunks=2, dim=1)
+            qz0_logstd = qz0_logstd.clamp(-5, 2)  # Prevent explosion
+            z0 = qz0_mean + qz0_logstd.exp() * torch.randn_like(qz0_mean)
+
+            zs[0] = z0
+
+            for i in range(1, ts.shape[0]):
+                zs[i] = zs[i-1] + latent_sde.f(ts[i], zs[i-1]) * (ts[i] - ts[i-1]) + latent_sde.g(ts[i], zs[i-1]) * bm[i]
+            xs = latent_sde.projector(zs)
+    else:
+        raise ValueError(f"Incorrect network type: {network}. Must be either 'prior' or 'posterior'")
+    
+    return xs.to("cpu").detach().numpy(), ts.to("cpu").detach().numpy()
 
 
 def integrate_sde(sde: LatentSDE, ts: torch.Tensor, bm: torch.Tensor, z0: torch.Tensor) -> None:

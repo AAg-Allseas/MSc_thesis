@@ -126,7 +126,7 @@ def plot_prediction(
             
             title = feats_samples[feature_idx] if feature_idx < len(feats_samples) else f"Feature {feature_idx}"
             ax.set_xlabel("Time (s)")
-            ax.set_ylabel("Value (scaled)")
+            ax.set_ylabel("Displacement (m)")
             ax.legend(fontsize=8)
             ax.grid(True, alpha=0.3)
         

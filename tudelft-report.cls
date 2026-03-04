@@ -85,7 +85,7 @@
 \RequirePackage{cleveref}
 \RequirePackage{float}
 \RequirePackage{multicol}
-\RequirePackage{nomencl}
+\RequirePackage[nomentbl]{nomencl}
 \RequirePackage{xstring}
 \RequirePackage{siunitx}
 \RequirePackage{titletoc}

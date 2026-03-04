@@ -1,3 +1,4 @@
 {"rule":"ENGLISH_WORD_REPEAT_BEGINNING_RULE","sentence":"^\\QNeural stochastic differential equations are their stochastic analogue.\\E$"}
 {"rule":"SENTENCE_WHITESPACE","sentence":"^\\Q\\E(?:Dummy|Ina|Jimmy-|Dummy-|Maniquí-|Maniquíes-|Dummy\\+|Dummy's\\+)[0-9]+\\Q \\E(?:Dummy|Ina|Jimmy-|Dummy-|Maniquí-|Maniquíes-|Dummy\\+|Dummy's\\+)[0-9]+\\Q adapted this idea to the stochastic setting, showing how to define and numerically solve a backward-in-time adjoint SDE that yields gradients with constant memory cost.\\E$"}
 {"rule":"MORFOLOGIK_RULE_EN_GB","sentence":"^\\QThe vessel used is a supply vessel based on the M/V Far Scandia \\E(?:Dummy|Ina|Jimmy-|Dummy-|Maniquí-|Maniquíes-|Dummy\\+|Dummy's\\+)[0-9]+\\Q.\\E$"}
+{"rule":"MORFOLOGIK_RULE_EN_GB","sentence":"^\\Qlpll@\\E$"}

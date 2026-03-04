@@ -159,11 +159,21 @@ approach useless for use in offshore decision-making.
 
 Uncertainty modelling and probabilistic forecasting is a well established field
 \parencite{gneitingProbabilisticForecasting2014}. It is widely used for applications such as meteorology, economics and
-power grids. Particularly power grids are of interest. A power grid is a highly non-linear dynamic system, subject to
+power grids. Particularly power grids are of interest. An example of such an approach applied to a power network is
+shown in \cref{fig:eg_prob_forecasting}, where the rotor angle of a generator in a 39-bus system subject to external
+stochastic loading is modelled using a surrogate. A power grid is a highly non-linear dynamic system, subject to
 external loading. Power distribution is regulated by controllers, aimed at minimising total power consumption
 \parencite{sadamotoDynamicModelingStability2019}. Such a system has a lot of parallels to a dynamic positioning system;
-a DP system aims to counter external loading while minimising power consumption. Most of these approaches use some form
-of surrogate model to more efficiently calculate the dynamic responses of a system, often at the cost of some model fidelity.
+a DP system aims to counter external loading while minimising power consumption and setpoint error. Most of these approaches use some form
+of surrogate model to more efficiently calculate the dynamic responses of a system, often at the cost of some model
+fidelity. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{report/images/literature_study/yeDeepONetBasedUncertainty2023}
+    \caption{Example of probabilistic forecasting in a power network setting \parencite{yeDeepONetBasedUncertainty2023}}
+    \label{fig:eg_prob_forecasting}
+\end{figure}
 
 In predicting a dynamic system's responses with surrogate models, two main approaches can be considered. The first is to
 directly predict output statistics of the system, such as the 3-hour most probable maximum footprint or peak thruster
@@ -179,8 +189,8 @@ Directly modelling for maximal responses exhibit large errors, whereas surrogate
 then derive maxima, achieve more accurate predictions of both instantaneous statistics and extremes.
 
 A direct regression on output statistics therefore may compress the complex, non-linear and time-dependent DP dynamics
-into a single mapping, likely resulting in reduced fidelity, particularly in the distribution tails relevant for
-determining operational limits, such as footprint and power margins.
+(\cref{chapter:DP_simulation}) into a single mapping, likely resulting in reduced fidelity, particularly in the
+distribution tails relevant for determining operational limits, such as footprint and power margins.
 
 In contrast, a time-series surrogate preserves the dynamic structure of the DP system. This aligns better with current
 industrial practice, where dynamic capability and operability assessments are performed in the time domain to capture
@@ -193,8 +203,14 @@ thruster utilisation or generator loading
 such as thruster loss or environmental changes, can also be incorporated directly at the trajectory level, whereas a
 statistics-only regression model would require modification or full retraining to reflect such changes.
 
-As probabilistic forecasting has seen use in predicting dynamic behaviour in electrical grids, it is likely to be
-suitable for predicting DP behaviour. 
+A final factor influencing the choice between time-series forecasting and direct-regression surrogate models is
+explainability \parencite{kamathExplainabilityTimeSeries2021}. When surrogate models directly output aggregated statistics, the reasoning behind the result becomes
+harder to trace. In contrast, time-series forecasts provide a full temporal trajectory, making it easier to diagnose
+discrepancies and understand model behaviour. This transparency is particularly important in the offshore industry,
+where model decisions must be interpretable and auditable for oversight bodies such as class.
+
+Probabilistic forecasting has seen use in predicting dynamic behaviour in electrical grids. Due to the similarities
+between the systems,  it is likely to be suitable for predicting DP behaviour. 
 
 
 \subsection{Uncertainty quantification}
@@ -211,8 +227,10 @@ propagate uncertainty from input to output
 Surrogate models can take many forms; for high dimensional non-linear systems machine learning is a promising candidate
 \parencite{salinasDeepARProbabilisticForecasting2020}. The use of machine learning models in uncertainty quantification
 can lead to significantly faster model evaluations while maintaining decent accuracy
-\parencite{willardIntegratingPhysicsBasedModelling2022}. Prior physics knowledge can also be included to further improve
-accuracy. 
+\parencite{willardIntegratingPhysicsBasedModelling2022}.
+
+Uncertainty aware forecasting allows decisions to be made with more information. This makes decisions safer and models
+more robust, especially when forecasting out-of-distribution scenarios \parencite{oleksiienkoVariationalNeuralNetworks2023}.
 
 \section{Research question}
 \label{sec:research_question}
@@ -230,7 +248,8 @@ Based on this research gap, the following research question is defined:
 \end{quotation}
 
 To answer this question, a series of research goals will be pursued. The focus of the study will be on generating
-uncertainty aware time-series predictions rather than directly obtaining statistics. In line with this focus, the goals
+uncertainty aware time-series predictions rather than directly obtaining statistics. The method should also be
+explainable. In line with this focus, the goals
 are as follows: 
 
 \begin{enumerate}

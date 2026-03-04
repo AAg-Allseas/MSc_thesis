@@ -28,6 +28,7 @@ Ships on DP are generally viewed in either a body-fixed reference frame or a nor
 \Cref{fig:dp_reference_frames} shows the relation between the two. Converting between the two is done with the following formula:
 
 \begin{equation}
+    \label{eq:ned_body_transform}
     \dot{\eta} = J(\eta)\nu
 \end{equation}
 
@@ -145,6 +146,7 @@ The wave elevation at any given time and point for a random sea state can be des
 components \parencite{faltinsenSeaLoadsShips1999}:
 
 \begin{equation}
+    \label{eq:wave_superposition}
     \zeta(t, x, y) = \sum_{j = 1}^N A_j \sin \left(\omega_j t - k_{x, j}x - k_{y, j}y - \epsilon_j\right)
 \end{equation}
 
@@ -154,6 +156,7 @@ wave numbers and random phase angles per wave component \(j\). The random phase 
 incidence angle of the wave. The wave amplitude is determined by the wave spectrum \(S(\omega)\):
 
 \begin{equation}
+    \label{eq:wave_amplitude_spectrum}
     \frac{1}{2} A_j^2 = S(\omega_j)\Delta \omega
 \end{equation}
 

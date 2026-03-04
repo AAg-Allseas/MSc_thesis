@@ -3,6 +3,7 @@
 A continuous time dynamical system can be considered in the following form:
 
 \begin{equation}
+    \label{eq:continuous_dynamical_system}
     \diff{\mathbf{x}(t)}{t} = \mathbf{f}\left(\mathbf{x}(t), t; \boldsymbol{\beta}\right)
 \end{equation}
 
@@ -13,7 +14,7 @@ A discrete time system can analogously be considered in the following form:
     \label{eq:discrete_dynamical_system}
 \end{equation}
 
-As this only depends on the state at the current time, these processes can be considered as Markov processes.
+If \(\mathbf{x}\) contains the full state, this only depends on the state at the current time; then these processes can be considered as Markov processes.
 
 In this chapter, three approaches to modelling the dynamics of nonlinear systems are considered. First, state-space
 models are reviewed in \cref{sec:state_space_models}. Operator learning techniques are then discussed in
@@ -27,6 +28,7 @@ covered in \cref{sec:neural_sde}, including neural ODEs (\cref{subsec:neural_ode
 \label{sec:state_space_models}
 State-space models (SSMs) describe dynamical systems using an internal state that evolves over time in response to inputs. In continuous time, a linear SSM is typically written as:
 \begin{equation}
+    \label{eq:ssm_continuous}
     \mathbf{x}'(t) = A\mathbf{x}(t) + B\mathbf{u}(t), \qquad \mathbf{y}(t) = C\mathbf{x}(t) + D\mathbf{u}(t)
 \end{equation}
 
@@ -34,6 +36,7 @@ Where $\mathbf{x}(t)$ is the latent state, $\mathbf{u}(t)$ the input, and $\math
 Discretising yields a recurrent update:
 
 \begin{equation}
+    \label{eq:ssm_discrete}
     \mathbf{x}_k = \bar{A}\mathbf{x}_{k-1} + \bar{B}\mathbf{u}_k, \qquad \mathbf{y}_k = \bar{C}\mathbf{x}_k
 \end{equation}
 
@@ -320,6 +323,10 @@ data, as it requires exact time traces of the forces to predict the motions. As 
 would require training on simulated data, having tuned the simulation to accurately match the real ship's behaviour. The
 DeepONet approach would however be very efficient to sample, as it does not require any time integration to obtain its
 predictions.
+
+DeepONets are also the more explainable option. As they can be interpreted as a spectral decomposition, understanding
+what each component of the network is doing is more understandable than with Koopman operators. There the arbitrary
+mapping to a measurement space does not necessarily have a physical interpretation.
 
 \section{Neural Stochastic Differential Equations}
 \label{sec:neural_sde}
@@ -641,6 +648,10 @@ measurements on-board. The neural SDE approach also allows for irregularly sampl
 advantage for on-board a real ship. These factors make the neural SDE approach well suited for acting as a surrogate model a DP system. The tradeoff is that the neural SDE approach is still limited by the SDE
 integration. This significantly increases the inference cost of this approach. 
 
+Another attractive property of neural SDEs is that they are relatively explainable, as they are based on stochastic
+differential equations, much like the actual dynamics of the DP system. This makes it simple to understand whether the
+model has accurately learned the system's dynamics, making this approach more attractive for offshore engineering
+applications where regulatory bodies maintain oversight. 
 
 \section{Conclusion}
 \label{sec:conclusion}
@@ -654,4 +665,6 @@ non-linear systems efficiently, with neural SDEs offering more flexibility while
 inference. In practice, the workflow between the two methods would differ for the DP problem. The advantage the neural
 SDE approach has over DeepONet is that for real-world applications, one could train it with data already available on
 board. DeepONet based approaches require a time trace of the exciting force. The trade-off is in computational cost;
-neural SDEs are more costly than DeepONets due to the time integration of the stochastic differential equation
+neural SDEs are more costly than DeepONets due to the time integration of the stochastic differential equations. Neural
+SDEs also take the edge in terms of explainability with the network outputs being directly comparable to a DP
+simulation's dynamics. 
