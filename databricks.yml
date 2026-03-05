@@ -32,12 +32,12 @@ artifacts:
 
 resources:
   jobs:
-    train_job:
-      name: thesis
+    test_job:
+      name: testDatabricks
       tasks:
-        - task_key: train
+        - task_key: databricksTest
           notebook_task:
-            notebook_path: src/databricks_test.ipynb
+            notebook_path: src/notebooks/databricks_test.ipynb
           # libraries:
           #   - whl: ./dist/*.whl
           existing_cluster_id:
