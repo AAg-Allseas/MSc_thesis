@@ -1,0 +1,45 @@
+# This is a Databricks asset bundle definition for MSc_thesis.
+# The Databricks extension requires databricks.yml configuration file.
+# See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
+
+bundle:
+  name: MSc_thesis
+
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      host: https://adb-5270772889732093.13.azuredatabricks.net
+
+  ## Optionally, there could be 'staging' or 'prod' targets here.
+  #
+  # prod:
+  #   workspace:
+  #     host: https://adb-5270772889732093.13.azuredatabricks.net
+
+
+workspace:
+  artifact_path: /Volumes/main_udev/ai_labs/aag/artifacts
+
+
+artifacts:
+  thesis:
+    type: whl
+    build: uv build --wheel       # uv builds your wheel
+    path: .
+    dynamic_version: true
+
+resources:
+  jobs:
+    train_job:
+      name: thesis
+      tasks:
+        - task_key: train
+          notebook_task:
+            notebook_path: src/databricks_test.ipynb
+          # libraries:
+          #   - whl: ./dist/*.whl
+          existing_cluster_id:
+            0212-141545-suh1awug
+          

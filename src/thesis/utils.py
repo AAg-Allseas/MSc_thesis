@@ -39,3 +39,6 @@ def save_checkpoint_artifact(
         path = os.path.join(tmp, f"checkpoint_epoch_{epoch}.pth")
         torch.save(checkpoint, path)
         mlflow.log_artifact(path, artifact_path="checkpoints")
+
+def databricks_test_func() -> None:
+    print("Test v2")

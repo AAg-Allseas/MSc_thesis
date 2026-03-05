@@ -6,7 +6,24 @@
         "gruntfuggly.todo-tree",
         "stkb.rewrap",
         "alefragnani.project-manager",
-        "zainchen.json",
-        "aaperghis.colour-theme-dark"
+        "aaperghis.colour-theme-dark",
+        "databricks.databricks",
+        "redhat.vscode-yaml",
+        "ms-python.vscode-python-envs",
+        "ms-python.debugpy",
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "shd101wyy.markdown-preview-enhanced",
+        "yzhang.markdown-all-in-one",
+        "ltex-plus.vscode-ltex-plus",
+        "ms-toolsai.vscode-jupyter-slideshow",
+        "ms-toolsai.jupyter-renderers",
+        "ms-toolsai.jupyter-keymap",
+        "ms-toolsai.vscode-jupyter-cell-tags",
+        "ms-toolsai.jupyter",
+        "github.copilot-chat",
+        "ms-vscode.extension-test-runner",
+        "dbaeumer.vscode-eslint",
+        "mblode.zotero"
     ]
 }

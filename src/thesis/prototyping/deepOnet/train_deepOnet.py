@@ -23,7 +23,7 @@ from src.prototyping.data_handling import find_parquet_files
 from src.prototyping.dataloader import ParquetDataset
 from src.prototyping.deepOnet.model_deepOnet import MIONet
 from src.prototyping.deepOnet.utils import BranchConstructor, CNN1DBranchConstructor, MLPConstructor, prepare_batch
-from src.utils import save_checkpoint_artifact
+from src.msc_thesis_awn_aperghis.utils import save_checkpoint_artifact
 
 logger = logging.getLogger(__name__)
 
