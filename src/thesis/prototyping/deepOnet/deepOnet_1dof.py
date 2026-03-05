@@ -8,11 +8,11 @@ import mlflow.pytorch
 import torch
 from torch import nn
 
-from src.msc_thesis_awn_aperghis.utils import is_databricks, save_checkpoint_artifact
-from src.prototyping.data_handling import find_parquet_files
-from src.prototyping.deepOnet.train_deepOnet import load_samples_sensors, train, test
-from src.prototyping.deepOnet.model_deepOnet import MIONet
-from src.prototyping.deepOnet.utils import BranchConstructor, CNN1DBranchConstructor, MLPConstructor
+from thesis.utils import is_databricks, save_checkpoint_artifact
+from thesis.prototyping.data_handling import find_parquet_files
+from thesis.prototyping.deepOnet.train_deepOnet import load_samples_sensors, train, test
+from thesis.prototyping.deepOnet.model_deepOnet import MIONet
+from thesis.prototyping.deepOnet.utils import BranchConstructor, CNN1DBranchConstructor, MLPConstructor
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

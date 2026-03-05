@@ -1,5 +1,5 @@
 import logging
-from src.prototyping.latentSDE.utils import ContextEncoder, LipSwish
+from thesis.prototyping.latentSDE.utils import ContextEncoder, LipSwish
 
 
 

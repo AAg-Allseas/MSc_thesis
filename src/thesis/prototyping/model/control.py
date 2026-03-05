@@ -11,7 +11,7 @@ Author:     Thor I. Fossen
 """
 
 import numpy as np
-from src.prototyping.model.gnc import ssa, Rzyx
+from thesis.prototyping.model.gnc import ssa, Rzyx
 
 
 # MIMO nonlinear PID pole placement

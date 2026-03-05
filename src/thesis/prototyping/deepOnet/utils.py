@@ -11,7 +11,7 @@ from typing import Any, Dict
 from torch import nn, Tensor
 import torch
 
-from src.prototyping.dataloader import ParquetDataset
+from thesis.prototyping.dataloader import ParquetDataset
 
 # get activation function from str
 def get_activation(identifier: str) -> nn.Module:

@@ -10,10 +10,10 @@ from concurrent import futures
 from pathlib import Path
 import time
 import numpy as np
-from src.prototyping.data_handling import ParquetMetadata, make_df, save_df_to_parquet, update_df
-from src.prototyping.model.ornstein_uhlenbeck import ou_generate_uniform, resample_from_base
-from src.prototyping.model.supply import SupplyVessel
-from src.prototyping.model.gnc import attitudeEuler
+from thesis.prototyping.data_handling import ParquetMetadata, make_df, save_df_to_parquet, update_df
+from thesis.prototyping.model.ornstein_uhlenbeck import ou_generate_uniform, resample_from_base
+from thesis.prototyping.model.supply import SupplyVessel
+from thesis.prototyping.model.gnc import attitudeEuler
 
 
 MODEL="ToyDPModel"

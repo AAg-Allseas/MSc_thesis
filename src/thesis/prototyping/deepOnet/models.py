@@ -1,7 +1,7 @@
 
 
-from src.prototyping.deepOnet.model_deepOnet import MIONet
-from src.prototyping.deepOnet.utils import BranchConstructor, CNN1DBranchConstructor, MLPConstructor
+from thesis.prototyping.deepOnet.model_deepOnet import MIONet
+from thesis.prototyping.deepOnet.utils import BranchConstructor, CNN1DBranchConstructor, MLPConstructor
 
 
 def model_1(latent_dim: int = 64, output_dim: int = 12) -> MIONet:

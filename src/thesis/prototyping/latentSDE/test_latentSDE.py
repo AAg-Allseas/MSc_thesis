@@ -9,7 +9,7 @@ import torch
 import torchsde
 from typing import Optional
 
-from src.prototyping.latentSDE.model_latentSDE import LatentSDE
+from thesis.prototyping.latentSDE.model_latentSDE import LatentSDE
 
 def load_and_sample(path: Path,
                     batch_size: int,

@@ -16,7 +16,7 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 from torch import Tensor
 
-from src.prototyping.data_handling import find_parquet_files
+from thesis.prototyping.data_handling import find_parquet_files
 
 class ParquetDataset(Dataset):
     """Dataset for reading time series from parquet files."""

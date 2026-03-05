@@ -4,8 +4,8 @@ from typing import Optional
 from matplotlib import pyplot as plt
 import numpy as np
 
-from src.prototyping.data_handling import find_parquet_files
-from src.prototyping.dataloader import ParquetDataset
+from thesis.prototyping.data_handling import find_parquet_files
+from thesis.prototyping.dataloader import ParquetDataset
 
 
 def plot_timetraces(dataset: ParquetDataset, 

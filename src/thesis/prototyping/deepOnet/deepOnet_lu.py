@@ -28,7 +28,7 @@ from torch import nn
 from torch.utils.data import DataLoader, TensorDataset
 import tqdm
 
-from src.prototyping.deepOnet.utils import MLP, MLPConstructor
+from thesis.prototyping.deepOnet.utils import MLP, MLPConstructor
 
 
 # ──────────────────────────────────────────────────────────────

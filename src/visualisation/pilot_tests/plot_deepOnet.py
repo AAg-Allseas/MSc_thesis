@@ -8,11 +8,11 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader
 
-from src.prototyping.data_handling import find_parquet_files
-from src.prototyping.dataloader import ParquetDataset
-from src.prototyping.deepOnet.model_deepOnet import MIONet
-from src.prototyping.deepOnet.models import model_1dof, model_1dof_2, model_2, model_cnn_1, model_cnn_2
-from src.prototyping.deepOnet.utils import BranchConstructor, MLPConstructor, prepare_batch
+from thesis.prototyping.data_handling import find_parquet_files
+from thesis.prototyping.dataloader import ParquetDataset
+from thesis.prototyping.deepOnet.model_deepOnet import MIONet
+from thesis.prototyping.deepOnet.models import model_1dof, model_1dof_2, model_2, model_cnn_1, model_cnn_2
+from thesis.prototyping.deepOnet.utils import BranchConstructor, MLPConstructor, prepare_batch
 from src.visualisation.general_plotting.config import LINEWIDTH
 
 

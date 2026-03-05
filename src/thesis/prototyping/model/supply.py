@@ -48,8 +48,8 @@ Author:     Thor I. Fossen
 """
 import numpy as np
 import math
-from src.prototyping.model.control import DPpolePlacement
-from src.prototyping.model.gnc import sat
+from thesis.prototyping.model.control import DPpolePlacement
+from thesis.prototyping.model.gnc import sat
 
 # Class Vehicle
 class SupplyVessel:

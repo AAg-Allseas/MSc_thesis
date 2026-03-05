@@ -1,4 +1,4 @@
-from src.thesis.utils import databricks_test_func
+from thesis.utils import databricks_test_func
 
 def test_func_2():
     print(f"from {__file__} test_funct_2")

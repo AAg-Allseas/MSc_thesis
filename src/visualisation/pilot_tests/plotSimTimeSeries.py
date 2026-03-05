@@ -12,11 +12,11 @@ Author:     Thor I. Fossen
 import math
 import matplotlib.pyplot as plt
 import numpy as np
-from src.prototyping.model.gnc import ssa
+from thesis.prototyping.model.gnc import ssa
 import mpl_toolkits.mplot3d.axes3d as p3
 import matplotlib.animation as animation
 
-from src.prototyping.model.supply import SupplyVessel
+from thesis.prototyping.model.supply import SupplyVessel
 
 legendSize = 10  # legend size
 figSize1 = [15, 10]  # figure1 size in cm

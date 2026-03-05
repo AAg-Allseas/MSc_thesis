@@ -6,7 +6,7 @@ model, including loss tracking, checkpointing, and learning rate scheduling.
 Example:
     Run training from the command line::
 
-        python -m src.prototyping.deepOnet.train_deepOnet
+        python -m thesis.prototyping.deepOnet.train_deepOnet
 """
 import logging
 from pathlib import Path
@@ -19,11 +19,11 @@ from torch import nn
 from torch.utils.data import DataLoader
 import tqdm
 
-from src.prototyping.data_handling import find_parquet_files
-from src.prototyping.dataloader import ParquetDataset
-from src.prototyping.deepOnet.model_deepOnet import MIONet
-from src.prototyping.deepOnet.utils import BranchConstructor, CNN1DBranchConstructor, MLPConstructor, prepare_batch
-from src.msc_thesis_awn_aperghis.utils import save_checkpoint_artifact
+from thesis.prototyping.data_handling import find_parquet_files
+from thesis.prototyping.dataloader import ParquetDataset
+from thesis.prototyping.deepOnet.model_deepOnet import MIONet
+from thesis.prototyping.deepOnet.utils import BranchConstructor, CNN1DBranchConstructor, MLPConstructor, prepare_batch
+from thesis.utils import save_checkpoint_artifact
 
 logger = logging.getLogger(__name__)
 

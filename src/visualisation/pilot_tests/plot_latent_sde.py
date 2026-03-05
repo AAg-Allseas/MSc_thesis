@@ -9,10 +9,10 @@ import torch
 from torch.utils.data import DataLoader
 from typing import Optional
 
-from src.prototyping.data_handling import find_parquet_files
-from src.prototyping.dataloader import ParquetDataset, prep_batch
-from src.prototyping.latentSDE.model_latentSDE import LatentSDE
-from src.prototyping.latentSDE.test_latentSDE import load_and_sample
+from thesis.prototyping.data_handling import find_parquet_files
+from thesis.prototyping.dataloader import ParquetDataset, prep_batch
+from thesis.prototyping.latentSDE.model_latentSDE import LatentSDE
+from thesis.prototyping.latentSDE.test_latentSDE import load_and_sample
 from src.visualisation.general_plotting.config import FLATTER
 from src.visualisation.pilot_tests.plot_batch_timeseries import plot_timetraces
 

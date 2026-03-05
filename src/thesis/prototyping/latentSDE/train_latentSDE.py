@@ -28,10 +28,10 @@ from torch.utils.data import DataLoader
 
 import torchsde
 
-from src.prototyping.data_handling import find_parquet_files
-from src.prototyping.dataloader import ParquetDataset, prep_batch
-from src.prototyping.latentSDE.model_latentSDE import LatentSDE
-from src.prototyping.latentSDE.utils import LinearScheduler
+from thesis.prototyping.data_handling import find_parquet_files
+from thesis.prototyping.dataloader import ParquetDataset, prep_batch
+from thesis.prototyping.latentSDE.model_latentSDE import LatentSDE
+from thesis.prototyping.latentSDE.utils import LinearScheduler
 
 logger = logging.getLogger(__name__)
 
