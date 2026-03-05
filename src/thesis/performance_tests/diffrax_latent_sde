@@ -1,0 +1,149 @@
+import diffrax
+import equinox as eqx  # https://github.com/patrick-kidger/equinox
+import jax
+import jax.nn as jnn
+import jax.numpy as jnp
+import jax.random as jr
+import matplotlib.pyplot as plt
+import optax  # https://github.com/deepmind/optax
+import mlflow
+
+def lipswish(x):
+    return 0.909 * jnn.silu(x)
+
+class VectorField(eqx.Module):
+    scale: int | jnp.ndarray
+    mlp: eqx.nn.MLP
+
+    def __init__(self, hidden_size, width_size, depth, scale, *, key, **kwargs):
+        super().__init__(**kwargs)
+        scale_key, mlp_key = jr.split(key)
+        if scale:
+            self.scale = jr.uniform(scale_key, (hidden_size,), minval=0.9, maxval=1.1)
+        else:
+            self.scale = 1
+        self.mlp = eqx.nn.MLP(
+            in_size=hidden_size + 1,
+            out_size=hidden_size,
+            width_size=width_size,
+            depth=depth,
+            activation=lipswish,
+            final_activation=jnn.tanh,
+            key=mlp_key,
+        )
+
+    def __call__(self, t, y, args):
+        t = jnp.asarray(t)
+        return self.scale * self.mlp(jnp.concatenate([t[None], y]))
+
+class PosteriorField(VectorField):
+    def __init__(self, hidden_size, width_size, depth, scale, key, args, kwargs):
+        super().__init__(hidden_size, width_size, depth, scale, key, *args, **kwargs)
+        self._context: Optional[tuple[jnp.ndarray, jnp.ndarray]] = None
+
+    @property
+    def context(self) -> None:
+        return self._context
+
+    @context.setter
+    def context(self, ts: jnp.ndarray, ctx: jnp.ndarray) -> None:
+        self._context = (ts, ctx)
+
+    def __call__(self, t, y, args) -> jnp.ndarray:
+        t = jnp.asarray(t)
+        ts, ctx = self.context
+        i = min(jnp.searchsorted(ts, t, side="right"), len(ts) - 1)
+        return super.__call__(t, jnp.concatenate([y, ctx[i]]))
+
+class ControlledVectorField(eqx.Module):
+    scale: int | jnp.ndarray
+    mlp: eqx.nn.MLP
+    control_size: int
+    hidden_size: int
+
+    def __init__(
+        self, control_size, hidden_size, width_size, depth, scale, *, key, **kwargs
+    ):
+        super().__init__(**kwargs)
+        scale_key, mlp_key = jr.split(key)
+        if scale:
+            self.scale = jr.uniform(
+                scale_key, (hidden_size, control_size), minval=0.9, maxval=1.1
+            )
+        else:
+            self.scale = 1
+        self.mlp = eqx.nn.MLP(
+            in_size=hidden_size + 1,
+            out_size=hidden_size * control_size,
+            width_size=width_size,
+            depth=depth,
+            activation=lipswish,
+            final_activation=jnn.tanh,
+            key=mlp_key,
+        )
+        self.control_size = control_size
+        self.hidden_size = hidden_size
+
+    def __call__(self, t, y, args):
+        t = jnp.asarray(t)
+        return self.scale * self.mlp(jnp.concatenate([t[None], y])).reshape(
+            self.hidden_size, self.control_size
+        )
+
+class Encoder(eqx.Module):
+    def __init__(self, data_size: int, hidden_size: int, ctx_size: int) -> None:
+        self.gru = eqx.nn.GRUCell(input_size=data_size, hidden_size=hidden_size)
+        self.lin = eqx.nn.Linear(hidden_size, ctx_size)
+
+    def __call__(self, data: jnp.ndarray) -> jnp.ndarray:
+        return self.lin(self.gru(data))
+
+
+class LatentDrift:
+    def __init__(self, f, h, g) -> None:
+        self.f = f
+        self.h = h
+        self.g = g
+    
+    def __call__(self, t, y) -> jnp.ndarray:
+        y = y[:-1] # Remove last KL Loss
+        z_f = self.f(t, y)
+        z_h = self.h(t, y)
+        return jnp.concatenate(z_f, 0.5 * (z_f - z_h) ** 2)
+
+class LatentSDE(eqx.Module):
+    encoder: eqx.Module
+    f: VectorField  # Posterior drift
+    h: VectorField  # Prior drift
+    g: ControlledVectorField  # Shared diffusion
+    qz0_posterior: eqx.nn.MLP
+    pz0_mean: jnp.ndarray  # Prior mean
+    pz0_logvar: jnp.ndarray  # Prior log variance
+    decoder: eqx.nn.MLP
+
+    def __init__(self, data_size: int, latent_size: int, context_size: int, hidden_size: int, *, key, **kwargs) -> None:
+        super().__init__(**kwargs)
+        self.encoder = Encoder(data_size, hidden_size, context_size)
+        self.qz0_posterior = eqx.nn.Linear(context_size, 2 * latent_size)
+
+        self.f = PosteriorField(latent_size, hidden_size, 4)
+        self.h = VectorField(latent_size, hidden_size, 4)
+        self.g = ControlledVectorField(latent_size, latent_size, hidden_size, 2)
+
+        self.decoder = eqx.nn.MLP(latent_size, data_size, hidden_size, 1)
+
+        mean_key, logvar_key = jr.split(key)
+        self.pz0_mean = jr.normal(mean_key, (latent_size,)) * 0.1
+        self.pz0_logvar = jr.uniform(logvar_key, (latent_size,), minval=-0.5, maxval=0.5)
+
+        self.sigma = 0.1
+
+    def __call__(self, xs: jnp.ndarray, ts: jnp.ndarray) -> None:
+
+        # Encode context
+        ctx = jnp.flip(self.encoder(jnp.flip(xs, axis=0)), axis=0)
+        self.f.context = (ts, ctx)
+
+        # Define terms
+
+

@@ -5,6 +5,9 @@
 bundle:
   name: MSc_thesis
 
+run_as:
+  user_name: aag@allseas.com
+
 targets:
   dev:
     mode: development
@@ -38,6 +41,16 @@ resources:
         - task_key: databricksTest
           notebook_task:
             notebook_path: src/notebooks/databricks_test.ipynb
+          # libraries:
+          #   - whl: ./dist/*.whl
+          existing_cluster_id:
+            0212-141545-suh1awug
+    neural_sde_gan:
+      name: NeuralSDE_GAN
+      tasks:
+        - task_key: trainNeuralSDE
+          notebook_task:
+            notebook_path: src/notebooks/neural_sde.ipynb
           # libraries:
           #   - whl: ./dist/*.whl
           existing_cluster_id:
