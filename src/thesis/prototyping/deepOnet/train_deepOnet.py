@@ -8,6 +8,7 @@ Example:
 
         python -m thesis.prototyping.deepOnet.train_deepOnet
 """
+
 import logging
 from pathlib import Path
 from typing import Optional
@@ -22,7 +23,12 @@ import tqdm
 from thesis.prototyping.data_handling import find_parquet_files
 from thesis.prototyping.dataloader import ParquetDataset
 from thesis.prototyping.deepOnet.model_deepOnet import MIONet
-from thesis.prototyping.deepOnet.utils import BranchConstructor, CNN1DBranchConstructor, MLPConstructor, prepare_batch
+from thesis.prototyping.deepOnet.utils import (
+    BranchConstructor,
+    CNN1DBranchConstructor,
+    MLPConstructor,
+    prepare_batch,
+)
 from thesis.utils import save_checkpoint_artifact
 
 logger = logging.getLogger(__name__)
@@ -68,14 +74,18 @@ def train(
 
     for i, batch in enumerate(dataloader):
         optimiser.zero_grad()
-                
-        x, samples, _ = prepare_batch(batch, dataset_samples, input_features,  n_samples=n_samples, device=device)
+
+        x, samples, _ = prepare_batch(
+            batch, dataset_samples, input_features, n_samples=n_samples, device=device
+        )
         loss = loss_fn(model(x), samples)
 
         # Early detection of numerical instability
         if not torch.isfinite(loss):
             error_count += 1
-            logger.warning(f"Non-finite loss detected: {loss.item()}, current error count: {error_count}")
+            logger.warning(
+                f"Non-finite loss detected: {loss.item()}, current error count: {error_count}"
+            )
             if error_count >= max_errors:
                 raise ValueError(f"Training diverged with loss={loss.item()}")
             continue
@@ -99,7 +109,7 @@ def test(
     model: nn.Module,
     dataloader: DataLoader,
     dataset_samples: ParquetDataset,
-    input_features: dict[str, int], 
+    input_features: dict[str, int],
     loss_fn: nn.Module,
     device: torch.device,
     n_samples: int,
@@ -126,13 +136,19 @@ def test(
 
     with torch.no_grad():
         for i, batch in enumerate(dataloader):
-            x, samples, _ = prepare_batch(batch, dataset_samples, input_features, n_samples=n_samples, device=device)
+            x, samples, _ = prepare_batch(
+                batch,
+                dataset_samples,
+                input_features,
+                n_samples=n_samples,
+                device=device,
+            )
             loss = loss_fn(model(x), samples)
-            
+
             if not torch.isfinite(loss):
                 logger.warning(f"Non-finite test loss: {loss.item()}")
                 continue
-            
+
             test_losses.append(loss.item())
             if i % log_interval == 0:
                 mlflow.log_metric("batch_test_loss", loss.item(), step=global_step)
@@ -149,7 +165,7 @@ def load_samples_sensors(
     feats_sensors: list[str],
     feats_samples: list[str],
     batch_size: int,
-    sample_dt: float=1.0, 
+    sample_dt: float = 1.0,
     scale: bool = True,
     shuffel: bool = True,
 ) -> tuple[ParquetDataset, DataLoader]:
@@ -168,25 +184,31 @@ def load_samples_sensors(
     Returns:
         Tuple of (sample dataset, DataLoader for sensors).
     """
-    dataset_sensors = ParquetDataset(files, 
-                        columns=feats_sensors,
-                        sample_length=sample_length,
-                        standardise=scale,
-                        resample_dt=sample_dt)
-    dataset_samples = ParquetDataset(files, 
-                             columns=feats_samples,
-                             sample_length=sample_length,
-                             standardise=scale,
-                             )
+    dataset_sensors = ParquetDataset(
+        files,
+        columns=feats_sensors,
+        sample_length=sample_length,
+        standardise=scale,
+        resample_dt=sample_dt,
+    )
+    dataset_samples = ParquetDataset(
+        files,
+        columns=feats_samples,
+        sample_length=sample_length,
+        standardise=scale,
+    )
 
-    dataloader = DataLoader(dataset_sensors, batch_size=batch_size, shuffle=shuffel, pin_memory=True)
+    dataloader = DataLoader(
+        dataset_sensors, batch_size=batch_size, shuffle=shuffel, pin_memory=True
+    )
 
-    return dataset_samples,dataloader
+    return dataset_samples, dataloader
+
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-    
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     logger.info(f"Running on {device}")
 
     latent_dim = 128
@@ -197,7 +219,7 @@ if __name__ == "__main__":
             name="initial_conditions",
             layer_sizes=[12, 100, latent_dim],
             activation="gelu",
-            dropout=0.1
+            dropout=0.1,
         ),
         CNN1DBranchConstructor(
             name="surge_force",
@@ -206,7 +228,7 @@ if __name__ == "__main__":
             kernel_sizes=[7, 5, 3],
             output_dim=latent_dim,
             activation="gelu",
-            dropout=0.1
+            dropout=0.1,
         ),
         CNN1DBranchConstructor(
             name="sway_force",
@@ -215,7 +237,7 @@ if __name__ == "__main__":
             kernel_sizes=[7, 5, 3],
             output_dim=latent_dim,
             activation="gelu",
-            dropout=0.1
+            dropout=0.1,
         ),
         CNN1DBranchConstructor(
             name="yaw_moment",
@@ -224,60 +246,73 @@ if __name__ == "__main__":
             kernel_sizes=[7, 5, 3],
             output_dim=latent_dim,
             activation="gelu",
-            dropout=0.1
+            dropout=0.1,
         ),
     ]
     trunk = MLPConstructor(
-        layer_sizes=[1, 125, 250, 250, latent_dim],
-        activation="gelu",
-        dropout=0.1
+        layer_sizes=[1, 125, 250, 250, latent_dim], activation="gelu", dropout=0.1
     )
-        
+
     mionet = MIONet(branches, trunk, output_dim).to(device)
 
     logger.info("Initialised model")
 
-    files_training = find_parquet_files(Path(r"C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\data"),
-                               lambda m: m["end_time"] == 10800 and m["timestep"] == 0.05 and m["seed"] <= 40)
-    files_testing = find_parquet_files(Path(r"C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\data"),
-                               lambda m: m["end_time"] == 10800 and m["timestep"] == 0.05 and m["seed"] > 40)
-    
-    sample_length = 10000
-    logger.info(f"Using {len(files_training)} files with sample length {sample_length} for training")
-    logger.info(f"Using {len(files_testing)} files with sample length {sample_length} for testing")
+    files_training = find_parquet_files(
+        Path(r"C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\data"),
+        lambda m: m["end_time"] == 10800 and m["timestep"] == 0.05 and m["seed"] <= 40,
+    )
+    files_testing = find_parquet_files(
+        Path(r"C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\data"),
+        lambda m: m["end_time"] == 10800 and m["timestep"] == 0.05 and m["seed"] > 40,
+    )
 
-    feats_sensors = [
-        'tau_ext_x',
-        'tau_ext_y',
-        'tau_ext_mz'
-    ]
+    sample_length = 10000
+    logger.info(
+        f"Using {len(files_training)} files with sample length {sample_length} for training"
+    )
+    logger.info(
+        f"Using {len(files_testing)} files with sample length {sample_length} for testing"
+    )
+
+    feats_sensors = ["tau_ext_x", "tau_ext_y", "tau_ext_mz"]
     feats_samples = [
-        'pos_eta_x',
-        'pos_eta_y',
-        'pos_eta_mz',
-        'pos_nu_x',
-        'pos_nu_y',
-        'pos_nu_mz',
-        'rpm_bow_fore',
-        'rpm_bow_aft',
-        'rpm_stern_fore',
-        'rpm_stern_aft',
-        'rpm_fixed_ps',
-        'rpm_fixed_sb',]
-    
-    input_features = {"surge_force": 0,
-                      "surge_force": 1,
-                      "yaw_moment": 2}
+        "pos_eta_x",
+        "pos_eta_y",
+        "pos_eta_mz",
+        "pos_nu_x",
+        "pos_nu_y",
+        "pos_nu_mz",
+        "rpm_bow_fore",
+        "rpm_bow_aft",
+        "rpm_stern_fore",
+        "rpm_stern_aft",
+        "rpm_fixed_ps",
+        "rpm_fixed_sb",
+    ]
+
+    input_features = {"surge_force": 0, "surge_force": 1, "yaw_moment": 2}
 
     n_samples = 2048
     batch_size = 16
     n_epochs = 10000
     max_errors = 3
-    
 
-
-    dataset_training_samples, dataloader_training = load_samples_sensors(files_training, sample_length, feats_sensors, feats_samples, batch_size, sample_dt=0.5)
-    dataset_testing_samples, dataloader_testing = load_samples_sensors(files_testing, sample_length, feats_sensors, feats_samples, batch_size, sample_dt=0.5)
+    dataset_training_samples, dataloader_training = load_samples_sensors(
+        files_training,
+        sample_length,
+        feats_sensors,
+        feats_samples,
+        batch_size,
+        sample_dt=0.5,
+    )
+    dataset_testing_samples, dataloader_testing = load_samples_sensors(
+        files_testing,
+        sample_length,
+        feats_sensors,
+        feats_samples,
+        batch_size,
+        sample_dt=0.5,
+    )
 
     last_lr = 1e-3
     warmup_epochs = 100
@@ -285,8 +320,12 @@ if __name__ == "__main__":
 
     optimiser = torch.optim.Adam(params=mionet.parameters(), lr=last_lr)
 
-    linear_warmup_schedule = torch.optim.lr_scheduler.LinearLR(optimiser, start_factor=1e-4, end_factor=1.0, total_iters=warmup_steps)
-    plateau_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimiser, factor=0.5, min_lr=1e-6)
+    linear_warmup_schedule = torch.optim.lr_scheduler.LinearLR(
+        optimiser, start_factor=1e-4, end_factor=1.0, total_iters=warmup_steps
+    )
+    plateau_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+        optimiser, factor=0.5, min_lr=1e-6
+    )
     scheduler = linear_warmup_schedule
 
     loss_fn = nn.MSELoss()
@@ -294,45 +333,73 @@ if __name__ == "__main__":
     mlflow.set_experiment("deepOnet_testing")
 
     with mlflow.start_run(run_name=f"mionet_bs{batch_size}_lr{last_lr}"):
-        mlflow.log_params({
-            "model_type": "MIONet",
-            "latent_dim": latent_dim,
-            "output_dim": output_dim,
-            "batch_size": batch_size,
-            "n_samples": n_samples,
-            "n_epochs": n_epochs,
-            "lr_init": last_lr,
-            "warmup_epochs": warmup_epochs,
-            "sample_length": sample_length,
-            "loss_fn": "MSELoss",
-            "optimizer": "Adam",
-            "grad_clip": 1.0,
-            "n_training_files": len(files_training),
-            "n_testing_files": len(files_testing),
-        })
+        mlflow.log_params(
+            {
+                "model_type": "MIONet",
+                "latent_dim": latent_dim,
+                "output_dim": output_dim,
+                "batch_size": batch_size,
+                "n_samples": n_samples,
+                "n_epochs": n_epochs,
+                "lr_init": last_lr,
+                "warmup_epochs": warmup_epochs,
+                "sample_length": sample_length,
+                "loss_fn": "MSELoss",
+                "optimizer": "Adam",
+                "grad_clip": 1.0,
+                "n_training_files": len(files_training),
+                "n_testing_files": len(files_testing),
+            }
+        )
 
         global_train_step = 0
         global_test_step = 0
 
         try:
             for epoch in tqdm.tqdm(range(n_epochs)):
-                global_train_step = train(mionet, dataloader_training, dataset_training_samples, input_features, optimiser, loss_fn, device, n_samples, max_errors, scheduler, global_step=global_train_step)
-                global_test_step, mean_test_loss = test(mionet, dataloader_testing, dataset_testing_samples, input_features, loss_fn, device, n_samples, global_step=global_test_step)
+                global_train_step = train(
+                    mionet,
+                    dataloader_training,
+                    dataset_training_samples,
+                    input_features,
+                    optimiser,
+                    loss_fn,
+                    device,
+                    n_samples,
+                    max_errors,
+                    scheduler,
+                    global_step=global_train_step,
+                )
+                global_test_step, mean_test_loss = test(
+                    mionet,
+                    dataloader_testing,
+                    dataset_testing_samples,
+                    input_features,
+                    loss_fn,
+                    device,
+                    n_samples,
+                    global_step=global_test_step,
+                )
 
                 if epoch == warmup_epochs:
                     scheduler = plateau_scheduler
 
                 if isinstance(scheduler, torch.optim.lr_scheduler.ReduceLROnPlateau):
                     scheduler.step(mean_test_loss)
-                
-                lr = optimiser.param_groups[0]['lr']
 
-                mlflow.log_metrics({
-                    "epoch_test_loss": mean_test_loss,
-                    "learning_rate": lr,
-                }, step=epoch)
+                lr = optimiser.param_groups[0]["lr"]
 
-                logger.info(f"Epoch {epoch} | test_loss: {mean_test_loss:.4f} | lr: {lr:.6f}")
+                mlflow.log_metrics(
+                    {
+                        "epoch_test_loss": mean_test_loss,
+                        "learning_rate": lr,
+                    },
+                    step=epoch,
+                )
+
+                logger.info(
+                    f"Epoch {epoch} | test_loss: {mean_test_loss:.4f} | lr: {lr:.6f}"
+                )
 
                 if epoch % 50 == 0:
                     save_checkpoint_artifact(mionet, epoch, optimiser, scheduler)
@@ -343,4 +410,3 @@ if __name__ == "__main__":
         except Exception as e:
             logger.error(f"Training failed: {e}")
             raise
-    

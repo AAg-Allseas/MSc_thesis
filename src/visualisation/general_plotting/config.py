@@ -1,5 +1,6 @@
 LINEWIDTH = 426.79 / 72.27
 
+
 class FigSize(tuple):
     def __new__(cls, width_factor: float, height_factor: float):
         width = LINEWIDTH * width_factor
@@ -14,8 +15,7 @@ class FigSize(tuple):
     def __rmul__(self, other: float):
         return self.__mul__(other)
 
-GOLDEN_RATIO = FigSize(1, 1/1.6)
+
+GOLDEN_RATIO = FigSize(1, 1 / 1.6)
 SQUARE = FigSize(1, 1)
-FLATTER = FigSize(1, 1/2)
-
-
+FLATTER = FigSize(1, 1 / 2)

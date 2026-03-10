@@ -1,20 +1,27 @@
 """DeepONet based on:
-Lu, L., Jin, P., Pang, G., Zhang, Z., & Karniadakis, G. E. (2021). 
-Learning nonlinear operators via DeepONet based on the universal approximation theorem of operators. 
+Lu, L., Jin, P., Pang, G., Zhang, Z., & Karniadakis, G. E. (2021).
+Learning nonlinear operators via DeepONet based on the universal approximation theorem of operators.
 Nature Machine Intelligence, 3(3), 218-229. https://doi.org/10.1038/s42256-021-00302-5
 
 Using the multiple input formulation from:
 Jin, P., Meng, S., & Lu, L. (2022).
- MIONet: Learning Multiple-Input Operators via Tensor Product. 
+ MIONet: Learning Multiple-Input Operators via Tensor Product.
  SIAM Journal on Scientific Computing, 44(6), A3490-A3514. https://doi.org/10.1137/22M1477751
 """
+
 from typing import Dict, List, Tuple
 
 from torch import nn
 import torch
 
 
-from thesis.prototyping.deepOnet.utils import CNN1D, CNN1DBranchConstructor, MLP, BranchConstructor, MLPConstructor
+from thesis.prototyping.deepOnet.utils import (
+    CNN1D,
+    CNN1DBranchConstructor,
+    MLP,
+    BranchConstructor,
+    MLPConstructor,
+)
 
 
 class MIONet(nn.Module):
@@ -90,13 +97,15 @@ class MIONet(nn.Module):
 
         # Ensure y has a trailing feature dim of 1 for the trunk MLP
         if y.dim() == 1:
-            y = y.unsqueeze(-1)           # (batch,) -> (batch, 1)
+            y = y.unsqueeze(-1)  # (batch,) -> (batch, 1)
         elif y.dim() == 2 and y.size(-1) != 1:
-            y = y.unsqueeze(-1)           # (batch, n_samples) -> (batch, n_samples, 1)
+            y = y.unsqueeze(-1)  # (batch, n_samples) -> (batch, n_samples, 1)
 
         # --- Branches: element-wise product across all branch outputs ---
         # Each branch output: (batch, latent_dim)
-        B = torch.ones_like(getattr(self, self.branch_names[0])(u[self.branch_names[0]]))
+        B = torch.ones_like(
+            getattr(self, self.branch_names[0])(u[self.branch_names[0]])
+        )
         for name in self.branch_names:
             B = B * getattr(self, name)(u[name])  # (batch, latent_dim)
 

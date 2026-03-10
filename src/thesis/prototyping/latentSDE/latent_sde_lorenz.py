@@ -22,6 +22,7 @@ pip install fire
 To run, execute:
 python -m examples.latent_sde_lorenz
 """
+
 import logging
 import os
 from typing import Sequence
@@ -59,10 +60,13 @@ class StochasticLorenz(object):
     Details described in Section 7.2 https://arxiv.org/pdf/2001.01328.pdf
     Default a, b from https://openreview.net/pdf?id=HkzRQhR9YX
     """
+
     noise_type = "diagonal"
     sde_type = "ito"
 
-    def __init__(self, a: Sequence = (10., 28., 8 / 3), b: Sequence = (.1, .28, .3)):
+    def __init__(
+        self, a: Sequence = (10.0, 28.0, 8 / 3), b: Sequence = (0.1, 0.28, 0.3)
+    ):
         super(StochasticLorenz, self).__init__()
         self.a = a
         self.b = b
@@ -114,7 +118,9 @@ class LatentSDE(nn.Module):
     def __init__(self, data_size, latent_size, context_size, hidden_size):
         super(LatentSDE, self).__init__()
         # Encoder.
-        self.encoder = Encoder(input_size=data_size, hidden_size=hidden_size, output_size=context_size)
+        self.encoder = Encoder(
+            input_size=data_size, hidden_size=hidden_size, output_size=context_size
+        )
         self.qz0_net = nn.Linear(context_size, latent_size + latent_size)
 
         # Decoder.
@@ -139,7 +145,7 @@ class LatentSDE(nn.Module):
                     nn.Linear(1, hidden_size),
                     nn.Softplus(),
                     nn.Linear(hidden_size, 1),
-                    nn.Sigmoid()
+                    nn.Sigmoid(),
                 )
                 for _ in range(latent_size)
             ]
@@ -179,13 +185,24 @@ class LatentSDE(nn.Module):
         if adjoint:
             # Must use the argument `adjoint_params`, since `ctx` is not part of the input to `f`, `g`, and `h`.
             adjoint_params = (
-                    (ctx,) +
-                    tuple(self.f_net.parameters()) + tuple(self.g_nets.parameters()) + tuple(self.h_net.parameters())
+                (ctx,)
+                + tuple(self.f_net.parameters())
+                + tuple(self.g_nets.parameters())
+                + tuple(self.h_net.parameters())
             )
             zs, log_ratio = torchsde.sdeint_adjoint(
-                self, z0, ts, adjoint_params=adjoint_params, dt=1e-2, logqp=True, method=method)
+                self,
+                z0,
+                ts,
+                adjoint_params=adjoint_params,
+                dt=1e-2,
+                logqp=True,
+                method=method,
+            )
         else:
-            zs, log_ratio = torchsde.sdeint(self, z0, ts, dt=1e-2, logqp=True, method=method)
+            zs, log_ratio = torchsde.sdeint(
+                self, z0, ts, dt=1e-2, logqp=True, method=method
+            )
 
         _xs = self.projector(zs)
         xs_dist = Normal(loc=_xs, scale=noise_std)
@@ -199,52 +216,60 @@ class LatentSDE(nn.Module):
 
     @torch.no_grad()
     def sample(self, batch_size, ts, bm=None):
-        eps = torch.randn(size=(batch_size, *self.pz0_mean.shape[1:]), device=self.pz0_mean.device)
+        eps = torch.randn(
+            size=(batch_size, *self.pz0_mean.shape[1:]), device=self.pz0_mean.device
+        )
         z0 = self.pz0_mean + self.pz0_logstd.exp() * eps
-        zs = torchsde.sdeint(self, z0, ts, names={'drift': 'h'}, dt=1e-3, bm=bm)
+        zs = torchsde.sdeint(self, z0, ts, names={"drift": "h"}, dt=1e-3, bm=bm)
         # Most of the times in ML, we don't sample the observation noise for visualization purposes.
         _xs = self.projector(zs)
         return _xs
 
 
 def make_dataset(t0, t1, batch_size, noise_std, train_dir, device):
-    data_path = os.path.join(train_dir, 'lorenz_data.pth')
+    data_path = os.path.join(train_dir, "lorenz_data.pth")
     if os.path.exists(data_path):
         data_dict = torch.load(data_path)
-        xs, ts = data_dict['xs'], data_dict['ts']
-        logging.warning(f'Loaded toy data at: {data_path}')
+        xs, ts = data_dict["xs"], data_dict["ts"]
+        logging.warning(f"Loaded toy data at: {data_path}")
         if xs.shape[1] != batch_size:
-            raise ValueError("Batch size has changed; please delete and regenerate the data.")
+            raise ValueError(
+                "Batch size has changed; please delete and regenerate the data."
+            )
         if ts[0] != t0 or ts[-1] != t1:
-            raise ValueError("Times interval [t0, t1] has changed; please delete and regenerate the data.")
+            raise ValueError(
+                "Times interval [t0, t1] has changed; please delete and regenerate the data."
+            )
     else:
         _y0 = torch.randn(batch_size, 3, device=device)
         ts = torch.linspace(t0, t1, steps=100, device=device)
         xs = StochasticLorenz().sample(_y0, ts, noise_std, normalize=True)
 
         os.makedirs(os.path.dirname(data_path), exist_ok=True)
-        torch.save({'xs': xs, 'ts': ts}, data_path)
-        logging.warning(f'Stored toy data at: {data_path}')
+        torch.save({"xs": xs, "ts": ts}, data_path)
+        logging.warning(f"Stored toy data at: {data_path}")
     return xs, ts
 
 
 def vis(xs, ts, latent_sde, bm_vis, img_path, num_samples=10):
     fig = plt.figure(figsize=(20, 9))
     gs = gridspec.GridSpec(1, 2)
-    ax00 = fig.add_subplot(gs[0, 0], projection='3d')
-    ax01 = fig.add_subplot(gs[0, 1], projection='3d')
+    ax00 = fig.add_subplot(gs[0, 0], projection="3d")
+    ax01 = fig.add_subplot(gs[0, 1], projection="3d")
 
     # Left plot: data.
     z1, z2, z3 = np.split(xs.cpu().numpy(), indices_or_sections=3, axis=-1)
     [ax00.plot(z1[:, i, 0], z2[:, i, 0], z3[:, i, 0]) for i in range(num_samples)]
-    ax00.scatter(z1[0, :num_samples, 0], z2[0, :num_samples, 0], z3[0, :10, 0], marker='x')
+    ax00.scatter(
+        z1[0, :num_samples, 0], z2[0, :num_samples, 0], z3[0, :10, 0], marker="x"
+    )
     ax00.set_yticklabels([])
     ax00.set_xticklabels([])
     ax00.set_zticklabels([])
-    ax00.set_xlabel('$z_1$', labelpad=0., fontsize=16)
-    ax00.set_ylabel('$z_2$', labelpad=.5, fontsize=16)
-    ax00.set_zlabel('$z_3$', labelpad=0., horizontalalignment='center', fontsize=16)
-    ax00.set_title('Data', fontsize=20)
+    ax00.set_xlabel("$z_1$", labelpad=0.0, fontsize=16)
+    ax00.set_ylabel("$z_2$", labelpad=0.5, fontsize=16)
+    ax00.set_zlabel("$z_3$", labelpad=0.0, horizontalalignment="center", fontsize=16)
+    ax00.set_title("Data", fontsize=20)
     xlim = ax00.get_xlim()
     ylim = ax00.get_ylim()
     zlim = ax00.get_zlim()
@@ -254,14 +279,16 @@ def vis(xs, ts, latent_sde, bm_vis, img_path, num_samples=10):
     z1, z2, z3 = np.split(xs, indices_or_sections=3, axis=-1)
 
     [ax01.plot(z1[:, i, 0], z2[:, i, 0], z3[:, i, 0]) for i in range(num_samples)]
-    ax01.scatter(z1[0, :num_samples, 0], z2[0, :num_samples, 0], z3[0, :10, 0], marker='x')
+    ax01.scatter(
+        z1[0, :num_samples, 0], z2[0, :num_samples, 0], z3[0, :10, 0], marker="x"
+    )
     ax01.set_yticklabels([])
     ax01.set_xticklabels([])
     ax01.set_zticklabels([])
-    ax01.set_xlabel('$z_1$', labelpad=0., fontsize=16)
-    ax01.set_ylabel('$z_2$', labelpad=.5, fontsize=16)
-    ax01.set_zlabel('$z_3$', labelpad=0., horizontalalignment='center', fontsize=16)
-    ax01.set_title('Samples', fontsize=20)
+    ax01.set_xlabel("$z_1$", labelpad=0.0, fontsize=16)
+    ax01.set_ylabel("$z_2$", labelpad=0.5, fontsize=16)
+    ax01.set_zlabel("$z_3$", labelpad=0.0, horizontalalignment="center", fontsize=16)
+    ax01.set_title("Samples", fontsize=20)
     ax01.set_xlim(xlim)
     ax01.set_ylim(ylim)
     ax01.set_zlim(zlim)
@@ -271,25 +298,32 @@ def vis(xs, ts, latent_sde, bm_vis, img_path, num_samples=10):
 
 
 def main(
-        batch_size=1024,
-        latent_size=4,
-        context_size=64,
-        hidden_size=128,
-        lr_init=1e-2,
-        t0=0.,
-        t1=2.,
-        lr_gamma=0.997,
-        num_iters=5000,
-        kl_anneal_iters=1000,
-        pause_every=50,
-        noise_std=0.01,
-        adjoint=False,
-        train_dir='./dump/lorenz/',
-        method="euler",
+    batch_size=1024,
+    latent_size=4,
+    context_size=64,
+    hidden_size=128,
+    lr_init=1e-2,
+    t0=0.0,
+    t1=2.0,
+    lr_gamma=0.997,
+    num_iters=5000,
+    kl_anneal_iters=1000,
+    pause_every=50,
+    noise_std=0.01,
+    adjoint=False,
+    train_dir="./dump/lorenz/",
+    method="euler",
 ):
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    xs, ts = make_dataset(t0=t0, t1=t1, batch_size=batch_size, noise_std=noise_std, train_dir=train_dir, device=device)
+    xs, ts = make_dataset(
+        t0=t0,
+        t1=t1,
+        batch_size=batch_size,
+        noise_std=noise_std,
+        train_dir=train_dir,
+        device=device,
+    )
     latent_sde = LatentSDE(
         data_size=3,
         latent_size=latent_size,
@@ -297,12 +331,22 @@ def main(
         hidden_size=hidden_size,
     ).to(device)
     optimizer = optim.Adam(params=latent_sde.parameters(), lr=lr_init)
-    scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer=optimizer, gamma=lr_gamma)
+    scheduler = torch.optim.lr_scheduler.ExponentialLR(
+        optimizer=optimizer, gamma=lr_gamma
+    )
     kl_scheduler = LinearScheduler(iters=kl_anneal_iters)
 
     # Fix the same Brownian motion for visualization.
     bm_vis = torchsde.BrownianInterval(
-        t0=t0, t1=t1, size=(batch_size, latent_size,), device=device, levy_area_approximation="space-time")
+        t0=t0,
+        t1=t1,
+        size=(
+            batch_size,
+            latent_size,
+        ),
+        device=device,
+        levy_area_approximation="space-time",
+    )
 
     for global_step in tqdm.tqdm(range(1, num_iters + 1)):
         latent_sde.zero_grad()
@@ -314,12 +358,12 @@ def main(
         kl_scheduler.step()
 
         if global_step % pause_every == 0:
-            lr_now = optimizer.param_groups[0]['lr']
+            lr_now = optimizer.param_groups[0]["lr"]
             logging.warning(
-                f'global_step: {global_step:06d}, lr: {lr_now:.5f}, '
-                f'log_pxs: {log_pxs:.4f}, log_ratio: {log_ratio:.4f} loss: {loss:.4f}, kl_coeff: {kl_scheduler.val:.4f}'
+                f"global_step: {global_step:06d}, lr: {lr_now:.5f}, "
+                f"log_pxs: {log_pxs:.4f}, log_ratio: {log_ratio:.4f} loss: {loss:.4f}, kl_coeff: {kl_scheduler.val:.4f}"
             )
-            img_path = os.path.join(train_dir, f'global_step_{global_step:06d}.pdf')
+            img_path = os.path.join(train_dir, f"global_step_{global_step:06d}.pdf")
             vis(xs, ts, latent_sde, bm_vis, img_path)
 
 

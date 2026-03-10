@@ -6,12 +6,14 @@ Based on:
     the power grid's post-fault trajectories.
     Neurocomputing, 535, 166-182. https://doi.org/10.1016/j.neucom.2023.03.015
 """
+
 from dataclasses import dataclass
 from typing import Any, Dict
 from torch import nn, Tensor
 import torch
 
 from thesis.prototyping.dataloader import ParquetDataset
+
 
 # get activation function from str
 def get_activation(identifier: str) -> nn.Module:
@@ -26,21 +28,22 @@ def get_activation(identifier: str) -> nn.Module:
     Raises:
         KeyError: If the identifier is not in the activation map.
     """
-    return{
-            "elu": nn.ELU(),
-            "relu": nn.ReLU(),
-            "selu": nn.SELU(),
-            "sigmoid": nn.Sigmoid(),
-            "leaky": nn.LeakyReLU(),
-            "tanh": nn.Tanh(),
-            "softplus": nn.Softplus(),
-            "Rrelu": nn.RReLU(),
-            "gelu": nn.GELU(),
-            "silu": nn.SiLU(),
-            "sin": sin_act(),
-            "Mish": nn.Mish(),
-            "identity": nn.Identity(),
+    return {
+        "elu": nn.ELU(),
+        "relu": nn.ReLU(),
+        "selu": nn.SELU(),
+        "sigmoid": nn.Sigmoid(),
+        "leaky": nn.LeakyReLU(),
+        "tanh": nn.Tanh(),
+        "softplus": nn.Softplus(),
+        "Rrelu": nn.RReLU(),
+        "gelu": nn.GELU(),
+        "silu": nn.SiLU(),
+        "sin": sin_act(),
+        "Mish": nn.Mish(),
+        "identity": nn.Identity(),
     }[identifier]
+
 
 # sin activation function
 class sin_act(nn.Module):
@@ -60,6 +63,7 @@ class MLPConstructor:
         activation: Activation name used between linear layers.
         dropout: Dropout probability applied after each hidden activation (0.0 = no dropout).
     """
+
     layer_sizes: list[int]
     activation: str
     dropout: float = 0.0
@@ -75,6 +79,7 @@ class BranchConstructor:
         activation: Activation name used between linear layers.
         dropout: Dropout probability applied after each hidden activation (0.0 = no dropout).
     """
+
     name: str
     layer_sizes: list[int]
     activation: str
@@ -94,6 +99,7 @@ class CNN1DBranchConstructor:
         activation: Activation name used between layers.
         dropout: Dropout probability applied after each activation (0.0 = no dropout).
     """
+
     name: str
     in_channels: int
     channels: list[int]
@@ -147,12 +153,22 @@ class MLP(nn.Module):
         self.net = nn.ModuleList()
 
         for k in range(len(constructor.layer_sizes) - 2):
-            self.net.append(nn.Linear(constructor.layer_sizes[k], constructor.layer_sizes[k+1], bias=True))
+            self.net.append(
+                nn.Linear(
+                    constructor.layer_sizes[k],
+                    constructor.layer_sizes[k + 1],
+                    bias=True,
+                )
+            )
             self.net.append(get_activation(constructor.activation))
             if constructor.dropout > 0:
                 self.net.append(nn.Dropout(constructor.dropout))
 
-        self.net.append(nn.Linear(constructor.layer_sizes[-2], constructor.layer_sizes[-1], bias=True))
+        self.net.append(
+            nn.Linear(
+                constructor.layer_sizes[-2], constructor.layer_sizes[-1], bias=True
+            )
+        )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Run a forward pass through the MLP.
@@ -175,7 +191,7 @@ def prepare_batch(
     input_features: dict[str, int],
     n_samples: int = -1,
     ordered: bool = False,
-    device: torch.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu'),
+    device: torch.device = torch.device("cuda" if torch.cuda.is_available() else "cpu"),
 ) -> tuple[Dict[str, Tensor], Tensor, Tensor]:
     """Prepare a batch of data for MIONet forward pass.
 
@@ -185,7 +201,7 @@ def prepare_batch(
     Args:
         batch: Tuple of (unused, sensors, metadata) from the DataLoader.
         sample_dataset: Dataset providing target samples at full resolution.
-        input_features: dictionary of strings defining the names of the input features and their corresponding index in the state vector. 
+        input_features: dictionary of strings defining the names of the input features and their corresponding index in the state vector.
                         Initial conditions are added automatically.
         n_samples: Number of time samples to use (-1 for all).
         ordered: If True, take first n_samples; if False, randomly permute.
@@ -228,7 +244,7 @@ def prepare_batch(
         idx_0 = torch.randint(0, ts.shape[-1] - n_samples + 1, size=(1,)).item()
         ts = ts[..., idx_0 : idx_0 + n_samples].to(device)
         samples = samples[:, idx_0 : idx_0 + n_samples, :].to(device)
-        
+
     else:
         idx = torch.randperm(ts.size(1))[:n_samples]
         ts = ts[:, idx].to(device)
@@ -243,5 +259,3 @@ def prepare_batch(
     x = (input_dict, ts)
 
     return x, samples, ts
-
-

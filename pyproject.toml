@@ -13,6 +13,7 @@ classifiers = [
 ]
 package-mode = true
 dependencies = [
+    "databricks-cli>=0.18.0",
     "diffrax>=0.7.0",
     "equinox>=0.13.4",
     "ipykernel>=7.2.0",

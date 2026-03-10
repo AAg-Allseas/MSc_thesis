@@ -35,6 +35,7 @@ from thesis.prototyping.deepOnet.utils import MLP, MLPConstructor
 # Data generation (ported from https://github.com/lululxvi/deeponet)
 # ──────────────────────────────────────────────────────────────
 
+
 def _eig(kernel, num, Nx):
     """Eigenvalues and eigenfunctions of a kernel on [0, 1].
 
@@ -177,6 +178,7 @@ class SODESystem:
 # DeepONet model
 # ──────────────────────────────────────────────────────────────
 
+
 class DeepONet(nn.Module):
     """Unstacked DeepONet with dot-product output.
 
@@ -233,6 +235,7 @@ class DeepONet(nn.Module):
 # Training utilities
 # ──────────────────────────────────────────────────────────────
 
+
 def _to_tensors(*arrays, device):
     """Convert numpy arrays to float32 tensors on device."""
     return [torch.tensor(a, dtype=torch.float32, device=device) for a in arrays]
@@ -284,16 +287,16 @@ if __name__ == "__main__":
     # ── Paper parameters ──
     # SODE: dX_t = σ(t) X_t dW_t, X_0 = 1
     # σ drawn from GRF with AE (Matérn-1/2) kernel, length scale l ∈ [1, 2]
-    Nx = 20          # sensor locations for KL bases
-    M = 5            # KL modes
-    m = Nx * M       # branch input dim = 100
-    p = 100          # latent dim (shared branch/trunk output)
-    dim_x = 1        # trunk input dim (time)
+    Nx = 20  # sensor locations for KL bases
+    M = 5  # KL modes
+    m = Nx * M  # branch input dim = 100
+    p = 100  # latent dim (shared branch/trunk output)
+    dim_x = 1  # trunk input dim (time)
     n_train = 1_000_000
     n_test = 1_000_000
     lr = 0.001
     epochs = 20_000
-    batch_size = 0   # 0 = full batch (paper default)
+    batch_size = 0  # 0 = full batch (paper default)
 
     print(f"m={m}, p={p}, Nx={Nx}, M={M}")
     print(f"Train: {n_train}, Test: {n_test}, Epochs: {epochs}")
@@ -363,7 +366,9 @@ if __name__ == "__main__":
         xb_ex, xt_ex, y_ex = system.gen_example_data(space, l, Nx, M)
         y_pred = predict(model, xb_ex, xt_ex, device)
         mse = np.mean((y_ex - y_pred) ** 2)
-        mse_outlier = np.mean(np.sort((y_ex - y_pred).ravel() ** 2)[:-max(1, len(y_ex) // 1000)])
+        mse_outlier = np.mean(
+            np.sort((y_ex - y_pred).ravel() ** 2)[: -max(1, len(y_ex) // 1000)]
+        )
         print(f"  l={l:.1f}  MSE={mse:.6e}  MSE(w/o outliers)={mse_outlier:.6e}")
 
         ax = axes[i // 5, i % 5]

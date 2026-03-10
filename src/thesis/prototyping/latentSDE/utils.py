@@ -2,13 +2,13 @@ import torch
 from torch import Tensor, nn
 
 
-
 class ContextEncoder(nn.Module):
     """GRU encoder to encode observation data into context for the posterior network.
 
     Uses chunked processing to handle long sequences that exceed cuDNN's ~65k limit.
     """
-    # cuDNN GRU has a max sequence length of ~65k 
+
+    # cuDNN GRU has a max sequence length of ~65k
     CUDNN_SEQ_LIMIT = 60000
 
     def __init__(self, input_size: int, hidden_size: int, output_size: int) -> None:
@@ -60,5 +60,3 @@ class LipSwish(nn.Module):
 
     def forward(self, x: Tensor) -> Tensor:
         return x * torch.sigmoid(x) / 1.1
-
-

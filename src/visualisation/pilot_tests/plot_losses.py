@@ -1,4 +1,3 @@
-
 from pathlib import Path
 from matplotlib import pyplot as plt
 import numpy as np
@@ -7,9 +6,8 @@ import pandas as pd
 from src.visualisation.general_plotting.config import GOLDEN_RATIO
 
 
-
 def plotLatentSDE() -> None:
-    """ 
+    """
     Function used to create a plot of the training losses of the LatentSDE approach
     Creates both a regular and log scaled plot.
 
@@ -17,8 +15,12 @@ def plotLatentSDE() -> None:
         likelihood np.ndarray: [Time, batch] arranged array containing the (positive) log-likelihood losses
         kl_loss np.ndarray: [Time, batch] arranged array containing the KL losses
     """
-    likelihood =  np.load(Path("dump/latentsde/proof_of_concept/likelihood_losses.npy"))[:, 0].reshape(-1, 1)
-    kl_loss = np.load(Path("dump/latentsde/proof_of_concept/kl_losses.npy"))[:, 0].reshape(-1, 1)
+    likelihood = np.load(Path("dump/latentsde/proof_of_concept/likelihood_losses.npy"))[
+        :, 0
+    ].reshape(-1, 1)
+    kl_loss = np.load(Path("dump/latentsde/proof_of_concept/kl_losses.npy"))[
+        :, 0
+    ].reshape(-1, 1)
     fig, ax = plt.subplots(figsize=GOLDEN_RATIO * 0.75)
     likelihood = likelihood[:491]
     kl_loss = kl_loss[:491]
@@ -34,8 +36,9 @@ def plotLatentSDE() -> None:
     ax.grid(linewidth=0.25)
     return fig
 
+
 def plotDeepONet() -> None:
-    """ 
+    """
     Function used to create a plot of the training losses of the DeepONet approach
     Creates both a regular and log scaled plot.
 
@@ -49,7 +52,6 @@ def plotDeepONet() -> None:
     mse = data["value"].to_numpy()[:100]
     epoch = data["step"].to_numpy()[:100]
 
-
     ax.plot(epoch, mse)
     ax.set_xlabel("Epoch")
     ax.set_ylabel("MSE loss")
@@ -60,7 +62,6 @@ def plotDeepONet() -> None:
 
 
 if __name__ == "__main__":
-
     plotLatentSDE()
     plotDeepONet()
     plt.show()

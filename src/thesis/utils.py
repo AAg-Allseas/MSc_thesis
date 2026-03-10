@@ -11,6 +11,7 @@ import torch
 from torch import nn
 import tempfile
 
+
 def is_databricks() -> bool:
     return "DATABRICKS_RUNTIME_VERSION" in os.environ
 
@@ -39,6 +40,7 @@ def save_checkpoint_artifact(
         path = os.path.join(tmp, f"checkpoint_epoch_{epoch}.pth")
         torch.save(checkpoint, path)
         mlflow.log_artifact(path, artifact_path="checkpoints")
+
 
 def databricks_test_func() -> None:
     print("Test v2")

@@ -2,7 +2,7 @@
 """
 Simulator plotting functions:
 
-plotVehicleStates(simTime, simData, figNo) 
+plotVehicleStates(simTime, simData, figNo)
 plotControls(simTime, simData, vehicle, figNo)
 def plot3D(simData, numDataPoints, FPS, filename, figNo)
 
@@ -35,13 +35,12 @@ def cm2inch(value):  # inch to cm
 # plotVehicleStates(simTime, simData, figNo) plots the 6-DOF vehicle
 # position/attitude and velocities versus time in figure no. figNo
 def displayPlot(simTime: np.ndarray, simData: np.ndarray) -> None:
-
     # Time vector
     t = simTime
 
     # State vectors
 
-    #eta
+    # eta
     x = simData[:, 0]
     y = simData[:, 1]
     simData[:, 2]
@@ -49,7 +48,7 @@ def displayPlot(simTime: np.ndarray, simData: np.ndarray) -> None:
     R2D(ssa(simData[:, 4]))
     psi = R2D(ssa(simData[:, 5]))
 
-    #nu
+    # nu
     u = simData[:, 6]
     v = simData[:, 7]
     w = simData[:, 8]
@@ -68,16 +67,15 @@ def displayPlot(simTime: np.ndarray, simData: np.ndarray) -> None:
     f_ext_y = simData[:, 19]
     simData[:, 20]
 
-
     # Speed
     np.sqrt(np.multiply(u, u) + np.multiply(v, v) + np.multiply(w, w))
 
-    R2D(ssa(np.arctan2(v,u)))   # crab angle, beta_c    
-    R2D(ssa(np.arctan2(w,u)))   # flight path angle
+    R2D(ssa(np.arctan2(v, u)))  # crab angle, beta_c
+    R2D(ssa(np.arctan2(w, u)))  # flight path angle
     R2D(ssa(simData[:, 5] + np.arctan2(v, u)))  # course angle, chi=psi+beta_c
 
     # Plots
-    
+
     fig, axs = plt.subplots(3, 2, figsize=figSize1, dpi=dpiValue)
     fig.suptitle("Vehicle states")
     axs[0, 0].set_title("North-East positions (m)")
@@ -99,7 +97,6 @@ def displayPlot(simTime: np.ndarray, simData: np.ndarray) -> None:
             zorder=3,
         )
     axs[0, 0].grid()
-
 
     axs[0, 1].set_title("Velocity")
     axs[0, 1].set_xlabel("Time (s)")
@@ -140,11 +137,15 @@ def displayPlot(simTime: np.ndarray, simData: np.ndarray) -> None:
     fig.savefig("plots/vehicleState.png")
 
 
-def debugPlot(simTime: np.ndarray, simData: np.ndarray, debugData: np.ndarray, vehicle: SupplyVessel) -> None:
-
+def debugPlot(
+    simTime: np.ndarray,
+    simData: np.ndarray,
+    debugData: np.ndarray,
+    vehicle: SupplyVessel,
+) -> None:
     t = simTime
 
-    #eta
+    # eta
     x = simData[:, 0]
     y = simData[:, 1]
     simData[:, 2]
@@ -154,7 +155,7 @@ def debugPlot(simTime: np.ndarray, simData: np.ndarray, debugData: np.ndarray, v
 
     pos = (x, y, psi)
 
-    #nu
+    # nu
     simData[:, 6]
     simData[:, 7]
     simData[:, 8]
@@ -185,8 +186,8 @@ def debugPlot(simTime: np.ndarray, simData: np.ndarray, debugData: np.ndarray, v
     pid_labels = ["Proportional", "Integral", "Derivative"]
     fig, axs = plt.subplots(ncols=3, nrows=4, figsize=figSize1, dpi=dpiValue)
 
-    for i in range(3): # DOF
-        for j in range(3): # PID
+    for i in range(3):  # DOF
+        for j in range(3):  # PID
             axs[0, i].plot(t, gains[j][:, i], label=pid_labels[j])
         axs[0, i].set_title(f"PID gains in {dof_labels[i]}")
         axs[0, i].set_xlabel("Gain (-)")
@@ -205,8 +206,14 @@ def debugPlot(simTime: np.ndarray, simData: np.ndarray, debugData: np.ndarray, v
     axs[1, 1].grid()
     axs[1, 2].grid()
 
-
-    thruster_labels = ["Bow Thruster 1", "Bow Thruster 2", "Bow Thruster 3", "Bow Thruster 4", "Main Propeller 1", "Main Propeller 2"]
+    thruster_labels = [
+        "Bow Thruster 1",
+        "Bow Thruster 2",
+        "Bow Thruster 3",
+        "Bow Thruster 4",
+        "Main Propeller 1",
+        "Main Propeller 2",
+    ]
 
     for i in range(6):
         y = i % 2 + 2
@@ -225,7 +232,6 @@ def debugPlot(simTime: np.ndarray, simData: np.ndarray, debugData: np.ndarray, v
 # plotControls(simTime, simData) plots the vehicle control inputs versus time
 # in figure no. figNo
 def plotControls(simTime, simData, vehicle, figNo):
-
     DOF = 6
 
     # Time vector
@@ -241,7 +247,6 @@ def plotControls(simTime, simData, vehicle, figNo):
 
     # Plot the vehicle.dimU active control inputs
     for i in range(0, vehicle.dimU):
-
         u_control = simData[:, 2 * DOF + i]  # control input, commands
         u_actual = simData[:, 2 * DOF + vehicle.dimU + i]  # actual control input
 
@@ -261,69 +266,69 @@ def plotControls(simTime, simData, vehicle, figNo):
 
 # plot3D(simData,numDataPoints,FPS,filename,figNo) plots the vehicles position (x, y, z) in 3D
 # in figure no. figNo
-def plot3D(simData,numDataPoints,FPS,filename,figNo):
-        
+def plot3D(simData, numDataPoints, FPS, filename, figNo):
     # State vectors
-    x = simData[:,0]
-    y = simData[:,1]
-    z = simData[:,2]
-    
+    x = simData[:, 0]
+    y = simData[:, 1]
+    z = simData[:, 2]
+
     # down-sampling the xyz data points
-    N = y[::len(x) // numDataPoints]
-    E = x[::len(x) // numDataPoints]
-    D = z[::len(x) // numDataPoints]
-    
+    N = y[:: len(x) // numDataPoints]
+    E = x[:: len(x) // numDataPoints]
+    D = z[:: len(x) // numDataPoints]
+
     # Animation function
     def anim_function(num, dataSet, line):
-        
-        line.set_data(dataSet[0:2, :num])    
-        line.set_3d_properties(dataSet[2, :num])    
+        line.set_data(dataSet[0:2, :num])
+        line.set_3d_properties(dataSet[2, :num])
         ax.view_init(elev=10.0, azim=-120.0)
-        
+
         return line
-    
-    dataSet = np.array([N, E, -D])      # Down is negative z
-    
+
+    dataSet = np.array([N, E, -D])  # Down is negative z
+
     # Attaching 3D axis to the figure
-    fig = plt.figure(figNo,figsize=(cm2inch(figSize1[0]),cm2inch(figSize1[1])),
-               dpi=dpiValue)
+    fig = plt.figure(
+        figNo, figsize=(cm2inch(figSize1[0]), cm2inch(figSize1[1])), dpi=dpiValue
+    )
     ax = p3.Axes3D(fig, auto_add_to_figure=False)
-    fig.add_axes(ax) 
-    
+    fig.add_axes(ax)
+
     # Line/trajectory plot
-    line = plt.plot(dataSet[0], dataSet[1], dataSet[2], lw=2, c='b')[0] 
+    line = plt.plot(dataSet[0], dataSet[1], dataSet[2], lw=2, c="b")[0]
 
     # Setting the axes properties
-    ax.set_xlabel('X / East')
-    ax.set_ylabel('Y / North')
-    ax.set_zlim3d([-100, 20])                   # default depth = -100 m
-    
+    ax.set_xlabel("X / East")
+    ax.set_ylabel("Y / North")
+    ax.set_zlim3d([-100, 20])  # default depth = -100 m
+
     if np.amax(z) > 100.0:
         ax.set_zlim3d([-np.amax(z), 20])
-        
-    ax.set_zlabel('-Z / Down')
+
+    ax.set_zlabel("-Z / Down")
 
     # Plot 2D surface for z = 0
     [x_min, x_max] = ax.get_xlim()
     [y_min, y_max] = ax.get_ylim()
-    x_grid = np.arange(x_min-20, x_max+20)
-    y_grid = np.arange(y_min-20, y_max+20)
+    x_grid = np.arange(x_min - 20, x_max + 20)
+    y_grid = np.arange(y_min - 20, y_max + 20)
     [xx, yy] = np.meshgrid(x_grid, y_grid)
     zz = 0 * xx
     ax.plot_surface(xx, yy, zz, alpha=0.3)
-                    
+
     # Title of plot
-    ax.set_title('North-East-Down')
-    
+    ax.set_title("North-East-Down")
+
     # Create the animation object
-    ani = animation.FuncAnimation(fig, 
-                         anim_function, 
-                         frames=numDataPoints, 
-                         fargs=(dataSet,line),
-                         interval=200, 
-                         blit=False,
-                         repeat=True)
-    
+    ani = animation.FuncAnimation(
+        fig,
+        anim_function,
+        frames=numDataPoints,
+        fargs=(dataSet, line),
+        interval=200,
+        blit=False,
+        repeat=True,
+    )
+
     # Save the 3D animation as a gif file
     ani.save(filename, writer=animation.PillowWriter(fps=FPS))
-

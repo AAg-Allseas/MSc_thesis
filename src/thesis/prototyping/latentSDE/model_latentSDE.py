@@ -2,7 +2,6 @@ import logging
 from thesis.prototyping.latentSDE.utils import ContextEncoder, LipSwish
 
 
-
 import torch
 import torchsde
 from torch import Tensor, nn
@@ -12,6 +11,7 @@ from torch.distributions import Normal
 from typing import Optional, Tuple
 
 LOGGER = logging.getLogger(__name__)
+
 
 class LatentSDE(torchsde.SDEIto):
     """Latent SDE model with learned drift, diffusion, and decoder."""
@@ -27,7 +27,9 @@ class LatentSDE(torchsde.SDEIto):
         """Initialize networks and trainable parameters."""
         super(LatentSDE, self).__init__(noise_type="diagonal")
         # Encoder - used to encode observations to context for posterior
-        self.encoder = ContextEncoder(input_size=data_size, hidden_size=hidden_size, output_size=context_size)
+        self.encoder = ContextEncoder(
+            input_size=data_size, hidden_size=hidden_size, output_size=context_size
+        )
         # Inital condition network - Generates a likely initial condition from context
         self.qz0_net = nn.Linear(context_size, latent_size + latent_size)
 
@@ -39,7 +41,7 @@ class LatentSDE(torchsde.SDEIto):
             nn.Linear(hidden_size, hidden_size),
             LipSwish(),
             nn.Linear(hidden_size, latent_size),
-            nn.Tanh()
+            nn.Tanh(),
         )
         # Prior network, takes just latent state
         self.h_net = nn.Sequential(
@@ -48,7 +50,7 @@ class LatentSDE(torchsde.SDEIto):
             nn.Linear(hidden_size, hidden_size),
             LipSwish(),
             nn.Linear(hidden_size, latent_size),
-            nn.Tanh()
+            nn.Tanh(),
         )
 
         # Shared drift network, in this case diagonal
@@ -58,7 +60,7 @@ class LatentSDE(torchsde.SDEIto):
                     nn.Linear(1, hidden_size),
                     LipSwish(),
                     nn.Linear(hidden_size, 1),
-                    nn.Sigmoid()
+                    nn.Sigmoid(),
                 )
                 for _ in range(latent_size)
             ]
@@ -73,7 +75,7 @@ class LatentSDE(torchsde.SDEIto):
 
         # Noise standard deviation
         if init_sigma is None:
-            init_sigma = torch.full((data_size, ), -1.0, dtype=torch.float32)
+            init_sigma = torch.full((data_size,), -1.0, dtype=torch.float32)
         elif init_sigma.shape != (data_size, 1):
             raise AttributeError("Inital log-sigma shape does not match data")
 
@@ -86,11 +88,10 @@ class LatentSDE(torchsde.SDEIto):
         """Update cached context tensors."""
         self._ctx = ctx  # A tuple of tensors of sizes (T,), (T, batch_size, d).
 
-
     def f(self, t: float, y: Tensor) -> Tensor:
         """Posterior drift network. Passes context along with the state."""
         ts, ctx = self._ctx
-        i = min(torch.searchsorted(ts, t, right=True), len(ts) - 1)
+        i = torch.searchsorted(ts, t, right=True).clamp(max=len(ts) - 1)
         return self.f_net(torch.cat((y, ctx[i]), dim=1))
 
     def h(self, t: float, y: Tensor) -> Tensor:
@@ -142,26 +143,42 @@ class LatentSDE(torchsde.SDEIto):
 
         # Must use the argument `adjoint_params`, since `ctx` is not part of the input to `f`, `g`, and `h`.
         adjoint_params = (
-                (ctx,) +
-                tuple(self.f_net.parameters()) + tuple(self.g_nets.parameters()) + tuple(self.h_net.parameters())
+            (ctx,)
+            + tuple(self.f_net.parameters())
+            + tuple(self.g_nets.parameters())
+            + tuple(self.h_net.parameters())
         )
 
         # Integrate SDE and adjoint
         LOGGER.info("   - Integrating SDE")
         zs, log_ratio = torchsde.sdeint_adjoint(
-            self, z0, ts, adjoint_params=adjoint_params, dt=dt, logqp=True, method=method, bm=bm)
+            self,
+            z0,
+            ts,
+            adjoint_params=adjoint_params,
+            dt=dt,
+            logqp=True,
+            method=method,
+            bm=bm,
+        )
 
         # Clamp log_sigma to prevent extreme values
         log_sigma_clamped = self.log_sigma.clamp(-4, 2)
         sigma = log_sigma_clamped.exp()
         _xs = self.projector(zs)
         xs_dist = Normal(loc=_xs, scale=sigma)
-        log_pxs = xs_dist.log_prob(xs).sum(dim=(2)).mean() # Sum over features, mean over batch and time
+        log_pxs = (
+            xs_dist.log_prob(xs).sum(dim=(2)).mean()
+        )  # Sum over features, mean over batch and time
 
         # Initial position KL divergence loss
         qz0 = torch.distributions.Normal(loc=qz0_mean, scale=qz0_logstd.exp())
-        pz0 = torch.distributions.Normal(loc=self.pz0_mean, scale=self.pz0_logstd.clamp(-5, 2).exp())
-        logqp0 = torch.distributions.kl_divergence(qz0, pz0).sum(dim=1).mean(dim=0) # Mean over batch and time, sum over features
+        pz0 = torch.distributions.Normal(
+            loc=self.pz0_mean, scale=self.pz0_logstd.clamp(-5, 2).exp()
+        )
+        logqp0 = (
+            torch.distributions.kl_divergence(qz0, pz0).sum(dim=1).mean(dim=0)
+        )  # Mean over batch and time, sum over features
         logqp_path = log_ratio.mean()  # Mean over batch and time
         return log_pxs, logqp0 + logqp_path
 
@@ -170,14 +187,45 @@ class LatentSDE(torchsde.SDEIto):
         self,
         batch_size: int,
         ts: Tensor,
+        dt: float = 0.01,
         bm: Optional[torchsde._brownian.brownian_base.BaseBrownian] = None,
         method: str = "euler",
     ) -> Tensor:
         """Sample batch of Neural SDEs and integrate."""
-        eps = torch.randn(size=(batch_size, *self.pz0_mean.shape[1:]), device=self.pz0_mean.device)
+        eps = torch.randn(
+            size=(batch_size, *self.pz0_mean.shape[1:]), device=self.pz0_mean.device
+        )
         z0 = self.pz0_mean + self.pz0_logstd.exp() * eps
-        zs = torchsde.sdeint(self, z0, ts, names={'drift': 'h'}, dt=1e-3, bm=bm, method=method)
+        zs = torchsde.sdeint(
+            self, z0, ts, names={"drift": "h"}, dt=dt, bm=bm, method=method
+        )
         # Most of the times in ML, we don't sample the observation noise for visualization purposes.
         _xs = self.projector(zs)
         return _xs
-    
+
+    @torch.no_grad()
+    def sample_posterior(
+        self,
+        batch_size: int,
+        ts: Tensor,
+        xs: Tensor,
+        dt: float = 0.01,
+        bm: Optional[torchsde._brownian.brownian_base.BaseBrownian] = None,
+        method: str = "euler",
+    ) -> Tensor:
+        """Sample batch of Neural SDEs and integrate."""
+        # Contextualization is only needed for posterior inference.
+        # .contiguous() is required because torch.flip creates negative strides that cuDNN doesn't support.
+        ctx = self.encoder(torch.flip(xs, dims=(0,)).contiguous())
+        ctx = torch.flip(ctx, dims=(0,)).contiguous()
+        self.contextualize((ts, ctx))
+        # Posterior initial condition
+        qz0_mean, qz0_logstd = self.qz0_net(ctx[0]).chunk(chunks=2, dim=1)
+        qz0_logstd = qz0_logstd.clamp(-5, 2)  # Prevent explosion
+        z0 = qz0_mean + qz0_logstd.exp() * torch.randn_like(qz0_mean)
+        zs = torchsde.sdeint(
+            self, z0, ts, names={"drift": "f"}, dt=dt, bm=bm, method=method
+        )
+        # Most of the times in ML, we don't sample the observation noise for visualization purposes.
+        _xs = self.projector(zs)
+        return _xs
