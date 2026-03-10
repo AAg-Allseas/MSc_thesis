@@ -2,10 +2,9 @@ from typing import Optional
 import numpy as np
 
 
-def resample_from_base(x_base: np.ndarray,
-                       dt_base: float,
-                       dt_target: float,
-                       T: float) -> np.ndarray:
+def resample_from_base(
+    x_base: np.ndarray, dt_base: float, dt_target: float, T: float
+) -> np.ndarray:
     """
     Sample the base OU at multiples of dt_target up to T.
     Assumes dt_target is an integer multiple of dt_base (recommended).
@@ -16,13 +15,15 @@ def resample_from_base(x_base: np.ndarray,
     return x_base[idx, :]
 
 
-def ou_generate_uniform(N: int,
-                        dt: float,
-                        theta: float=0.01,
-                        mu: np.ndarray=np.zeros(3),
-                        sigma: np.ndarray=np.zeros(3),
-                        x0: Optional[np.ndarray]=None,
-                        rng: Optional[np.random.Generator]=None) -> np.ndarray:
+def ou_generate_uniform(
+    N: int,
+    dt: float,
+    theta: float = 0.01,
+    mu: np.ndarray = np.zeros(3),
+    sigma: np.ndarray = np.zeros(3),
+    x0: Optional[np.ndarray] = None,
+    rng: Optional[np.random.Generator] = None,
+) -> np.ndarray:
     """
     Exact OU discretization on a uniform grid.
     SDE: dX = theta*(mu - X) dt + sigma dW
@@ -36,10 +37,10 @@ def ou_generate_uniform(N: int,
     x = np.empty([N + 2, 3], dtype=float)
     x[0, :] = x0
 
-    phi = np.exp(-theta * dt)                 # AR coefficient
+    phi = np.exp(-theta * dt)  # AR coefficient
     q = sigma * np.sqrt((1.0 - phi**2) / (2.0 * theta))  # noise std
 
-    z = rng.normal(size=N+1)
+    z = rng.normal(size=N + 1)
     for n in range(N + 1):
-        x[n+1] = mu + (x[n] - mu) * phi + q * z[n]
+        x[n + 1] = mu + (x[n] - mu) * phi + q * z[n]
     return x

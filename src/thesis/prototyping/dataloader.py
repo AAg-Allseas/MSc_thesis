@@ -18,6 +18,7 @@ from torch import Tensor
 
 from thesis.prototyping.data_handling import find_parquet_files
 
+
 class ParquetDataset(Dataset):
     """Dataset for reading time series from parquet files."""
 
@@ -49,7 +50,7 @@ class ParquetDataset(Dataset):
         """
         if len(files) == 0:
             raise AttributeError("File list must include at least one entry")
-        
+
         self.files = files
         if not columns:
             pass
@@ -68,7 +69,10 @@ class ParquetDataset(Dataset):
                 self.standardise = self.compute_statistics()
         else:
             n_feats = len(self.columns) - 1 if self.columns else 0
-            self.standardise = {"mean": np.zeros(n_feats, dtype=np.float32), "std": np.ones(n_feats, dtype=np.float32)}
+            self.standardise = {
+                "mean": np.zeros(n_feats, dtype=np.float32),
+                "std": np.ones(n_feats, dtype=np.float32),
+            }
 
         series_length = len(pd.read_parquet(self.files[0]))
         self.sample_length = sample_length if sample_length else series_length
@@ -77,12 +81,11 @@ class ParquetDataset(Dataset):
             raise ValueError("Provide only one of resample_every or resample_dt")
         self.resample_every = resample_every
         self.resample_dt = resample_dt
-        
+
         self.n_per_series = int(np.floor(series_length / self.sample_length))
 
         self.metas: list[Dict[str, Any]] = []
         for file in self.files:
-
             schema = pq.read_schema(file)
             meta = schema.metadata or {}
 
@@ -92,8 +95,6 @@ class ParquetDataset(Dataset):
             params = json.loads(meta[meta_key_bytes].decode("utf-8"))
             self.metas.append(params)
 
-
-
     def __len__(self) -> int:
         """Return the number of samples across all files.
 
@@ -101,7 +102,7 @@ class ParquetDataset(Dataset):
             Total number of samples in the dataset.
         """
         return self.n_per_series * len(self.files)
-    
+
     def __getitem__(self, idx: int) -> Tuple[Tensor, Tensor, Dict[str, Any]]:
         """Load a sample window, resample if needed, and return time and states.
 
@@ -114,11 +115,19 @@ class ParquetDataset(Dataset):
         file_idx = idx // self.n_per_series
         states_time = pd.read_parquet(self.files[file_idx], columns=self.columns)
         states_time = np.ascontiguousarray(states_time.values, dtype=np.float32)
-        states_time = states_time[(idx % self.n_per_series) * self.sample_length: (idx % self.n_per_series + 1) * self.sample_length, ...]
+        states_time = states_time[
+            (idx % self.n_per_series) * self.sample_length : (
+                idx % self.n_per_series + 1
+            )
+            * self.sample_length,
+            ...,
+        ]
 
         if self.resample_every is not None or self.resample_dt is not None:
             if states_time.shape[0] < 2:
-                raise ValueError("Series must have at least two timesteps for resampling")
+                raise ValueError(
+                    "Series must have at least two timesteps for resampling"
+                )
 
             if self.resample_every is not None:
                 step = int(self.resample_every)
@@ -131,14 +140,16 @@ class ParquetDataset(Dataset):
             if step <= 0:
                 raise ValueError("Resample step must be >= 1")
             states_time = states_time[::step]
-        
+
         states = states_time[:, 1:]
 
         states = (states - self.standardise["mean"]) / self.standardise["std"]
 
         states = torch.from_numpy(states).to(dtype=torch.float32)
 
-        time = torch.from_numpy(np.round(states_time[:, 0] - states_time[0, 0], 2)).to(dtype=torch.float32)
+        time = torch.from_numpy(np.round(states_time[:, 0] - states_time[0, 0], 2)).to(
+            dtype=torch.float32
+        )
         meta = self.metas[file_idx].copy()
         meta["idx"] = idx  # Add file index
         return time, states, meta
@@ -178,12 +189,18 @@ class ParquetDataset(Dataset):
         Returns:
             Tensor in original (unscaled) space.
         """
-        mean = torch.as_tensor(self.standardise["mean"], dtype=states.dtype, device=states.device)
-        std = torch.as_tensor(self.standardise["std"], dtype=states.dtype, device=states.device)
+        mean = torch.as_tensor(
+            self.standardise["mean"], dtype=states.dtype, device=states.device
+        )
+        std = torch.as_tensor(
+            self.standardise["std"], dtype=states.dtype, device=states.device
+        )
         return states * std + mean
 
 
-def prep_batch(batch: Tuple[Tensor, Tensor, Dict[str, Any]], device: str = "cpu") -> Tuple[Tensor, Tensor]:
+def prep_batch(
+    batch: Tuple[Tensor, Tensor, Dict[str, Any]], device: str = "cpu"
+) -> Tuple[Tensor, Tensor]:
     """Move batch to device and validate aligned timesteps.
 
     Args:
@@ -196,21 +213,26 @@ def prep_batch(batch: Tuple[Tensor, Tensor, Dict[str, Any]], device: str = "cpu"
     ts, xs, _ = batch
     t = ts[0, :]
     if not torch.allclose(ts, t, atol=0.005):
-        raise ValueError("Timesteps between runs are different. Please ensure they are equal")
+        raise ValueError(
+            "Timesteps between runs are different. Please ensure they are equal"
+        )
 
     xs = torch.permute(xs, (1, 0, 2)).contiguous().to(device, non_blocking=True)
     t = t.to(device, non_blocking=True)
     return t, xs
-    
 
 
 if __name__ == "__main__":
-    files = find_parquet_files(Path(r"C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\data"),
-                                lambda m: m["seed"] < 10)
+    files = find_parquet_files(
+        Path(r"C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\data"),
+        lambda m: m["seed"] < 10,
+    )
 
     dataset = ParquetDataset(files, sample_length=5000)
-    dataloader = DataLoader(dataset, batch_size=5, shuffle=True, pin_memory=True, num_workers=2)
-    
+    dataloader = DataLoader(
+        dataset, batch_size=5, shuffle=True, pin_memory=True, num_workers=2
+    )
+
     for batch in dataloader:
         ts, xs = prep_batch(batch)
         print(xs.shape)

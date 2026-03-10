@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-supply.py: 
-    Class for an offshore supply vessel length L = 76.2. 
+supply.py:
+    Class for an offshore supply vessel length L = 76.2.
     The constructors are:
 
-    supply()                                      
+    supply()
         Step inputs for the propeller speeds n1, n2, n3, n4, n5 and n6
     supply('DPcontrol',x_d,y_d,psi_d,V_c,beta_c)  DP control system
         x_d: desired x position (m)
@@ -13,14 +13,14 @@ supply.py:
         psi_d: desired yaw angle (deg)
         V_c: current speed (m/s)
         beta_c: current direction (deg)
-        
+
 Methods:
-    
+
     [nu,u_actual] = dynamics(eta,nu,u_actual,u_control,sampleTime)
-        returns nu[k+1] and u_actual[k+1] using Euler's method. 
+        returns nu[k+1] and u_actual[k+1] using Euler's method.
         The control inputs are:
 
-        u_control = n 
+        u_control = n
         n = [  #1 Bow tunnel thruster (RPM),
                #2 Bow tunnel thruster (RPM),
                #3 Stern tunnel thruster (RPM),
@@ -29,34 +29,36 @@ Methods:
                #6 Left main propeller (RPM)]
 
     u_alloc = controlAllocation(tau)
-        Control allocation based on the pseudoinverse                 
+        Control allocation based on the pseudoinverse
 
     n = DPcontrol(eta,nu,sampleTime)
-        Nonlinear PID controller for DP based on pole placement.    
+        Nonlinear PID controller for DP based on pole placement.
 
     n = stepInput(t) generates propellers step inputs.
-    
-References: 
-    
+
+References:
+
     T. I. Fossen, S. I. Sagatun and A. J. Sorensen (1996)
          Identification of Dynamically Positioned Ships
          Journal of Control Engineering Practice CEP-4(3):369-376
-    T. I. Fossen (2021). Handbook of Marine Craft Hydrodynamics and Motion 
-         Control. 2nd. Edition, Wiley. URL: www.fossen.biz/wiley            
+    T. I. Fossen (2021). Handbook of Marine Craft Hydrodynamics and Motion
+         Control. 2nd. Edition, Wiley. URL: www.fossen.biz/wiley
 
 Author:     Thor I. Fossen
 """
+
 import numpy as np
 import math
-from thesis.prototyping.model.control import DPpolePlacement
-from thesis.prototyping.model.gnc import sat
+from thesis.toy_model.control import DPpolePlacement
+from thesis.toy_model.gnc import sat
+
 
 # Class Vehicle
 class SupplyVessel:
     """
     supply()                                      Propeller step inputs
     supply('DPcontrol',x_d,y_d,psi_d,V_c,beta_c)  DP control system
-    
+
     Inputs:
         x_d: desired x position (m)
         y_d: desired y position (m)
@@ -68,16 +70,15 @@ class SupplyVessel:
     def __init__(
         self,
         controlSystem="stepInput",
-        r_x = 0,
-        r_y = 0,
-        r_n = 0,
-        V_current = 0,
-        beta_current = 0,
+        r_x=0,
+        r_y=0,
+        r_n=0,
+        V_current=0,
+        beta_current=0,
     ):
-        
         # Constants
-        D2R = math.pi / 180     # deg2rad
-        g = 9.81                # acceleration of gravity (m/s^2)
+        D2R = math.pi / 180  # deg2rad
+        g = 9.81  # acceleration of gravity (m/s^2)
 
         if controlSystem == "DPcontrol":
             self.controlDescription = (
@@ -100,14 +101,15 @@ class SupplyVessel:
         self.controlMode = controlSystem
 
         # Initialize the supply vessel model
-        m = 6000.0e3        # mass (kg)
-        self.L = 76.2       # length (m)
-        self.T_n = 1.0      # prop. speed time constant (s)
-        self.n_max = np.array([250, 250, 250, 250, 
-                               160, 160], float) # RPM saturation limits
-        self.eta = np.array([0, 0, 0, 0, 0, 0], float) # initial position vector
-        self.nu = np.array([0, 0, 0, 0, 0, 0], float) # initial velocity vector
-        self.u_actual = np.array([0, 0, 0, 0, 0, 0], float) # RPM inputs
+        m = 6000.0e3  # mass (kg)
+        self.L = 76.2  # length (m)
+        self.T_n = 1.0  # prop. speed time constant (s)
+        self.n_max = np.array(
+            [250, 250, 250, 250, 160, 160], float
+        )  # RPM saturation limits
+        self.eta = np.array([0, 0, 0, 0, 0, 0], float)  # initial position vector
+        self.nu = np.array([0, 0, 0, 0, 0, 0], float)  # initial velocity vector
+        self.u_actual = np.array([0, 0, 0, 0, 0, 0], float)  # RPM inputs
         self.name = "Offshore supply vessel (see 'supply.py' for more details)"
 
         # Two tunnel thrusters in the bow, no. 1 and 2
@@ -119,7 +121,7 @@ class SupplyVessel:
             "#3 Stern tunnel thruster (RPM)",
             "#4 Stern tunnel thruster (RPM)",
             "#5 Right main propeller (RPM)",
-            "#6 Left main propeller (RPM)"
+            "#6 Left main propeller (RPM)",
         ]
         self.dimU = len(self.controls)
 
@@ -129,10 +131,9 @@ class SupplyVessel:
         # Main propeller: 31.2 * 160^2 = 799 kN
         self.K = np.diag([3.2, 3.2, 3.2, 3.2, 31.2, 31.2])
         self.T = np.array(
-            [ [0, 0, 0, 0, 1, 1], [1, 1, 1, 1, 0, 0], 
-              [30, 22, -22, -30, -8, 8] ], float
+            [[0, 0, 0, 0, 1, 1], [1, 1, 1, 1, 0, 0], [30, 22, -22, -30, -8, 8]], float
         )
-        self.B =  self.T @ self.K
+        self.B = self.T @ self.K
 
         # Tbis = np.diag( [1, 1, 1 / self.L],float)
         Tbis_inv = np.diag([1.0, 1.0, self.L])
@@ -155,12 +156,17 @@ class SupplyVessel:
         self.x_d = 0.0  # Estimates
         self.y_d = 0.0
         self.psi_d = 0.0
-        self.gains = (np.zeros(3), np.zeros(3), np.zeros(3)) # Force per gain for debugging
-        self.wn = np.diag([0.1, 0.1, 0.2])    # PID pole placement
+        self.gains = (
+            np.zeros(3),
+            np.zeros(3),
+            np.zeros(3),
+        )  # Force per gain for debugging
+        self.wn = np.diag([0.1, 0.1, 0.2])  # PID pole placement
         self.zeta = np.diag([1.0, 1.0, 1.0])
 
-
-    def dynamics(self, eta, nu, u_actual, u_control, sampleTime, f_external=np.zeros(3)):
+    def dynamics(
+        self, eta, nu, u_actual, u_control, sampleTime, f_external=np.zeros(3)
+    ):
         """
         [nu,u_actual] = dynamics(eta,nu,u_actual,u_control,sampleTime) integrates the
         supply vessel equations of motion using Euler's method.
@@ -170,16 +176,16 @@ class SupplyVessel:
         n = u_actual  # propeller speed (RPM)
 
         # Current velocities
-        u_c = self.V_c * math.cos(self.beta_c - eta[5]) # current surge velocity
-        v_c = self.V_c * math.sin(self.beta_c - eta[5]) # current sway velocity
+        u_c = self.V_c * math.cos(self.beta_c - eta[5])  # current surge velocity
+        v_c = self.V_c * math.sin(self.beta_c - eta[5])  # current sway velocity
 
-        nu_c = np.array([u_c, v_c, 0, 0, 0, 0], float) # current velocity vector
+        nu_c = np.array([u_c, v_c, 0, 0, 0, 0], float)  # current velocity vector
         nu_r = nu - nu_c  # relative velocity vector
 
         # Control forces and moments with propeller saturation
         n_squared = np.zeros(self.dimU)
         for i in range(0, self.dimU):
-            n[i] = sat(n[i], -self.n_max[i], self.n_max[i])      # saturation
+            n[i] = sat(n[i], -self.n_max[i], self.n_max[i])  # saturation
             n_squared[i] = abs(n[i]) * n[i]
 
         tau3 = np.matmul(self.B, n_squared)
@@ -210,7 +216,6 @@ class SupplyVessel:
 
         return u_alloc
 
-
     def DPcontrol(self, eta, nu, sampleTime):
         """
         u = DPcontrol(eta,nu,sampleTime) is a nonlinear PID controller
@@ -222,19 +227,21 @@ class SupplyVessel:
         eta3 = np.array([eta[0], eta[1], eta[5]])
         nu3 = np.array([nu[0], nu[1], nu[5]])
 
-        [tau3, self.e_int, self.x_d, self.y_d, self.psi_d, self.gains] = DPpolePlacement(
-            self.e_int,
-            self.M3,
-            self.D3,
-            eta3,
-            nu3,
-            self.x_d,
-            self.y_d,
-            self.psi_d,
-            self.wn,
-            self.zeta,
-            self.ref,
-            sampleTime,
+        [tau3, self.e_int, self.x_d, self.y_d, self.psi_d, self.gains] = (
+            DPpolePlacement(
+                self.e_int,
+                self.M3,
+                self.D3,
+                eta3,
+                nu3,
+                self.x_d,
+                self.y_d,
+                self.psi_d,
+                self.wn,
+                self.zeta,
+                self.ref,
+                sampleTime,
+            )
         )
 
         u_alloc = self.controlAllocation(tau3)
@@ -249,7 +256,7 @@ class SupplyVessel:
         return u_control
 
     def thrusterFailure(self, thruster_number: int) -> None:
-        """ 
+        """
         Method to simulate a thruster failure. Sets the current rpm to zero and disables the allocation to it.
 
         args:
@@ -258,7 +265,7 @@ class SupplyVessel:
 
         if thruster_number > self.dimU:
             raise IndexError("Thruster number out of range")
-        
+
         self.K[thruster_number - 1] = 0
         self.B = self.T @ self.K
         self.u_actual[thruster_number - 1] = 0
