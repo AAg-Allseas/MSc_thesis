@@ -55,4 +55,12 @@ resources:
           #   - whl: ./dist/*.whl
           existing_cluster_id:
             0212-141545-suh1awug
+    diffrax_latent_sde:
+      name: TrainDiffraxLatentSDE
+      tasks:
+        - task_key: TrainDiffraxLatentSDE
+          notebook_task:
+            notebook_path: src/notebooks/diffrax_latent_sde.ipynb
+          existing_cluster_id:
+            0212-141545-suh1awug
 

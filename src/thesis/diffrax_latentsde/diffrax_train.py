@@ -17,19 +17,18 @@ if __name__ == "__main__":
         print(f"Installing: {latest_local}")
         subprocess.run(["pip", "install", latest_local], check=True)
 
+from thesis.diffrax_latentsde.vector_fields import FieldConfig, FieldType
 from thesis.prototyping.dataloader import ParquetDataset
 from thesis.prototyping.data_handling import find_parquet_files
-from thesis.performance_tests.diffrax_model import LatentSDE
-import diffrax
+from thesis.diffrax_latentsde.diffrax_model import LatentSDE
 import equinox as eqx  # https://github.com/patrick-kidger/equinox
 import jax
-import jax.nn as jnn
 import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
-import numpy as np
 import optax  # https://github.com/deepmind/optax
 import mlflow
+import tempfile
 
 import torch
 from pathlib import Path
@@ -42,7 +41,7 @@ mlflow.enable_system_metrics_logging()
 @eqx.filter_jit
 def loss_fn(
     sde: LatentSDE, xs: jnp.ndarray, ts: jnp.ndarray, *, key, kl_weight: float = 1.0
-) -> jnp.ndarray:
+) -> tuple[jnp.ndarray, jnp.ndarray, jnp.ndarray, jnp.ndarray]:
     """ELBO loss: -log p(x|z) + kl_weight * KL.
 
     Args:
@@ -53,9 +52,12 @@ def loss_fn(
         kl_weight: Annealing weight for KL term (0 → 1 over training).
     Returns:
         Scalar loss (negative ELBO).
+        kl_initial: Initial KL divergence.
+        kl_path: KL divergence accumulated along the SDE path.
+        log_pxs: Log likelihood of data given latent path.
     """
-    log_pxs, kl = sde(xs, ts, key=key)
-    return -log_pxs + kl_weight * kl
+    log_pxs, kl_initial, kl_path = sde(xs, ts, key=key)
+    return -log_pxs + kl_weight * (kl_initial + kl_path), kl_initial, kl_path, log_pxs
 
 
 @eqx.filter_jit
@@ -66,14 +68,21 @@ def batch_loss_fn(
     *,
     key,
     kl_weight: float = 1.0,
-) -> jnp.ndarray:
+) -> tuple[jnp.ndarray, jnp.ndarray, jnp.ndarray, jnp.ndarray]:
     """Mean loss over a batch. xs_batch shape: (batch, T, data_size)."""
     batch_size = xs_batch.shape[0]
     keys = jr.split(key, batch_size)
-    losses = jax.vmap(lambda x, k: loss_fn(sde, x, ts, key=k, kl_weight=kl_weight))(
-        xs_batch, keys
+    # losses shape: (batch, 4) if loss_fn returns 4 values
+    losses, kl_initials, kl_paths, log_pxs = jax.vmap(
+        lambda x, k: loss_fn(sde, x, ts, key=k, kl_weight=kl_weight)
+    )(xs_batch, keys)
+    # Average each component separately for logging
+    return (
+        jnp.mean(losses),
+        (jnp.mean(kl_initials),
+        jnp.mean(kl_paths),
+        jnp.mean(log_pxs))
     )
-    return jnp.mean(losses)
 
 
 def increase_update_initial(updates, sde):
@@ -91,34 +100,75 @@ def increase_update_initial(updates, sde):
 def train_step(
     sde: LatentSDE, opt_state, optimizer, xs_batch, ts, *, key, kl_weight: float = 1.0
 ):
-    loss, grads = eqx.filter_value_and_grad(batch_loss_fn)(
+    # batch_loss_fn returns (elbo, kl_initial, kl_path, log_pxs)
+    (elbo, (kl_initial, kl_path, log_pxs)), grads = eqx.filter_value_and_grad(batch_loss_fn, has_aux=True)(
         sde, xs_batch, ts, key=key, kl_weight=kl_weight
     )
     grads = increase_update_initial(grads, sde)
     updates, opt_state = optimizer.update(grads, opt_state, sde)
     sde = eqx.apply_updates(sde, updates)
-    return sde, opt_state, loss
+    return sde, opt_state, elbo, kl_initial, kl_path, log_pxs
 
 
-if __name__ == "__main__":
+def main(data_path: Path, checkpoint_path: Path) -> None:
     # --- Hyperparameters ---
-    import os
-
+    # Model params
     DATA_SIZE = 12
-    LATENT_SIZE = 8  # compress 12→8: positions & velocities share structure
+    LATENT_SIZE = 24  
     CONTEXT_SIZE = 64
     HIDDEN_SIZE = 128
-    LR_INIT = 1e-3  # conservative start; SDE training is sensitive
-    LR_GAMMA = 0.999  # gentler decay (~0.6× after 500 epochs)
-    NUM_EPOCHS = 2000  # start shorter, extend once loss stabilises
-    KL_ANNEAL_ITERS = 500  # ramp KL over ~500 epochs to let decoder learn first
-    BATCH_SIZE = 32  # moderate batch for stable gradients without OOM
-    DT = 0.05
-    SAMPLE_LENGTH = 5000  # 250 s windows — manageable for memory & gradients
+    DEPTH = 4
+    CONTROL_SIZE = 3 # Dimension of noise control for g field (e.g., 3 for 3D Brownian motion)
+    f_type = FieldType.CONTEXT_STATE
+    h_type = FieldType.STATE
+    g_type = FieldType.STATE
+
+    # Training params
+    LR_INIT = 1e-3 
+    NUM_EPOCHS = 1000
+    KL_ANNEAL_ITERS = 200
+    BATCH_SIZE = 32
+    DT = 0.2
+    SAMPLE_LENGTH = 5000 
     LOG_EVERY = 10
     SAMPLE_EVERY = 250
-    CHECKPOINT_EVERY = 250  # save model every N epochs
+    CHECKPOINT_EVERY = 250
 
+
+    # --- Model ---
+    key = jax.random.key(7777)
+    model_key, train_key = jr.split(key)
+
+    f_key, h_key, g_key, model_key = jr.split(model_key, 4)
+
+    # Field parameters
+    f_config = FieldConfig(
+        field_type=f_type,
+        latent_size=LATENT_SIZE,
+        context_size=CONTEXT_SIZE,
+        hidden_layer_width=HIDDEN_SIZE,
+        depth=DEPTH,
+        key=f_key,
+    )
+    h_config = FieldConfig(
+        field_type = h_type,
+        latent_size=LATENT_SIZE,
+        hidden_layer_width=HIDDEN_SIZE,
+        depth=DEPTH,
+        key=h_key,
+    )
+    g_config = FieldConfig(
+        field_type = g_type,
+        latent_size=LATENT_SIZE,
+        hidden_layer_width=HIDDEN_SIZE,
+        control_size=CONTROL_SIZE,
+        depth=DEPTH,
+        key=g_key,
+    )
+
+    sde = LatentSDE(DATA_SIZE, LATENT_SIZE, CONTEXT_SIZE, HIDDEN_SIZE, f_config, h_config, g_config, key=model_key)
+
+    # --- Data ---
     FEATS = [
         "pos_eta_x",
         "pos_eta_y",
@@ -134,25 +184,13 @@ if __name__ == "__main__":
         "rpm_fixed_sb",
     ]
 
-    mlflow.set_tracking_uri("databricks")
-    # Experiments go in Workspace, not Volumes
-    mlflow.set_experiment(experiment_id="2984249850048933")
-    if "DATABRICKS_RUNTIME_VERSION" in os.environ:
-        DATA_PATH = Path("/Volumes/main_udev/ai_labs/aag/data/pilot_3dof/")
-        CHECKPOINT_DIR = Path(
-            "/Volumes/main_udev/ai_labs/aag/artifacts/checkpoints/latentsde_diffrax"
-        )
-    else:
-        DATA_PATH = Path(
-            r"C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\data"
-        )
-        CHECKPOINT_DIR = Path("runs/latentSDE/checkpoints")
 
-    CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
 
-    # --- Data loading ---
+    checkpoint_path.mkdir(parents=True, exist_ok=True)
+
+
     files = find_parquet_files(
-        DATA_PATH,
+        data_path,
         lambda m: m["end_time"] == 10800 and m["timestep"] == 0.05,
     )
     dataset = ParquetDataset(
@@ -163,29 +201,27 @@ if __name__ == "__main__":
         f"Loaded {len(files)} files, {len(dataset)} samples, {len(dataloader)} batches/epoch"
     )
 
-    # --- Model + optimizer ---
-    key = jax.random.key(7777)
-    model_key, train_key = jr.split(key)
 
-    sde = LatentSDE(DATA_SIZE, LATENT_SIZE, CONTEXT_SIZE, HIDDEN_SIZE, key=model_key)
-
-    schedule = optax.exponential_decay(LR_INIT, transition_steps=1, decay_rate=LR_GAMMA)
+    # --- Optimiser ---
+    schedule = optax.schedules.cosine_onecycle_schedule(transition_steps = NUM_EPOCHS * len(dataloader), peak_value=LR_INIT, pct_start=0.1)
     optimizer = optax.adam(schedule)
     opt_state = optimizer.init(eqx.filter(sde, eqx.is_array))
 
-    # --- Training loop ---
-    import tempfile
 
-    with mlflow.start_run(run_name=f"latentsde_diffrax_bs{BATCH_SIZE}_lr{LR_INIT}"):
+    # --- Training loop ---
+    with mlflow.start_run(run_name=f"latentsde_diffrax_bs{BATCH_SIZE}_lr{LR_INIT}_"):
         mlflow.log_params(
             {
                 "model_type": "LatentSDE_diffrax",
                 "batch_size": BATCH_SIZE,
                 "latent_size": LATENT_SIZE,
-                "context_size": CONTEXT_SIZE,
                 "hidden_size": HIDDEN_SIZE,
+                "f_type": f_type.value,
+                "context_size": CONTEXT_SIZE,
+                "h_type": h_type.value,
+                "g_type": g_type.value,
+                "control_size": CONTROL_SIZE,
                 "lr_init": LR_INIT,
-                "lr_gamma": LR_GAMMA,
                 "num_epochs": NUM_EPOCHS,
                 "kl_anneal_iters": KL_ANNEAL_ITERS,
                 "dt": DT,
@@ -201,6 +237,7 @@ if __name__ == "__main__":
             epoch_key = jr.fold_in(train_key, epoch)
             kl_weight = min(1.0, epoch / KL_ANNEAL_ITERS)
             epoch_losses = []
+
 
             for i, (ts_batch, xs_batch, meta) in enumerate(dataloader):
                 # Validate aligned timesteps across the batch
@@ -220,7 +257,7 @@ if __name__ == "__main__":
                 xs = jnp.asarray(xs_batch.numpy())
 
                 step_key = jr.fold_in(epoch_key, i)
-                sde, opt_state, loss = train_step(
+                sde, opt_state, elbo, kl_initial, kl_path, log_pxs = train_step(
                     sde,
                     opt_state,
                     optimizer,
@@ -230,14 +267,20 @@ if __name__ == "__main__":
                     kl_weight=kl_weight,
                 )
 
-                loss_val = float(loss)
-                epoch_losses.append(loss_val)
+                elbo_val = float(elbo)
+                kl_initial_val = float(kl_initial)
+                kl_path_val = float(kl_path)
+                log_pxs_val = float(log_pxs)
+                epoch_losses.append(elbo_val)
 
                 if global_step % LOG_EVERY == 0:
                     lr_now = float(schedule(global_step))
                     mlflow.log_metrics(
                         {
-                            "batch_loss": loss_val,
+                            "batch_loss": elbo_val,
+                            "kl_initial": kl_initial_val,
+                            "kl_path": kl_path_val,
+                            "log_pxs": log_pxs_val,
                             "learning_rate": lr_now,
                             "kl_weight": kl_weight,
                         },
@@ -290,10 +333,21 @@ if __name__ == "__main__":
                 plt.close(fig)
 
         # Save final model + log as artifact
-        final_path = CHECKPOINT_DIR / "final.eqx"
+        final_path = checkpoint_path / "final.eqx"
         eqx.tree_serialise_leaves(final_path, sde)
         mlflow.log_artifact(str(final_path), artifact_path="checkpoints")
         mlflow.log_artifact(
-            str(CHECKPOINT_DIR / "best.eqx"), artifact_path="checkpoints"
+            str(checkpoint_path / "best.eqx"), artifact_path="checkpoints"
         )
         print(f"Training complete. Best loss: {best_loss:.4f}")
+
+
+if __name__ == "__main__":
+ 
+    mlflow.set_experiment("diffrax_latentsde_local")
+    data_path = Path(
+        r"C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\data"
+    )
+    checkpoint_path = Path("runs/latentSDE/checkpoints")
+
+    main(data_path, checkpoint_path)
