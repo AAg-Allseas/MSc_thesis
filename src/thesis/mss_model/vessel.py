@@ -1,4 +1,3 @@
-
 """
 Offshore Supply Vessel (OSV) model — 6-DOF equations of motion.
 
@@ -43,8 +42,12 @@ class OSVParams:
     Cb: float = 0.65
     S: float = 0.0
 
-    K_max: NDArray = field(default_factory=lambda: np.array([300e3, 300e3, 420e3, 655e3]))
-    n_max: NDArray = field(default_factory=lambda: np.array([140.0, 140.0, 150.0, 200.0]))
+    K_max: NDArray = field(
+        default_factory=lambda: np.array([300e3, 300e3, 420e3, 655e3])
+    )
+    n_max: NDArray = field(
+        default_factory=lambda: np.array([140.0, 140.0, 150.0, 200.0])
+    )
     K_thr: NDArray = field(default_factory=lambda: np.eye(4))
     l_x: list[float] = field(default_factory=lambda: [37.0, 35.0, -41.5, -41.5])
     l_y: list[float] = field(default_factory=lambda: [0.0, 0.0, 7.0, -7.0])
@@ -125,21 +128,25 @@ class OSV:
         v.R66 = 0.25 * v.L
         v.MRB, _ = rbody(v.m, v.R44, v.R55, v.R66, np.zeros(3), r_bg)
 
-        v.MA = 1e9 * np.array([
-            [0.0006, 0, 0, 0, 0, 0],
-            [0, 0.0020, 0, 0.0031, 0, -0.0091],
-            [0, 0, 0.0083, 0, 0.0907, 0],
-            [0, 0.0031, 0, 0.0748, 0, -0.1127],
-            [0, 0, 0.0907, 0, 3.9875, 0],
-            [0, -0.0091, 0, -0.1127, 0, 1.2416],
-        ])
+        v.MA = 1e9 * np.array(
+            [
+                [0.0006, 0, 0, 0, 0, 0],
+                [0, 0.0020, 0, 0.0031, 0, -0.0091],
+                [0, 0, 0.0083, 0, 0.0907, 0],
+                [0, 0.0031, 0, 0.0748, 0, -0.1127],
+                [0, 0, 0.0907, 0, 3.9875, 0],
+                [0, -0.0091, 0, -0.1127, 0, 1.2416],
+            ]
+        )
 
         v.M = v.MRB + v.MA
         v.Minv = np.linalg.inv(v.M)
         v.D = dmtrx(
             np.array([v.T1, v.T2, v.T6]),
             np.array([v.zeta4, v.zeta5]),
-            v.MRB, v.MA, v.G,
+            v.MRB,
+            v.MA,
+            v.G,
         )
         return v
 
@@ -194,7 +201,8 @@ class OSV:
 
         # Surge damping (replaces D[0,0])
         X, _, _ = force_surge_damping(
-            nu_r[0], v.m, v.S, v.L, v.T1, v.rho, v.U_max, v.thrust_max)
+            nu_r[0], v.m, v.S, v.L, v.T1, v.rho, v.U_max, v.thrust_max
+        )
         tau_drag = np.zeros(6)
         tau_drag[0] = X
         D = v.D.copy()
@@ -204,8 +212,7 @@ class OSV:
         tau_crossflow = cross_flow_drag(v.L, v.B, v.T, nu_r)
 
         # Wave drift forces
-        tau_wave = mean_wave_drift_force(
-            Hs, Tp, beta_wave, eta[5], self.drift_coeffs)
+        tau_wave = mean_wave_drift_force(Hs, Tp, beta_wave, eta[5], self.drift_coeffs)
 
         # Thrust
         u_thr = np.abs(ui[:4]) * ui[:4]
@@ -218,7 +225,11 @@ class OSV:
         J = eulerang(eta[3], eta[4], eta[5])
         eta_dot = J @ nu
         nu_dot = nu_c_dot + v.Minv @ (
-            tau_thr + tau_drag + tau_crossflow + tau_wave
-            - (CRB + CA + D) @ nu_r - v.G @ eta
+            tau_thr
+            + tau_drag
+            + tau_crossflow
+            + tau_wave
+            - (CRB + CA + D) @ nu_r
+            - v.G @ eta
         )
         return np.concatenate([nu_dot, eta_dot])

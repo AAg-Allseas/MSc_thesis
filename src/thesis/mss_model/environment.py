@@ -26,6 +26,7 @@ from thesis.mss_model.gnc import smtrx
 # Ocean current
 # ---------------------------------------------------------------------------
 
+
 def ocean_current(
     Vc: float,
     betaVc: float,
@@ -52,11 +53,13 @@ def ocean_current(
     nu_c_dot : NDArray
         Time derivative of ``nu_c`` (due to vessel rotation in current).
     """
-    v_c = np.array([
-        Vc * np.cos(betaVc - psi),
-        Vc * np.sin(betaVc - psi),
-        0.0,
-    ])
+    v_c = np.array(
+        [
+            Vc * np.cos(betaVc - psi),
+            Vc * np.sin(betaVc - psi),
+            0.0,
+        ]
+    )
     nu_c = np.concatenate([v_c, np.zeros(3)])
     nu_c_dot = np.concatenate([-smtrx(nu_ang) @ v_c, np.zeros(3)])
     return nu_c, nu_c_dot
@@ -65,6 +68,7 @@ def ocean_current(
 # ---------------------------------------------------------------------------
 # Wave spectra (translated from MSS waveSpectrum.m)
 # ---------------------------------------------------------------------------
+
 
 def jonswap_spectrum(
     omega: NDArray,
@@ -112,6 +116,7 @@ def pierson_moskowitz_spectrum(omega: NDArray, Hs: float, Tp: float) -> NDArray:
 # ---------------------------------------------------------------------------
 # Wave drift forces
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class WaveDriftCoefficients:

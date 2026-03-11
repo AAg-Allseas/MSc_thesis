@@ -12,15 +12,9 @@ from thesis.prototyping.data_handling import find_parquet_files
 from thesis.prototyping.dataloader import ParquetDataset
 from thesis.prototyping.deepOnet.model_deepOnet import MIONet
 from thesis.prototyping.deepOnet.models import (
-    model_1dof,
     model_1dof_2,
-    model_2,
-    model_cnn_1,
-    model_cnn_2,
 )
 from thesis.prototyping.deepOnet.utils import (
-    BranchConstructor,
-    MLPConstructor,
     prepare_batch,
 )
 from src.visualisation.general_plotting.config import LINEWIDTH

@@ -11,10 +11,8 @@ Example:
 
 import logging
 from pathlib import Path
-from typing import Optional
 import mlflow
 import mlflow.pytorch
-import numpy as np
 import torch
 from torch import nn
 from torch.utils.data import DataLoader

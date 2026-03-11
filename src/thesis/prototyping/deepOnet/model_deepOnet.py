@@ -19,7 +19,6 @@ from thesis.prototyping.deepOnet.utils import (
     CNN1D,
     CNN1DBranchConstructor,
     MLP,
-    BranchConstructor,
     MLPConstructor,
 )
 

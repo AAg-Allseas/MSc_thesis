@@ -7,13 +7,11 @@ Author:     Thor I. Fossen
 """
 
 from concurrent import futures
-from pathlib import Path
 import time
 import numpy as np
 from thesis.prototyping.data_handling import (
     ParquetMetadata,
     make_df,
-    save_df_to_parquet,
     update_df,
 )
 from thesis.toy_model.ornstein_uhlenbeck import (

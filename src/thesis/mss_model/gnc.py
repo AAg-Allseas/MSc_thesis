@@ -17,11 +17,13 @@ from numpy.typing import NDArray
 
 def smtrx(a: NDArray) -> NDArray:
     """3x3 skew-symmetric matrix S(a) such that a x b = S(a) @ b."""
-    return np.array([
-        [0, -a[2], a[1]],
-        [a[2], 0, -a[0]],
-        [-a[1], a[0], 0],
-    ])
+    return np.array(
+        [
+            [0, -a[2], a[1]],
+            [a[2], 0, -a[0]],
+            [-a[1], a[0], 0],
+        ]
+    )
 
 
 def hmtrx(r: NDArray) -> NDArray:
@@ -36,22 +38,34 @@ def Rzyx(phi: float, theta: float, psi: float) -> NDArray:
     cphi, sphi = np.cos(phi), np.sin(phi)
     cth, sth = np.cos(theta), np.sin(theta)
     cpsi, spsi = np.cos(psi), np.sin(psi)
-    return np.array([
-        [cpsi * cth, -spsi * cphi + cpsi * sth * sphi, spsi * sphi + cpsi * cphi * sth],
-        [spsi * cth, cpsi * cphi + sphi * sth * spsi, -cpsi * sphi + sth * spsi * cphi],
-        [-sth, cth * sphi, cth * cphi],
-    ])
+    return np.array(
+        [
+            [
+                cpsi * cth,
+                -spsi * cphi + cpsi * sth * sphi,
+                spsi * sphi + cpsi * cphi * sth,
+            ],
+            [
+                spsi * cth,
+                cpsi * cphi + sphi * sth * spsi,
+                -cpsi * sphi + sth * spsi * cphi,
+            ],
+            [-sth, cth * sphi, cth * cphi],
+        ]
+    )
 
 
 def Tzyx(phi: float, theta: float) -> NDArray:
     """Euler angle attitude transformation matrix T, zyx convention."""
     cphi, sphi = np.cos(phi), np.sin(phi)
     cth, sth = np.cos(theta), np.sin(theta)
-    return np.array([
-        [1, sphi * sth / cth, cphi * sth / cth],
-        [0, cphi, -sphi],
-        [0, sphi / cth, cphi / cth],
-    ])
+    return np.array(
+        [
+            [1, sphi * sth / cth, cphi * sth / cth],
+            [0, cphi, -sphi],
+            [0, sphi / cth, cphi / cth],
+        ]
+    )
 
 
 def eulerang(phi: float, theta: float, psi: float) -> NDArray:

@@ -24,8 +24,9 @@ def gmtrx(
     """6x6 hydrostatic restoring matrix G about point P."""
     rho, g = 1025.0, 9.81
     r_bf = np.array([LCF, 0.0, 0.0])
-    G_CF = np.diag([0, 0, rho * g * A_wp, rho * g * nabla * GMT,
-                    rho * g * nabla * GML, 0])
+    G_CF = np.diag(
+        [0, 0, rho * g * A_wp, rho * g * nabla * GMT, rho * g * nabla * GML, 0]
+    )
     Hf = hmtrx(r_bf)
     G_CO = Hf.T @ G_CF @ Hf
     Hp = hmtrx(r_bp)
@@ -45,10 +46,12 @@ def rbody(
     O3 = np.zeros((3, 3))
     Ig = m * np.diag([R44**2, R55**2, R66**2])
     MRB_CG = np.block([[m * I3, O3], [O3, Ig]])
-    CRB_CG = np.block([
-        [m * smtrx(nu2), O3],
-        [O3, -smtrx(Ig @ nu2)],
-    ])
+    CRB_CG = np.block(
+        [
+            [m * smtrx(nu2), O3],
+            [O3, -smtrx(Ig @ nu2)],
+        ]
+    )
     H = hmtrx(r_bp)
     return H.T @ MRB_CG @ H, H.T @ CRB_CG @ H
 
@@ -68,11 +71,13 @@ def m2c(M: NDArray, nu: NDArray) -> NDArray:
         C[3:, 3:] = -smtrx(nu2_dot)
         return C
     # 3-DOF horizontal plane
-    return np.array([
-        [0, 0, -M[1, 1] * nu[1] - M[1, 2] * nu[2]],
-        [0, 0, M[0, 0] * nu[0]],
-        [M[1, 1] * nu[1] + M[1, 2] * nu[2], -M[0, 0] * nu[0], 0],
-    ])
+    return np.array(
+        [
+            [0, 0, -M[1, 1] * nu[1] - M[1, 2] * nu[2]],
+            [0, 0, M[0, 0] * nu[0]],
+            [M[1, 1] * nu[1] + M[1, 2] * nu[2], -M[0, 0] * nu[0], 0],
+        ]
+    )
 
 
 def dmtrx(
@@ -90,11 +95,13 @@ def dmtrx(
     w3 = np.sqrt(G[2, 2] / M[2, 2])
     w4 = np.sqrt(G[3, 3] / M[3, 3])
     w5 = np.sqrt(G[4, 4] / M[4, 4])
-    return np.diag([
-        M[0, 0] / T1,
-        M[1, 1] / T2,
-        M[2, 2] * 2 * zeta3 * w3,
-        M[3, 3] * 2 * zeta4 * w4,
-        M[4, 4] * 2 * zeta5 * w5,
-        M[5, 5] / T6,
-    ])
+    return np.diag(
+        [
+            M[0, 0] / T1,
+            M[1, 1] / T2,
+            M[2, 2] * 2 * zeta3 * w3,
+            M[3, 3] * 2 * zeta4 * w4,
+            M[4, 4] * 2 * zeta5 * w5,
+            M[5, 5] / T6,
+        ]
+    )

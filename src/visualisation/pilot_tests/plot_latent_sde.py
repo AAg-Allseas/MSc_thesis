@@ -2,7 +2,6 @@ from cProfile import Profile
 from pathlib import Path
 import pstats
 
-from matplotlib import pyplot as plt
 import numpy as np
 import torch
 from torch.utils.data import DataLoader
@@ -10,7 +9,6 @@ from typing import Optional
 
 from thesis.prototyping.data_handling import find_parquet_files
 from thesis.prototyping.dataloader import ParquetDataset, prep_batch
-from thesis.prototyping.latentSDE.model_latentSDE import LatentSDE
 from thesis.prototyping.latentSDE.test_latentSDE import load_and_sample
 from src.visualisation.general_plotting.config import FLATTER
 from src.visualisation.pilot_tests.plot_batch_timeseries import plot_timetraces

@@ -37,8 +37,11 @@ def thruster_config(
             T[:, i] = [1, 0, -l_y[i]]
         else:
             az = float(a)
-            T[:, i] = [np.cos(az), np.sin(az),
-                       l_x[i] * np.sin(az) - l_y[i] * np.cos(az)]
+            T[:, i] = [
+                np.cos(az),
+                np.sin(az),
+                l_x[i] * np.sin(az) - l_y[i] * np.cos(az),
+            ]
     return T
 
 
@@ -64,6 +67,7 @@ def optimal_alloc(
     l_y: list[float],
     K_thr: NDArray,
     h: float,
+    x0: NDArray | None = None,
 ) -> tuple[NDArray, NDArray, float]:
     """Constrained control allocation via SQP (scipy SLSQP).
 
@@ -75,9 +79,12 @@ def optimal_alloc(
     def objective(x):
         alpha, u, s = x[:2], x[2:6], x[6:9]
         w1, w2, w3, w4 = 1, 100, 1, 0.1
-        return (w1 * np.dot(u, u) + w2 * np.dot(s, s)
-                + w3 * np.linalg.norm(alpha - alpha_old) ** 2
-                + w4 * np.linalg.norm(u - u_old) ** 2)
+        return (
+            w1 * np.dot(u, u)
+            + w2 * np.dot(s, s)
+            + w3 * np.linalg.norm(alpha - alpha_old) ** 2
+            + w4 * np.linalg.norm(u - u_old) ** 2
+        )
 
     def eq_constraint(x):
         alpha, u, s = x[:2], x[2:6], x[6:9]
@@ -97,10 +104,13 @@ def optimal_alloc(
             c[4 + 2 * j + 1] = max_rate_u + du
         return c
 
-    x0 = np.array([np.deg2rad(-28), np.deg2rad(28),
-                    0, 0, 0, 0, 0, 0, 0])
+    if x0 is None:
+        x0 = np.array([np.deg2rad(-28), np.deg2rad(28), 0, 0, 0, 0, 0, 0, 0])
+    x0 = np.clip(x0, lb, ub)
     result = minimize(
-        objective, x0, method="SLSQP",
+        objective,
+        x0,
+        method="SLSQP",
         bounds=list(zip(lb, ub)),
         constraints=[
             {"type": "eq", "fun": eq_constraint},
@@ -109,4 +119,4 @@ def optimal_alloc(
         options={"disp": False, "maxiter": 200},
     )
     xo = result.x
-    return xo[:2], xo[2:6], float(np.linalg.norm(xo[6:9]))
+    return xo[:2], xo[2:6], np.linalg.norm(xo[6:9])

@@ -7,13 +7,19 @@ and environmental loads into a time-domain simulation.
 
 from __future__ import annotations
 
+import warnings
 from dataclasses import dataclass
 
+from mlflow import config
 import numpy as np
 from numpy.typing import NDArray
 
 from thesis.mss_model.gnc import ssa, rk4
-from thesis.mss_model.thruster import thruster_config, alloc_pseudoinverse, optimal_alloc
+from thesis.mss_model.thruster import (
+    thruster_config,
+    alloc_pseudoinverse,
+    optimal_alloc,
+)
 from thesis.mss_model.control import PIDNonlinearMIMO
 from thesis.mss_model.vessel import OSV
 
@@ -63,6 +69,7 @@ def simulate_osv(cfg: SimConfig | None = None) -> dict[str, NDArray]:
 
     alpha_old = alpha0.copy()
     u_old = np.zeros(4)
+    x0_alloc: np.ndarray | None = None
 
     # PID controller
     M = v.M
@@ -104,9 +111,25 @@ def simulate_osv(cfg: SimConfig | None = None) -> dict[str, NDArray]:
             alpha_c = alpha0.copy()
             u_c = alloc_pseudoinverse(K_max, T_thr, np.eye(4), tau[[0, 1, 5]])
         else:
-            alpha_c, u_c, _ = optimal_alloc(
-                tau[[0, 1, 5]], lb, ub, alpha_old, u_old,
-                l_x, l_y, K_max, cfg.h)
+            with warnings.catch_warnings():
+                warnings.filterwarnings(
+                    "ignore",
+                    message="Values in x were outside bounds",
+                    category=RuntimeWarning,
+                )
+                alpha_c, u_c, slack = optimal_alloc(
+                    tau[[0, 1, 5]],
+                    lb,
+                    ub,
+                    alpha_old,
+                    u_old,
+                    l_x,
+                    l_y,
+                    K_max,
+                    cfg.h,
+                    x0=x0_alloc,
+                )
+            x0_alloc = np.concatenate([alpha_c, u_c, np.full(3, slack)])
             alpha_old = alpha_c.copy()
             u_old = u_c.copy()
 
@@ -121,8 +144,7 @@ def simulate_osv(cfg: SimConfig | None = None) -> dict[str, NDArray]:
         sim_alpha[i] = alpha_c
 
         # RK4 step
-        x = rk4(vessel, cfg.h, x, ui, cfg.Vc, cfg.betaVc,
-                 cfg.Hs, cfg.Tp, cfg.beta_wave)
+        x = rk4(vessel, cfg.h, x, ui, cfg.Vc, cfg.betaVc, cfg.Hs, cfg.Tp, cfg.beta_wave)
         nu = x[:6]
         eta = x[6:]
 
@@ -132,7 +154,21 @@ def simulate_osv(cfg: SimConfig | None = None) -> dict[str, NDArray]:
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
 
-    results = simulate_osv()
+    config = SimConfig(
+        T_final=10800.0,
+        h=0.05,
+        x_ref=0.0,
+        y_ref=0.0,
+        psi_ref=0.0,
+        Vc=0.0,
+        betaVc=np.deg2rad(-140),
+        Hs=0.0,
+        Tp=8.0,
+        beta_wave=0.0,
+        alloc_dynamic=True,
+    )
+
+    results = simulate_osv(config)
     t = results["t"]
     eta = results["eta"]
     nu = results["nu"]

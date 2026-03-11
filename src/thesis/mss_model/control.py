@@ -44,11 +44,13 @@ class PIDNonlinearMIMO:
         else:
             eta3, nu3, M3 = eta, nu, M
 
-        R = np.array([
-            [np.cos(eta3[2]), -np.sin(eta3[2]), 0],
-            [np.sin(eta3[2]),  np.cos(eta3[2]), 0],
-            [0, 0, 1],
-        ])
+        R = np.array(
+            [
+                [np.cos(eta3[2]), -np.sin(eta3[2]), 0],
+                [np.sin(eta3[2]), np.cos(eta3[2]), 0],
+                [0, 0, 1],
+            ]
+        )
 
         M_diag = np.diag(np.diag(M3))
         Kp = M_diag @ wn @ wn
