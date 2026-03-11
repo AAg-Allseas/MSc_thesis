@@ -43,7 +43,7 @@ import gc
 @mlflow.trace(name="toy_model")
 def toy_model_simulation():
     """Benchmark the NumPy/CPU toy DP model over the same time horizon as the neural SDEs."""
-    RUNTIME = 10800       # seconds – same as neural SDE benchmarks
+    RUNTIME = 10800  # seconds – same as neural SDE benchmarks
     DT = 0.05
     N = int(RUNTIME // DT)
     SEED = 0
@@ -51,14 +51,16 @@ def toy_model_simulation():
     SIGMA_F = np.array([50e3, 0, 0])
 
     with mlflow.start_run(run_name="toy_model", nested=True):
-        mlflow.log_params({
-            "framework": "numpy",
-            "model": "ToyDPModel",
-            "runtime_s": RUNTIME,
-            "dt": DT,
-            "n_timesteps": N,
-            "seed": SEED,
-        })
+        mlflow.log_params(
+            {
+                "framework": "numpy",
+                "model": "ToyDPModel",
+                "runtime_s": RUNTIME,
+                "dt": DT,
+                "n_timesteps": N,
+                "seed": SEED,
+            }
+        )
 
         with mlflow.start_span(name="setup"):
             rng = np.random.default_rng(SEED)
@@ -66,8 +68,11 @@ def toy_model_simulation():
 
             noise_dt = 0.05
             f_ext = ou_generate_uniform(
-                int(RUNTIME // noise_dt), noise_dt,
-                mu=MU_F, sigma=SIGMA_F, rng=rng,
+                int(RUNTIME // noise_dt),
+                noise_dt,
+                mu=MU_F,
+                sigma=SIGMA_F,
+                rng=rng,
             )
             f_ext = resample_from_base(f_ext, noise_dt, DT, N * DT)
 
@@ -82,17 +87,24 @@ def toy_model_simulation():
             for i in range(N + 1):
                 u_control = vessel.DPcontrol(eta, nu, DT)
                 nu, u_actual = vessel.dynamics(
-                    eta, nu, u_actual, u_control, DT, f_external=f_ext[i],
+                    eta,
+                    nu,
+                    u_actual,
+                    u_control,
+                    DT,
+                    f_external=f_ext[i],
                 )
                 eta = attitudeEuler(eta, nu, DT)
                 trajectory[i, :6] = eta
                 trajectory[i, 6:] = u_actual
             t_elapsed = time.perf_counter() - t_start
 
-        mlflow.log_metrics({
-            "wall_time_s": t_elapsed,
-            "timesteps_per_second": N / t_elapsed,
-        })
+        mlflow.log_metrics(
+            {
+                "wall_time_s": t_elapsed,
+                "timesteps_per_second": N / t_elapsed,
+            }
+        )
 
 
 @mlflow.trace(name="mss_model")
@@ -107,36 +119,40 @@ def mss_model_simulation():
         h=DT,
         Vc=0.5,
         betaVc=np.deg2rad(-140),
-        Hs=2.0,
+        Hs=0.0,
         Tp=8.0,
         beta_wave=np.deg2rad(45),
         alloc_dynamic=True,
     )
 
     with mlflow.start_run(run_name="mss_model", nested=True):
-        mlflow.log_params({
-            "framework": "numpy",
-            "model": "MSS_OSV_6DOF",
-            "runtime_s": RUNTIME,
-            "dt": DT,
-            "n_timesteps": N,
-            "integrator": "RK4",
-            "alloc": "SLSQP_optimal",
-            "Hs": cfg.Hs,
-            "Tp": cfg.Tp,
-            "beta_wave_deg": round(np.rad2deg(cfg.beta_wave), 1),
-            "Vc": cfg.Vc,
-        })
+        mlflow.log_params(
+            {
+                "framework": "numpy",
+                "model": "MSS_OSV_6DOF",
+                "runtime_s": RUNTIME,
+                "dt": DT,
+                "n_timesteps": N,
+                "integrator": "RK4",
+                "alloc": "SLSQP_optimal",
+                "Hs": cfg.Hs,
+                "Tp": cfg.Tp,
+                "beta_wave_deg": round(np.rad2deg(cfg.beta_wave), 1),
+                "Vc": cfg.Vc,
+            }
+        )
 
         with mlflow.start_span(name="simulation"):
             t_start = time.perf_counter()
             results = simulate_osv(cfg)
             t_elapsed = time.perf_counter() - t_start
 
-        mlflow.log_metrics({
-            "wall_time_s": t_elapsed,
-            "timesteps_per_second": N / t_elapsed,
-        })
+        mlflow.log_metrics(
+            {
+                "wall_time_s": t_elapsed,
+                "timesteps_per_second": N / t_elapsed,
+            }
+        )
 
 
 @mlflow.trace(name="torchsde_prior")
@@ -146,14 +162,16 @@ def latent_sde_prior():
     DT = 0.05
 
     with mlflow.start_run(run_name="torchsde_prior", nested=True):
-        mlflow.log_params({
-            "framework": "torchsde",
-            "network": "prior",
-            "batch_size": BATCH_SIZE,
-            "end_time": END_TIME,
-            "dt": DT,
-            "n_timesteps": int(END_TIME / DT),
-        })
+        mlflow.log_params(
+            {
+                "framework": "torchsde",
+                "network": "prior",
+                "batch_size": BATCH_SIZE,
+                "end_time": END_TIME,
+                "dt": DT,
+                "n_timesteps": int(END_TIME / DT),
+            }
+        )
 
         with mlflow.start_span(name="sde_integration"):
             t_start = time.perf_counter()
@@ -172,10 +190,12 @@ def latent_sde_prior():
             del _
             t_elapsed = time.perf_counter() - t_start
 
-        mlflow.log_metrics({
-            "wall_time_s": t_elapsed,
-            "samples_per_second": BATCH_SIZE / t_elapsed,
-        })
+        mlflow.log_metrics(
+            {
+                "wall_time_s": t_elapsed,
+                "samples_per_second": BATCH_SIZE / t_elapsed,
+            }
+        )
 
 
 @mlflow.trace(name="torchsde_posterior")
@@ -220,14 +240,16 @@ def latent_sde_posterior():
             del _
 
     with mlflow.start_run(run_name="torchsde_posterior", nested=True):
-        mlflow.log_params({
-            "framework": "torchsde",
-            "network": "posterior",
-            "batch_size": BATCH_SIZE,
-            "end_time": END_TIME,
-            "dt": DT,
-            "n_timesteps": int(END_TIME / DT),
-        })
+        mlflow.log_params(
+            {
+                "framework": "torchsde",
+                "network": "posterior",
+                "batch_size": BATCH_SIZE,
+                "end_time": END_TIME,
+                "dt": DT,
+                "n_timesteps": int(END_TIME / DT),
+            }
+        )
 
         batched_data_states = torch.cat(
             dataset_states, dim=1
@@ -252,10 +274,12 @@ def latent_sde_posterior():
             del _, batched_data_states, dataset_states
             t_elapsed = time.perf_counter() - t_start
 
-        mlflow.log_metrics({
-            "wall_time_s": t_elapsed,
-            "samples_per_second": BATCH_SIZE / t_elapsed,
-        })
+        mlflow.log_metrics(
+            {
+                "wall_time_s": t_elapsed,
+                "samples_per_second": BATCH_SIZE / t_elapsed,
+            }
+        )
 
     # Clean up GPU objects that survive past the `del` above
     del dataset, dataloader
@@ -296,19 +320,20 @@ def diffrax_sde_train_step():
     xs_batch = jr.normal(data_key, (BATCH_SIZE, SAMPLE_LENGTH, DATA_SIZE))
 
     with mlflow.start_run(run_name="diffrax_train_step", nested=True):
-        mlflow.log_params({
-            "framework": "diffrax",
-            "network": "train_step",
-            "batch_size": BATCH_SIZE,
-            "sample_length": SAMPLE_LENGTH,
-            "dt": DT,
-            "lr_init": LR_INIT,
-            "n_steps": N_STEPS,
-            "latent_size": LATENT_SIZE,
-            "context_size": CONTEXT_SIZE,
-            "hidden_size": HIDDEN_SIZE,
-        })
-
+        mlflow.log_params(
+            {
+                "framework": "diffrax",
+                "network": "train_step",
+                "batch_size": BATCH_SIZE,
+                "sample_length": SAMPLE_LENGTH,
+                "dt": DT,
+                "lr_init": LR_INIT,
+                "n_steps": N_STEPS,
+                "latent_size": LATENT_SIZE,
+                "context_size": CONTEXT_SIZE,
+                "hidden_size": HIDDEN_SIZE,
+            }
+        )
 
         with mlflow.start_span(name="jit_compilation"):
             # Warmup: JIT compilation
@@ -331,12 +356,14 @@ def diffrax_sde_train_step():
             jax.block_until_ready(loss)
             t_elapsed = time.perf_counter() - t_start
 
-            mlflow.log_metrics({
-                "wall_time_s": t_elapsed,
-                "time_per_step_s": t_elapsed / N_STEPS,
-                "samples_per_second": BATCH_SIZE * N_STEPS / t_elapsed,
-                "final_loss": float(loss),
-            })
+            mlflow.log_metrics(
+                {
+                    "wall_time_s": t_elapsed,
+                    "time_per_step_s": t_elapsed / N_STEPS,
+                    "samples_per_second": BATCH_SIZE * N_STEPS / t_elapsed,
+                    "final_loss": float(loss),
+                }
+            )
 
 
 @mlflow.trace(name="diffrax_prior_sample")
@@ -363,17 +390,19 @@ def diffrax_sde_sample():
     ts = jnp.arange(0, END_TIME, DT)
 
     with mlflow.start_run(run_name="diffrax_prior_sample", nested=True):
-        mlflow.log_params({
-            "framework": "diffrax",
-            "network": "prior",
-            "n_samples": N_SAMPLES,
-            "end_time": END_TIME,
-            "dt": DT,
-            "n_timesteps": int(END_TIME / DT),
-            "latent_size": LATENT_SIZE,
-            "context_size": CONTEXT_SIZE,
-            "hidden_size": HIDDEN_SIZE,
-        })
+        mlflow.log_params(
+            {
+                "framework": "diffrax",
+                "network": "prior",
+                "n_samples": N_SAMPLES,
+                "end_time": END_TIME,
+                "dt": DT,
+                "n_timesteps": int(END_TIME / DT),
+                "latent_size": LATENT_SIZE,
+                "context_size": CONTEXT_SIZE,
+                "hidden_size": HIDDEN_SIZE,
+            }
+        )
 
         # Warmup: JIT compilation
         with mlflow.start_span(name="jit_compilation"):
@@ -391,11 +420,13 @@ def diffrax_sde_sample():
             jax.block_until_ready(samples)
             t_elapsed = time.perf_counter() - t_start
 
-            mlflow.log_metrics({
-                "wall_time_s": t_elapsed,
-                "time_per_sample_s": t_elapsed / N_SAMPLES,
-                "samples_per_second": N_SAMPLES / t_elapsed,
-            })
+            mlflow.log_metrics(
+                {
+                    "wall_time_s": t_elapsed,
+                    "time_per_sample_s": t_elapsed / N_SAMPLES,
+                    "samples_per_second": N_SAMPLES / t_elapsed,
+                }
+            )
 
 
 def _log_gpu(tag: str):
@@ -404,10 +435,12 @@ def _log_gpu(tag: str):
         return
     alloc = torch.cuda.memory_allocated() / 1e9
     reserved = torch.cuda.memory_reserved() / 1e9
-    mlflow.log_metrics({
-        f"gpu_allocated_gb_{tag}": round(alloc, 3),
-        f"gpu_reserved_gb_{tag}": round(reserved, 3),
-    })
+    mlflow.log_metrics(
+        {
+            f"gpu_allocated_gb_{tag}": round(alloc, 3),
+            f"gpu_reserved_gb_{tag}": round(reserved, 3),
+        }
+    )
     print(f"[GPU {tag}] allocated={alloc:.3f} GB  reserved={reserved:.3f} GB")
 
 
@@ -423,7 +456,7 @@ if __name__ == "__main__":
 
     with mlflow.start_run(run_name="profiling"):
         # CPU-only models first (no GPU contention).
-        toy_model_simulation()
+        # toy_model_simulation()
         mss_model_simulation()
 
         # Run PyTorch first — JAX pre-allocates GPU memory that isn't
