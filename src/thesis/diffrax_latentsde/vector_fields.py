@@ -13,6 +13,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from time import time
 from typing import Any
+import os
 
 import equinox as eqx
 import jax
@@ -105,6 +106,9 @@ class TimeStateField(eqx.Module):
         Returns:
             Output of the vector field (same shape as y).
         """
+        if os.environ.get("DEBUG_PRINT", "0") == "1":
+            print("[DEBUG] JIT compiling: TimeStateField.__call__")
+
         t = jnp.asarray(t)
         out = self.mlp(jnp.concatenate([t[None], y])).reshape(-1, self.control_size)
         if self.control_size == 1:
@@ -158,6 +162,8 @@ class StateField(eqx.Module):
         self.control_size = config.control_size
 
     def __call__(self, t: jnp.ndarray, y: jnp.ndarray, args: Any) -> jnp.ndarray:
+        import os
+
         """
         Evaluates the vector field at a given state.
 
@@ -169,6 +175,9 @@ class StateField(eqx.Module):
         Returns:
             Output of the vector field (same shape as y).
         """
+        if os.environ.get("DEBUG_PRINT", "0") == "1":
+            print("[DEBUG] JIT compiling: StateField.__call__")
+
         out = self.mlp(y).reshape(-1, self.control_size)
         if self.control_size == 1:
             out = out.squeeze(axis=-1)
@@ -221,6 +230,9 @@ class ContextTimeStateField(eqx.Module):
         self.control_size = config.control_size
 
     def __call__(self, t: jnp.ndarray, y: jnp.ndarray, args: Any) -> jnp.ndarray:
+
+        if os.environ.get("DEBUG_PRINT", "0") == "1":
+            print("[DEBUG] JIT compiling: ContextTimeStateField.__call__")
         """
         Evaluates the vector field at a given time, state, and context.
 
@@ -297,7 +309,10 @@ class ContextStateField(eqx.Module):
 
         Returns:
             Output of the vector field (same shape as y or output_size).
-        """
+        """ 
+        if os.environ.get("DEBUG_PRINT", "0") == "1":
+            print("[DEBUG] JIT compiling: ContextStateField.__call__")
+
         ts, ctx = args
         i = jnp.minimum(jnp.searchsorted(ts, t, side="right"), ts.shape[0] - 1)
         out = self.mlp(jnp.concatenate([y, ctx[i]])).reshape(-1, self.control_size)

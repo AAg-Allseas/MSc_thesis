@@ -1,3 +1,4 @@
+
 import subprocess
 import os
 
@@ -56,6 +57,8 @@ def loss_fn(
         kl_path: KL divergence accumulated along the SDE path.
         log_pxs: Log likelihood of data given latent path.
     """
+    if os.environ.get("DEBUG_PRINT", "0") == "1":
+        print("[DEBUG] JIT compiling: loss_fn")
     log_pxs, kl_initial, kl_path = sde(xs, ts, key=key)
     return -log_pxs + kl_weight * (kl_initial + kl_path), kl_initial, kl_path, log_pxs
 
@@ -70,6 +73,9 @@ def batch_loss_fn(
     kl_weight: float = 1.0,
 ) -> tuple[jnp.ndarray, jnp.ndarray, jnp.ndarray, jnp.ndarray]:
     """Mean loss over a batch. xs_batch shape: (batch, T, data_size)."""
+    if os.environ.get("DEBUG_PRINT", "0") == "1":
+        print("[DEBUG] JIT compiling: batch_loss_fn")
+
     batch_size = xs_batch.shape[0]
     keys = jr.split(key, batch_size)
     # losses shape: (batch, 4) if loss_fn returns 4 values
@@ -85,7 +91,7 @@ def batch_loss_fn(
     )
 
 
-def increase_update_initial(updates, sde):
+def increase_update_initial(updates: optax.Updates, sde: LatentSDE) -> optax.Updates:
     """Multiply gradient updates for initial condition params (pz0_mean, pz0_logvar, qz0_posterior) by 10."""
     initial_leaves = lambda u: [
         u.pz0_mean,
@@ -98,8 +104,18 @@ def increase_update_initial(updates, sde):
 
 @eqx.filter_jit
 def train_step(
-    sde: LatentSDE, opt_state, optimizer, xs_batch, ts, *, key, kl_weight: float = 1.0
-):
+        sde: LatentSDE, 
+        opt_state: optax.OptState, 
+        optimizer: optax.GradientTransformationExtraArgs, 
+        xs_batch: jnp.ndarray, 
+        ts: jnp.ndarray, 
+        *, key: jr.PRNGKey, 
+        kl_weight: float = 1.0, 
+
+        ) -> tuple[LatentSDE, optax.OptState, jnp.ndarray, jnp.ndarray, jnp.ndarray, jnp.ndarray]:
+    if os.environ.get("DEBUG_PRINT", "0") == "1":
+        print("[DEBUG] JIT compiling: train_step")
+
     # batch_loss_fn returns (elbo, kl_initial, kl_path, log_pxs)
     (elbo, (kl_initial, kl_path, log_pxs)), grads = eqx.filter_value_and_grad(batch_loss_fn, has_aux=True)(
         sde, xs_batch, ts, key=key, kl_weight=kl_weight
@@ -111,6 +127,16 @@ def train_step(
 
 
 def main(data_path: Path, checkpoint_path: Path) -> None:
+    if os.environ.get("DEBUG_PRINT", "0") == "1":
+        print("[DEBUG] JAX devices:", jax.devices())
+        print(f"[DEBUG] JAX default device: {jax.default_backend()}")
+        # Check if CUDA is available and which JAX backend is being used
+        cuda_devices = [d for d in jax.devices() if d.platform == "gpu"]
+        if cuda_devices:
+            print(f"[DEBUG] JAX is using CUDA (GPU). CUDA devices: {cuda_devices}")
+        else:
+            print("[DEBUG] JAX is NOT using CUDA (GPU). Running on CPU.")
+
     # --- Hyperparameters ---
     # Model params
     DATA_SIZE = 12
@@ -127,13 +153,12 @@ def main(data_path: Path, checkpoint_path: Path) -> None:
     LR_INIT = 1e-3 
     NUM_EPOCHS = 1000
     KL_ANNEAL_ITERS = 200
-    BATCH_SIZE = 32
+    BATCH_SIZE = 256
     DT = 0.2
     SAMPLE_LENGTH = 5000 
     LOG_EVERY = 10
     SAMPLE_EVERY = 250
     CHECKPOINT_EVERY = 250
-
 
     # --- Model ---
     key = jax.random.key(7777)
@@ -184,10 +209,7 @@ def main(data_path: Path, checkpoint_path: Path) -> None:
         "rpm_fixed_sb",
     ]
 
-
-
     checkpoint_path.mkdir(parents=True, exist_ok=True)
-
 
     files = find_parquet_files(
         data_path,
@@ -209,6 +231,7 @@ def main(data_path: Path, checkpoint_path: Path) -> None:
 
 
     # --- Training loop ---
+    import time
     with mlflow.start_run(run_name=f"latentsde_diffrax_bs{BATCH_SIZE}_lr{LR_INIT}_"):
         mlflow.log_params(
             {
@@ -232,12 +255,13 @@ def main(data_path: Path, checkpoint_path: Path) -> None:
 
         global_step = 0
         best_loss = float("inf")
+        train_start_time = time.time()
+        batch_start_time = time.time()
 
         for epoch in range(NUM_EPOCHS):
             epoch_key = jr.fold_in(train_key, epoch)
             kl_weight = min(1.0, epoch / KL_ANNEAL_ITERS)
             epoch_losses = []
-
 
             for i, (ts_batch, xs_batch, meta) in enumerate(dataloader):
                 # Validate aligned timesteps across the batch
@@ -264,7 +288,7 @@ def main(data_path: Path, checkpoint_path: Path) -> None:
                     xs,
                     ts,
                     key=step_key,
-                    kl_weight=kl_weight,
+                    kl_weight=kl_weight
                 )
 
                 elbo_val = float(elbo)
@@ -275,6 +299,8 @@ def main(data_path: Path, checkpoint_path: Path) -> None:
 
                 if global_step % LOG_EVERY == 0:
                     lr_now = float(schedule(global_step))
+                    batch_time = (time.time() - batch_start_time) / LOG_EVERY
+                    batch_start_time = time.time()
                     mlflow.log_metrics(
                         {
                             "batch_loss": elbo_val,
@@ -283,6 +309,7 @@ def main(data_path: Path, checkpoint_path: Path) -> None:
                             "log_pxs": log_pxs_val,
                             "learning_rate": lr_now,
                             "kl_weight": kl_weight,
+                            "batch_time": batch_time,
                         },
                         step=global_step,
                     )
@@ -339,6 +366,8 @@ def main(data_path: Path, checkpoint_path: Path) -> None:
         mlflow.log_artifact(
             str(checkpoint_path / "best.eqx"), artifact_path="checkpoints"
         )
+        wall_time = time.time() - train_start_time
+        mlflow.log_metric("wall_time", wall_time)
         print(f"Training complete. Best loss: {best_loss:.4f}")
 
 
@@ -349,5 +378,6 @@ if __name__ == "__main__":
         r"C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\data"
     )
     checkpoint_path = Path("runs/latentSDE/checkpoints")
+    os.environ["DEBUG_PRINT"] = "1"  # Enable debug prints
 
     main(data_path, checkpoint_path)

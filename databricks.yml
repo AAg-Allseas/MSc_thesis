@@ -63,4 +63,11 @@ resources:
             notebook_path: src/notebooks/diffrax_latent_sde.ipynb
           existing_cluster_id:
             0212-141545-suh1awug
+      email_notifications:
+        on_start: []
+        on_success: 
+          - aag@allseas.com
+        on_failure:
+          - aag@allseas.com
+
 

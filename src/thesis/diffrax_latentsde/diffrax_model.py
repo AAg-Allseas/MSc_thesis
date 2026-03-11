@@ -4,6 +4,7 @@ import jax
 import jax.numpy as jnp
 import jax.random as jr
 import mlflow
+import os
 
 from thesis.diffrax_latentsde.utils import Encoder
 from thesis.diffrax_latentsde.vector_fields import (
@@ -214,6 +215,9 @@ class LatentSDE(eqx.Module):
             u^2 = 0.5 * (f - h)^T @ (g g^T)^{-1} @ (f - h)
         where g g^T is the diffusion covariance matrix (latent_size, latent_size).
         """
+        if os.environ.get("DEBUG_PRINT", "0") == "1":
+            print("[DEBUG] JIT compiling: LatentSDE.drift")
+
         y_state = y[..., :-1]  # Strip KL accumulator
         z_f = self.f(t, y_state, args)
         z_h = self.h(t, y_state, args)
@@ -229,6 +233,8 @@ class LatentSDE(eqx.Module):
         return jnp.append(z_f, kl_rate)
 
     def diffusion(self, t: jnp.ndarray, y: jnp.ndarray, args) -> jnp.ndarray:
+        if os.environ.get("DEBUG_PRINT", "0") == "1":
+            print("[DEBUG] JIT compiling: LatentSDE.diffusion")
         y_state = y[..., :-1]
         g_val = self.g(t, y_state, args)
         # Diagonal matrix for augmented state: [g(z), 0]
