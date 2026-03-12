@@ -1,4 +1,4 @@
-
+from typing import Optional
 import subprocess
 import os
 
@@ -18,6 +18,7 @@ if __name__ == "__main__":
         print(f"Installing: {latest_local}")
         subprocess.run(["pip", "install", latest_local], check=True)
 
+from thesis.diffrax_latentsde.jax_dataset import JAXParquetDataset
 from thesis.diffrax_latentsde.vector_fields import FieldConfig, FieldType
 from thesis.prototyping.dataloader import ParquetDataset
 from thesis.prototyping.data_handling import find_parquet_files
@@ -127,15 +128,11 @@ def train_step(
 
 
 def main(data_path: Path, checkpoint_path: Path) -> None:
+    cuda_available = any(d.platform == 'gpu' for d in jax.devices())
+    device = jax.devices('gpu')[0] if cuda_available else jax.devices('cpu')[0]
     if os.environ.get("DEBUG_PRINT", "0") == "1":
         print("[DEBUG] JAX devices:", jax.devices())
-        print(f"[DEBUG] JAX default device: {jax.default_backend()}")
-        # Check if CUDA is available and which JAX backend is being used
-        cuda_devices = [d for d in jax.devices() if d.platform == "gpu"]
-        if cuda_devices:
-            print(f"[DEBUG] JAX is using CUDA (GPU). CUDA devices: {cuda_devices}")
-        else:
-            print("[DEBUG] JAX is NOT using CUDA (GPU). Running on CPU.")
+        print(f"[DEBUG] JAX default device: {jax.default_backend()}, using device: {device}")
 
     # --- Hyperparameters ---
     # Model params
@@ -151,18 +148,18 @@ def main(data_path: Path, checkpoint_path: Path) -> None:
 
     # Training params
     LR_INIT = 1e-3 
-    NUM_EPOCHS = 1000
+    NUM_EPOCHS = 1
     KL_ANNEAL_ITERS = 200
-    BATCH_SIZE = 256
+    BATCH_SIZE = 32
     DT = 0.2
     SAMPLE_LENGTH = 5000 
-    LOG_EVERY = 10
+    LOG_EVERY = 1
     SAMPLE_EVERY = 250
     CHECKPOINT_EVERY = 250
 
     # --- Model ---
     key = jax.random.key(7777)
-    model_key, train_key = jr.split(key)
+    model_key, train_key, loader_key = jr.split(key, 3)
 
     f_key, h_key, g_key, model_key = jr.split(model_key, 4)
 
@@ -213,22 +210,27 @@ def main(data_path: Path, checkpoint_path: Path) -> None:
 
     files = find_parquet_files(
         data_path,
-        lambda m: m["end_time"] == 10800 and m["timestep"] == 0.05,
+        lambda m: m["end_time"] == 10800 and m["timestep"] == 0.05 and m["seed"] < 2
     )
-    dataset = ParquetDataset(
+    dataset = JAXParquetDataset(
         files, columns=FEATS, sample_length=SAMPLE_LENGTH, standardise=True
     )
-    dataloader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=0)
+
     print(
-        f"Loaded {len(files)} files, {len(dataset)} samples, {len(dataloader)} batches/epoch"
+        f"Loaded {len(files)} files, {len(dataset)} samples"
     )
 
 
     # --- Optimiser ---
-    schedule = optax.schedules.cosine_onecycle_schedule(transition_steps = NUM_EPOCHS * len(dataloader), peak_value=LR_INIT, pct_start=0.1)
+    schedule = optax.schedules.cosine_onecycle_schedule(transition_steps = NUM_EPOCHS * dataset.steps_per_epoch(BATCH_SIZE), peak_value=LR_INIT, pct_start=0.1)
     optimizer = optax.adam(schedule)
     opt_state = optimizer.init(eqx.filter(sde, eqx.is_array))
 
+    # --- Move model to GPU ---
+   
+    sde = jax.device_put(sde, device)
+    if os.environ.get("DEBUG_PRINT", "0") == "1":
+        print(f"[DEBUG] Model moved to device: {device}")
 
     # --- Training loop ---
     import time
@@ -263,23 +265,7 @@ def main(data_path: Path, checkpoint_path: Path) -> None:
             kl_weight = min(1.0, epoch / KL_ANNEAL_ITERS)
             epoch_losses = []
 
-            for i, (ts_batch, xs_batch, meta) in enumerate(dataloader):
-                # Validate aligned timesteps across the batch
-                t = ts_batch[0]
-                if not torch.allclose(
-                    ts_batch, t.unsqueeze(0).expand_as(ts_batch), atol=0.005
-                ):
-                    print(f"Skipping batch {i} — misaligned timesteps")
-                    continue
-
-                # Skip incomplete batches (last batch may be smaller)
-                if xs_batch.shape[0] != BATCH_SIZE:
-                    continue
-
-                # Convert to JAX arrays: ts (T,), xs (batch, T, data_size)
-                ts = jnp.asarray(t.numpy())
-                xs = jnp.asarray(xs_batch.numpy())
-
+            for i, (ts, xs, _) in enumerate(dataset.iter_batches(BATCH_SIZE, key=epoch_key, device=device)):
                 step_key = jr.fold_in(epoch_key, i)
                 sde, opt_state, elbo, kl_initial, kl_path, log_pxs = train_step(
                     sde,
@@ -356,28 +342,72 @@ def main(data_path: Path, checkpoint_path: Path) -> None:
                     ax.set_title(FEATS[j])
                 fig.suptitle(f"Prior samples — Epoch {epoch}")
                 plt.tight_layout()
-                mlflow.log_figure(fig, f"samples/epoch_{epoch:05d}.png")
+                mlflow.log_figure(fig, f"samples/epoch_{epoch:05d}.pdf")
                 plt.close(fig)
+        # Log final metrics
+        lr_now = float(schedule(global_step))
+        batch_time = (time.time() - batch_start_time) / LOG_EVERY
+        batch_start_time = time.time()
+        mlflow.log_metrics(
+            {
+                "batch_loss": elbo_val,
+                "kl_initial": kl_initial_val,
+                "kl_path": kl_path_val,
+                "log_pxs": log_pxs_val,
+                "learning_rate": lr_now,
+                "kl_weight": kl_weight,
+                "batch_time": batch_time,
+            },
+            step=global_step,
+        )
 
         # Save final model + log as artifact
-        final_path = checkpoint_path / "final.eqx"
-        eqx.tree_serialise_leaves(final_path, sde)
-        mlflow.log_artifact(str(final_path), artifact_path="checkpoints")
-        mlflow.log_artifact(
-            str(checkpoint_path / "best.eqx"), artifact_path="checkpoints"
-        )
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp_path = Path(tmpdir) / f"final.eqx"
+            eqx.tree_serialise_leaves(tmp_path, sde)
+            mlflow.log_artifact(str(tmp_path), artifact_path="checkpoint")
+
+
         wall_time = time.time() - train_start_time
         mlflow.log_metric("wall_time", wall_time)
         print(f"Training complete. Best loss: {best_loss:.4f}")
-
+        # Stop JAX profiler
 
 if __name__ == "__main__":
- 
+
     mlflow.set_experiment("diffrax_latentsde_local")
     data_path = Path(
         r"C:\Users\AAg\OneDrive - Allseas Engineering BV\Documents\Thesis\data"
     )
     checkpoint_path = Path("runs/latentSDE/checkpoints")
     os.environ["DEBUG_PRINT"] = "1"  # Enable debug prints
-
+    
+    # cProfile profiling
+    import cProfile
+    import pstats
+    from io import StringIO
+    
+    pr = cProfile.Profile()
+    pr.enable()
+    
     main(data_path, checkpoint_path)
+    
+    pr.disable()
+    
+    # Print profiling results
+    s = StringIO()
+    ps = pstats.Stats(pr, stream=s).sort_stats('cumulative')
+    ps.print_stats(30)  # Top 30 functions
+    profile_output = s.getvalue()
+    print("\n" + "="*80)
+    print("PROFILING RESULTS (Top 30 functions by cumulative time):")
+    print("="*80)
+    print(profile_output)
+    
+    # Save profile to file
+    profile_path = Path("runs/latentSDE/profile.txt")
+    profile_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(profile_path, "w") as f:
+        f.write(profile_output)
+    print(f"\nProfile saved to: {profile_path}")
+
